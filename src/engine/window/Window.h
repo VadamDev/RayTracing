@@ -1,48 +1,54 @@
-#ifndef WINDOW_H
-#define WINDOW_H
+#pragma once
 
+#include <string>
+#include <utility>
 #include <GLFW/glfw3.h>
 
-namespace window
+namespace engine
 {
     class Window
     {
 
     public:
-        Window(const int width, const int height, std::string title)
+        explicit Window(const int width, const int height, std::string title)
             : width(width), height(height), title(std::move(title)) {}
 
         ~Window();
 
+        /*
+           Window Management
+         */
+
         GLFWwindow* create();
+
         void update();
+        void swapBuffers() const;
 
         /*
            Getters
          */
 
-        bool shouldClose();
+        bool shouldClose() const;
 
-        int getWidth() const
-        {
-            return width;
-        }
+        int getWidth() const { return width; }
+        int getHeight() const { return height; }
+        float getAspectRatio() const { return (float) width / height; }
+        std::string getTitle() const { return title; }
 
-        int getHeight() const
-        {
-            return height;
-        }
+        /*
+           Setters
+         */
 
-        std::string getTitle()
-        {
-            return title;
-        }
+        void setTitle(std::string title);
+
     private:
         int width, height;
         std::string title;
 
         GLFWwindow *window = nullptr;
+
+        bool resized = true;
+
+        void setupCallbacks();
     };
 }
-
-#endif

@@ -1,38 +1,21 @@
-#include <chrono>
-#include <iostream>
+#include <memory>
 
+#include "engine/clock/FixedStepClock.h"
 #include "engine/window/Window.h"
+#include "game/Game.h"
 
-using window::Window;
-using std::chrono::high_resolution_clock;
+using namespace game;
 
 int main()
 {
-    Window window(960, 540, "test");
+    engine::Window window(960, 540, "GLFW Window");
     if (!window.create())
         return -1;
 
-    std::cout << "Width: " << window.getWidth() << " | Height: " << window.getHeight() << std::endl;
-    std::cout << window.getTitle() << std::endl;
+    Game game(&window);
 
-    auto lastFrame = high_resolution_clock::now();
-
-    int frames = 0;
-    while (!window.shouldClose())
-    {
-        auto now = high_resolution_clock::now();
-
-        if (now - lastFrame > std::chrono::seconds(1))
-        {
-            std::cout << "FPS: " << frames << std::endl;
-
-            frames = 0;
-            lastFrame = now;
-        }
-
-        window.update();
-        frames++;
-    }
+    const auto clock = std::make_unique<engine::FixedStepClock>(&window, &game);
+    game.start(clock.get());
 
     return 0;
 }
