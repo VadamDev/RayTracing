@@ -1,3 +1,4 @@
+#include <iostream>
 #include <memory>
 
 #include "engine/clock/FixedStepClock.h"
@@ -10,7 +11,10 @@ int main()
 {
     engine::Window window(960, 540, "GLFW Window");
     if (!window.create())
+    {
+        std::cerr << "Failed to initialize the window" << std::endl;
         return -1;
+    }
 
     Game game(&window);
 

@@ -3,8 +3,9 @@ project(GravitySim)
 
 set(CMAKE_CXX_STANDARD 20)
 
+find_package(glad CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
-find_package(OpenGL REQUIRED)
+find_package(glm CONFIG REQUIRED)
 
 add_executable(GravitySim ../GravitySim/src/main.cpp
         ../GravitySim/src/engine/window/Window.cpp
@@ -19,6 +20,8 @@ add_executable(GravitySim ../GravitySim/src/main.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
-        glfw
-        OpenGL::GL
+        PRIVATE
+            glad::glad
+            glfw
+            glm::glm
 )

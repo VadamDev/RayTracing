@@ -21,8 +21,8 @@ namespace engine
 
         GLFWwindow* create();
 
-        void update();
-        void swapBuffers() const;
+        void pushFrame();
+        void popFrame() const;
 
         /*
            Getters

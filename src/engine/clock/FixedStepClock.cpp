@@ -46,9 +46,9 @@ namespace engine
 
                 game->processInputs(deltaTime);
 
-                window->update();
+                window->pushFrame();
                 game->render(deltaTime);
-                window->swapBuffers();
+                window->popFrame();
 
                 frames++;
                 lastRenderTime = now;

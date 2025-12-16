@@ -1,4 +1,5 @@
 #include <iostream>
+#include <glad/glad.h>
 
 #include "Window.h"
 
@@ -16,7 +17,7 @@ namespace engine
     {
         //Initializing GLFW
         glfwSetErrorCallback([](int error, const char* description) {
-            std::cerr << "Caught a GLFW error [" << error << "]: " << description << std::endl;
+            std::cerr << "Caught a GLFW error [" << error << "]: " << std::endl << description << std::endl;
         });
 
         if (!glfwInit())
@@ -27,8 +28,8 @@ namespace engine
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
@@ -54,11 +55,17 @@ namespace engine
         glfwMakeContextCurrent(window);
         glfwSwapInterval(0);
 
+        //Create OpenGL capabilities
+        if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
+        {
+            std::cerr << "Failed to initialize OpenGL context" << std::endl;
+            return nullptr;
+        }
+
         //Show the window
         glfwShowWindow(window);
 
-        //Create OpenGL capabilities
-        //TODO: glad
+        std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 
         return window;
     }
@@ -77,25 +84,23 @@ namespace engine
         //TODO: actually setup callbacks
     }
 
-    void Window::update()
+    void Window::pushFrame()
     {
         if (resized)
         {
             glViewport(0, 0, width, height);
-
-            std::cout << "Resized! | dimensions: " << width << " / " << height << std::endl;
             resized = false;
         }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glfwPollEvents();
     }
 
-    void Window::swapBuffers() const
+
+    void Window::popFrame() const
     {
+        glfwPollEvents();
         glfwSwapBuffers(window);
     }
-
 
     /*
        Getters
