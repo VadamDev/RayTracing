@@ -1,7 +1,3 @@
-//
-// Created by Edgar on 12/12/2025.
-//
-
 #include "Game.h"
 
 namespace game
