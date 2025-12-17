@@ -30,8 +30,8 @@ namespace engine
         {
             const auto now = steady_clock::now();
 
-            const uint64_t elapsedSinceLastUpdate = duration_cast<nanoseconds>(now - lastUpdateTime).count();
-            const uint64_t elapsedSinceLastRender = duration_cast<nanoseconds>(now - lastRenderTime).count();
+            const int64_t elapsedSinceLastUpdate = duration_cast<nanoseconds>(now - lastUpdateTime).count();
+            const int64_t elapsedSinceLastRender = duration_cast<nanoseconds>(now - lastRenderTime).count();
 
             if (elapsedSinceLastUpdate >= updateTime)
             {

@@ -4,7 +4,7 @@
 
 namespace engine
 {
-    static constexpr uint64_t NANO = 1e9;
+    static constexpr int64_t NANO = 1e9;
     static constexpr float NANO_F = 1e9f;
 
     class FixedStepClock : public AbstractClock {
@@ -46,7 +46,7 @@ namespace engine
 
     private:
         int targetUps = 30, targetFps = 60;
-        uint64_t updateTime = NANO / targetUps, renderTime = NANO / targetFps;
+        int64_t updateTime = NANO / targetUps, renderTime = NANO / targetFps;
 
         int ups = 0, fps = 0;
 
