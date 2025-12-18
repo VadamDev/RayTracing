@@ -7,19 +7,12 @@ find_package(glad CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 
-add_executable(GravitySim ../GravitySim/src/main.cpp
-        ../GravitySim/src/engine/window/Window.cpp
-        ../GravitySim/src/engine/window/Window.h
-        src/engine/AbstractGame.h
+add_executable(GravitySim
+        src/main.cpp
+        src/engine/window/Window.cpp
         src/game/Game.cpp
-        src/game/Game.h
-        src/engine/clock/AbstractClock.h
         src/engine/clock/FixedStepClock.cpp
-        src/engine/clock/FixedStepClock.h
-        src/engine/GameLogic.h
         src/engine/graphics/shader/ShaderProgram.cpp
-        src/engine/graphics/shader/ShaderProgram.h
-        src/engine/utils/FileReader.h
 )
 
 target_link_libraries(${PROJECT_NAME}
