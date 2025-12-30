@@ -1,6 +1,7 @@
 #include "FixedStepClock.h"
+
 #include <chrono>
-#include <iostream>
+#include <spdlog/spdlog.h>
 
 using namespace std::chrono;
 
@@ -9,6 +10,14 @@ namespace engine
     void FixedStepClock::start()
     {
         running = true;
+
+        try { game->init(); }
+        catch (std::exception &e)
+        {
+            spdlog::critical("A critical exception has been caught during game init:\n{}", e.what());
+            return;
+        }
+
         loop();
     }
 
@@ -35,20 +44,33 @@ namespace engine
 
             if (elapsedSinceLastUpdate >= updateTime)
             {
-                game->update();
+                try { game->update(); }
+                catch (std::runtime_error &e)
+                {
+                    spdlog::critical("An error has been caught during game update:\n{}", e.what());
+                    break;
+                }
 
                 updates++;
                 lastUpdateTime = now;
             }
-            else if (elapsedSinceLastRender >= renderTime)
+            else if (ignoreFpsCap || elapsedSinceLastRender >= renderTime)
             {
                 const float deltaTime = elapsedSinceLastRender / NANO_F;
 
-                game->processInputs(deltaTime);
+                try
+                {
+                    game->processInputs(deltaTime);
 
-                window->pushFrame();
-                game->render(deltaTime);
-                window->popFrame();
+                    window->pushFrame();
+                    game->render(deltaTime);
+                    window->popFrame();
+                }
+                catch (std::runtime_error &e)
+                {
+                    spdlog::critical("An error has been caught during frame render:\n{}", e.what());
+                    break;
+                }
 
                 frames++;
                 lastRenderTime = now;
@@ -56,13 +78,18 @@ namespace engine
 
             if (duration_cast<milliseconds>(now - timer).count() >= 1000)
             {
-                std::cout << "FPS: " << frames << " | UPS: " << updates << std::endl;
+                ups = updates;
+                fps = frames;
 
                 updates = 0;
                 frames = 0;
 
                 timer = now;
+
+                spdlog::info("FPS: {} | UPS: {}", fps, ups);
             }
         }
+
+        game->destroy();
     }
 }

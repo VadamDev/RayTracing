@@ -1,8 +1,9 @@
 #pragma once
 
+#include <glad/glad.h> //Prevent the compiler from bitching, GLAD need to be loaded before GLFW
+#include <GLFW/glfw3.h>
 #include <string>
 #include <utility>
-#include <GLFW/glfw3.h>
 
 namespace engine
 {
@@ -12,17 +13,16 @@ namespace engine
     public:
         explicit Window(const int width, const int height, std::string title)
             : width(width), height(height), title(std::move(title)) {}
-
         ~Window();
 
         /*
            Window Management
          */
 
-        GLFWwindow* create();
+        void create();
 
-        void pushFrame();
-        void popFrame() const;
+        void pushFrame() noexcept;
+        void popFrame() const noexcept;
 
         /*
            Getters

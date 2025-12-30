@@ -1,17 +1,15 @@
 #pragma once
 
 #include "../window/Window.h"
-#include "../GameLogic.h"
+#include "../GameLifecycle.h"
 
 namespace engine
 {
-    class Window;
-
     class AbstractClock
     {
 
     public:
-        explicit AbstractClock(Window *window, GameLogic *game)
+        explicit AbstractClock(Window *window, GameLifecycle *game)
             : window(window), game(game) {}
 
         virtual ~AbstractClock() = default;
@@ -27,12 +25,12 @@ namespace engine
            Getters
          */
 
-        virtual int getFPS() = 0;
+        virtual int getFPS() const = 0;
         bool isRunning() const { return running; }
 
     protected:
         Window *window;
-        GameLogic *game;
+        GameLifecycle *game;
 
         bool running = false;
     };

@@ -2,20 +2,31 @@
 
 #include <string>
 
+#include "UniformAccess.h"
+#include "exceptions/ShaderException.h"
+
 namespace engine {
     class ShaderProgram {
 
     public:
-        ShaderProgram(std::string vertexPath, std::string fragmentPath);
-        ~ShaderProgram();
+        static unsigned int createShader(const char *source, unsigned int type);
+
+        explicit ShaderProgram(std::string vertexPath, std::string fragmentPath)
+            : vertexPath(std::move(vertexPath)), fragmentPath(std::move(fragmentPath)) {}
+        virtual ~ShaderProgram();
+
+        void create();
 
         void bind() const;
-        void unbind() const;
+        static void unbind();
+
+        UniformAccess accessUniform(const std::string &name) const;
 
     private:
-        unsigned int programId;
-        unsigned int vertexShader, fragmentShader;
+        std::string vertexPath, fragmentPath;
+        unsigned int programId = 0;
 
-        unsigned int createShader(const char *source, unsigned int type);
+    protected:
+        virtual void setupUniforms() = 0;
     };
 }

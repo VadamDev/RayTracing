@@ -1,5 +1,5 @@
-#include <iostream>
-#include <memory>
+#include <stdexcept>
+#include <spdlog/spdlog.h>
 
 #include "engine/clock/FixedStepClock.h"
 #include "engine/window/Window.h"
@@ -10,9 +10,11 @@ using namespace game;
 int main()
 {
     engine::Window window(960, 540, "GLFW Window");
-    if (!window.create())
+
+    try { window.create(); }
+    catch (std::runtime_error &e)
     {
-        std::cerr << "Failed to initialize the window" << std::endl;
+        spdlog::critical(e.what());
         return -1;
     }
 

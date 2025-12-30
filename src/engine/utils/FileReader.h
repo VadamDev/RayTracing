@@ -1,25 +1,24 @@
 #pragma once
 
 #include <fstream>
-#include <string>
-#include <iostream>
+#include <spdlog/spdlog.h>
 
 namespace engine::utils {
-    inline std::string readFile(const std::string& filePath)
+    static std::string readFile(const std::string &filePath)
     {
         std::ifstream in;
         in.open(filePath);
 
         std::string result;
-        if (in.is_open())
+        if (!in.is_open())
         {
-            std::string line;
-            while(getline(in, line))
-            {
-                result.append(line).append("\n");
-            }
-        } else
-            std::cout << "Could not open file " << filePath << std::endl;
+            spdlog::error("Failed to open file at path {}", filePath);
+            return result;
+        }
+
+        std::string line;
+        while(getline(in, line))
+            result.append(line).append("\n");
 
         return result;
     }

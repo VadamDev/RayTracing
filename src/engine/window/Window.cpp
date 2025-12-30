@@ -1,7 +1,6 @@
-#include <iostream>
-#include <glad/glad.h>
-
 #include "Window.h"
+
+#include "spdlog/spdlog.h"
 
 namespace engine
 {
@@ -13,15 +12,15 @@ namespace engine
         glfwTerminate(); //Have no effect when GLFW is not initialized so no need to add a check, I think... Maybe? Eh...
     }
 
-    GLFWwindow* Window::create()
+    void Window::create()
     {
         //Initializing GLFW
         glfwSetErrorCallback([](int error, const char* description) {
-            std::cerr << "Caught a GLFW error [" << error << "]: " << std::endl << description << std::endl;
+            spdlog::error("Caught a GLFW error [{}]: \n{}", error, description);
         });
 
         if (!glfwInit())
-            return nullptr;
+            throw std::runtime_error("Failed to initialize GLFW");
 
         //Creating the window
         glfwDefaultWindowHints();
@@ -36,10 +35,7 @@ namespace engine
 
         window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
         if (!window)
-        {
-            glfwTerminate();
-            return nullptr;
-        }
+            throw std::runtime_error("Failed to create a GLFW window");
 
         //Black magic pointer shit that I DO NOT understand
         glfwSetWindowUserPointer(window, this);
@@ -57,17 +53,12 @@ namespace engine
 
         //Create OpenGL capabilities
         if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
-        {
-            std::cerr << "Failed to initialize OpenGL context" << std::endl;
-            return nullptr;
-        }
+            throw std::runtime_error("Failed to initialize OpenGL context");
 
         //Show the window
         glfwShowWindow(window);
 
-        std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
-
-        return window;
+        spdlog::info("OpenGL version is {}", std::string_view(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
     }
 
     void Window::setupCallbacks()
@@ -84,7 +75,7 @@ namespace engine
         //TODO: actually setup callbacks
     }
 
-    void Window::pushFrame()
+    void Window::pushFrame() noexcept
     {
         if (resized)
         {
@@ -96,7 +87,7 @@ namespace engine
     }
 
 
-    void Window::popFrame() const
+    void Window::popFrame() const noexcept
     {
         glfwPollEvents();
         glfwSwapBuffers(window);

@@ -23,22 +23,27 @@ namespace engine
            Getters
          */
 
+        bool isIgnoreFpsCap() const { return ignoreFpsCap; }
+
         int getUPS() const { return ups; }
-        int getFPS() override { return fps; }
-
-
+        int getFPS() const override { return fps; }
 
         /*
            Setters
          */
 
-        void setTargetUPS(int targetUps)
+        void setIgnoreFpsCap(const bool ignoreFpsCap)
+        {
+            this->ignoreFpsCap = ignoreFpsCap;
+        }
+
+        void setTargetUPS(const int targetUps)
         {
             this->targetUps = targetUps;
             updateTime = NANO / targetUps;
         }
 
-        void setTargetFPS(int targetFps)
+        void setTargetFPS(const int targetFps)
         {
             this->targetFps = targetFps;
             renderTime = NANO / targetFps;
@@ -47,6 +52,8 @@ namespace engine
     private:
         int targetUps = 30, targetFps = 60;
         int64_t updateTime = NANO / targetUps, renderTime = NANO / targetFps;
+
+        bool ignoreFpsCap = false;
 
         int ups = 0, fps = 0;
 
