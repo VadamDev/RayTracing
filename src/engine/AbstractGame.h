@@ -19,7 +19,7 @@ namespace engine
         
         void start(AbstractClock *clock) noexcept
         {
-            if (clock != nullptr && clock->isRunning())
+            if (this->clock != nullptr && this->clock->isRunning())
                 return;
 
             this->clock = clock;
@@ -39,6 +39,7 @@ namespace engine
          */
 
         Window* getWindow() const { return window; }
+        AbstractClock* getClock() const { return clock; }
 
     private:
         Window *window;

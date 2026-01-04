@@ -1,6 +1,10 @@
 #pragma once
 
+#include <memory>
+
+#include "TestShader.h"
 #include "../engine/AbstractGame.h"
+#include "../engine/graphics/mesh/VertexArrayObject.h"
 
 namespace game
 {
@@ -17,6 +21,10 @@ namespace game
         void render(float deltaTime) override;
 
         void destroy() noexcept override;
+
+    private:
+        std::unique_ptr<engine::VertexArrayObject> vao;
+        std::unique_ptr<TestShader> shader;
     };
 }
 

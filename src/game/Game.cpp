@@ -5,6 +5,7 @@
 #include <spdlog/spdlog.h>
 
 #include "TestShader.h"
+#include "../engine/graphics/mesh/VertexArrayObject.h"
 
 namespace game
 {
@@ -12,8 +13,8 @@ namespace game
     {
         try
         {
-            TestShader shader;
-            shader.create();
+            shader = std::make_unique<TestShader>();
+            shader->create();
         }
         catch (engine::exceptions::ProgramException &e)
         {
@@ -23,6 +24,14 @@ namespace game
         {
             spdlog::critical(e.what());
         }
+
+        vao = std::make_unique<engine::VertexArrayObject>();
+        vao->createAndBind(4, engine::RenderType::STRIP);
+
+        const auto *vertices = new float[]{ -1, 1, -1, -1, 1, 1, 1, -1 };
+        vao->genBuffer(sizeof(float) * 2 * 4, vertices, GL_STATIC_DRAW, 2, GL_FLOAT);
+
+        vao->ready();
     }
 
     void Game::update()
@@ -37,7 +46,11 @@ namespace game
 
     void Game::render(float deltaTime)
     {
+        shader->bind();
 
+        vao->render();
+
+        TestShader::unbind();
     }
 
     void Game::destroy() noexcept

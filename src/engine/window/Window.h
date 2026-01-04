@@ -30,6 +30,8 @@ namespace engine
 
         bool shouldClose() const;
 
+        static int getMonitorRefreshRate();
+
         int getWidth() const { return width; }
         int getHeight() const { return height; }
         float getAspectRatio() const { return (float) width / height; }

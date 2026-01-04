@@ -8,8 +8,8 @@ namespace engine {
     class UniformAccess {
 
     public:
-        explicit UniformAccess(const int position)
-            : location(position) {}
+        explicit UniformAccess(const int location)
+            : location(location) {}
 
         /*
            Float

@@ -83,13 +83,13 @@ namespace engine
             resized = false;
         }
 
+        glfwPollEvents();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
 
     void Window::popFrame() const noexcept
     {
-        glfwPollEvents();
         glfwSwapBuffers(window);
     }
 
@@ -100,6 +100,11 @@ namespace engine
     bool Window::shouldClose() const
     {
         return window != nullptr ? glfwWindowShouldClose(window) : true;
+    }
+
+    int Window::getMonitorRefreshRate()
+    {
+        return glfwGetVideoMode(glfwGetPrimaryMonitor())->refreshRate;
     }
 
     /*

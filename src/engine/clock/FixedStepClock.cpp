@@ -18,6 +18,7 @@ namespace engine
             return;
         }
 
+        spdlog::info("Starting game clock with target FPS: {} and target UPS: {}", targetFps, targetUps);
         loop();
     }
 
@@ -54,7 +55,7 @@ namespace engine
                 updates++;
                 lastUpdateTime = now;
             }
-            else if (ignoreFpsCap || elapsedSinceLastRender >= renderTime)
+            else if (bIgnoreFpsCap || elapsedSinceLastRender >= renderTime)
             {
                 const float deltaTime = elapsedSinceLastRender / NANO_F;
 

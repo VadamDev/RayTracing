@@ -37,6 +37,7 @@ add_executable(${PROJECT_NAME}
         src/engine/graphics/shader/UniformAccess.h
         src/engine/graphics/mesh/VertexArrayObject.cpp
         src/engine/graphics/mesh/VertexArrayObject.h
+        src/engine/graphics/rendering/Renderable.h
 )
 
 target_link_libraries(${PROJECT_NAME}

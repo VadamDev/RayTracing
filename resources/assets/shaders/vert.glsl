@@ -1,7 +1,11 @@
 #version 460
 
-uniform float test;
+layout(location = 0) in vec2 aPos;
+
+out vec2 pTextureCoords;
 
 void main() {
-    gl_Position = vec4(test, 0, 0, 0);
+    pTextureCoords = aPos * 0.5 + 0.5;
+
+    gl_Position = vec4(aPos, 0, 1);
 }

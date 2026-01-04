@@ -21,6 +21,8 @@ int main()
     Game game(&window);
 
     const auto clock = std::make_unique<engine::FixedStepClock>(&window, &game);
+    clock->setTargetFPS(engine::Window::getMonitorRefreshRate());
+
     game.start(clock.get());
 
     return 0;
