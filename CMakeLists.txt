@@ -9,7 +9,7 @@ find_package(glad CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 
-file(GLOB_RECURSE PROJECT_SOURCE_FILES src/*.cpp src/*.h)
+file(GLOB_RECURSE PROJECT_SOURCE_FILES src/*.cpp)
 
 # Source files
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCE_FILES})
