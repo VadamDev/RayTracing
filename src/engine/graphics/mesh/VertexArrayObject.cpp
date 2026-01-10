@@ -33,8 +33,6 @@ namespace engine
 
     void VertexArrayObject::create(const int verticesCount, const RenderType renderType)
     {
-        spdlog::info("Created vao");
-
         this->renderType = renderType;
         this->verticesCount = verticesCount;
 

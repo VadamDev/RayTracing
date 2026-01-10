@@ -2,11 +2,11 @@
 
 namespace engine
 {
-    class Renderable
+    class IRenderable
     {
 
     public:
-        virtual ~Renderable() = default;
+        virtual ~IRenderable() = default;
 
         virtual void render() = 0;
     };

@@ -18,9 +18,9 @@ int main()
         return -1;
     }
 
-    Game game(&window);
+    Game game(window);
 
-    const auto clock = std::make_unique<engine::FixedStepClock>(&window, &game);
+    const auto clock = std::make_unique<engine::FixedStepClock>(window, game);
     clock->setTargetFPS(engine::Window::getMonitorRefreshRate());
 
     game.start(clock.get());

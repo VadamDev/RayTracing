@@ -57,13 +57,13 @@ namespace engine {
         glUseProgram(0);
     }
 
-    UniformAccess ShaderProgram::accessUniform(const std::string &name) const
+    std::unique_ptr<UniformAccess> ShaderProgram::accessUniform(const std::string &name) const
     {
         const int location = glGetUniformLocation(programId, name.c_str());
         if (location < 0)
             throw exceptions::UniformException(std::format("Failed to retrieve uniform location for {}", name), name, location);
 
-        return UniformAccess(location);
+        return std::make_unique<UniformAccess>(location);
     }
 
     /*

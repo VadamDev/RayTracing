@@ -9,9 +9,9 @@ namespace engine
 {
     void FixedStepClock::start()
     {
-        running = true;
+        bRunning = true;
 
-        try { game->init(); }
+        try { game.init(); }
         catch (std::exception &e)
         {
             spdlog::critical("A critical exception has been caught during game init:\n{}", e.what());
@@ -24,11 +24,19 @@ namespace engine
 
     void FixedStepClock::stop()
     {
-        running = false;
+        bRunning = false;
+    }
+
+    void FixedStepClock::setupProfilers()
+    {
+        updateProfiler = gameProfiler.newEntry("Game Update");
+        renderProfiler = gameProfiler.newEntry("Frame Render");
     }
 
     void FixedStepClock::loop()
     {
+        setupProfilers();
+
         int frames = 0, updates = 0;
 
         auto lastRenderTime = steady_clock::now();
@@ -36,7 +44,7 @@ namespace engine
 
         auto timer = steady_clock::now();
 
-        while (running && !window->shouldClose())
+        while (bRunning && !window.shouldClose())
         {
             const auto now = steady_clock::now();
 
@@ -45,7 +53,9 @@ namespace engine
 
             if (elapsedSinceLastUpdate >= updateTime)
             {
-                try { game->update(); }
+                updateProfiler->begin();
+
+                try { game.update(); }
                 catch (std::runtime_error &e)
                 {
                     spdlog::critical("An error has been caught during game update:\n{}", e.what());
@@ -54,18 +64,23 @@ namespace engine
 
                 updates++;
                 lastUpdateTime = now;
+
+                updateProfiler->end();
             }
             else if (bIgnoreFpsCap || elapsedSinceLastRender >= renderTime)
             {
-                const float deltaTime = elapsedSinceLastRender / NANO_F;
+                renderProfiler->begin();
+
+                deltaTime = static_cast<float>(elapsedSinceLastRender) / NANO_F;
 
                 try
                 {
-                    game->processInputs(deltaTime);
+                    window.pushFrame();
 
-                    window->pushFrame();
-                    game->render(deltaTime);
-                    window->popFrame();
+                    game.processInputs(deltaTime);
+                    game.render(deltaTime);
+
+                    window.popFrame();
                 }
                 catch (std::runtime_error &e)
                 {
@@ -75,6 +90,8 @@ namespace engine
 
                 frames++;
                 lastRenderTime = now;
+
+                renderProfiler->end();
             }
 
             if (duration_cast<milliseconds>(now - timer).count() >= 1000)
@@ -87,10 +104,16 @@ namespace engine
 
                 timer = now;
 
-                spdlog::info("FPS: {} | UPS: {}", fps, ups);
+                spdlog::info("FPS: {} [{:.3f}ms, avg {:.3f}ms] | UPS: {}",
+                    fps,
+                    renderProfiler->getLastSpentTime().count() / 1e6f,
+                    renderProfiler->calculateSpentTimeAvg().count() / 1e6f,
+
+                    ups
+                );
             }
         }
 
-        game->destroy();
+        game.destroy();
     }
 }

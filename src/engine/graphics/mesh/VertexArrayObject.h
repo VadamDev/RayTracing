@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../rendering/Renderable.h"
+#include "../rendering/IRenderable.h"
 #include <unordered_map>
 
 namespace engine
@@ -10,7 +10,7 @@ namespace engine
         ARRAYS = 0, STRIP = 1, ELEMENTS = 2
     };
 
-    class VertexArrayObject : public Renderable
+    class VertexArrayObject : public IRenderable
     {
 
     public:

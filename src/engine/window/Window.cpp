@@ -63,8 +63,12 @@ namespace engine
 
     void Window::setupCallbacks()
     {
-        glfwSetFramebufferSizeCallback(window, [](GLFWwindow *window, int width, int height) {
-            auto *self = static_cast<Window*>(glfwGetWindowUserPointer(window));
+        /*
+         * Window Resize
+         */
+
+        glfwSetFramebufferSizeCallback(window, [](GLFWwindow *window, const int width, const int height) {
+            auto *self = retrieveWindow(window);
 
             self->width = width;
             self->height = height;
@@ -72,7 +76,35 @@ namespace engine
             self->resized = true;
         });
 
-        //TODO: actually setup callbacks
+        /*
+         * Inputs
+         */
+
+        inputManager = std::make_shared<InputsManager>();
+
+        /*
+         * Mouse
+         */
+
+        glfwSetMouseButtonCallback(window, [](GLFWwindow *windowHandle, const int button, const int action, const int mods) {
+            retrieveMouse(windowHandle).onMouseButton(button, action, mods);
+        });
+
+        glfwSetScrollCallback(window, [](GLFWwindow *windowHandle, const double xOffset, const double yOffset) {
+            retrieveMouse(windowHandle).onScroll(xOffset, yOffset);
+        });
+
+        glfwSetCursorPosCallback(window, [](GLFWwindow *windowHandle, const double xPos, const double yPos) {
+            retrieveMouse(windowHandle).onCursorPosition(xPos, yPos);
+        });
+
+        /*
+         * Keyboard
+         */
+
+        glfwSetKeyCallback(window, [](GLFWwindow *windowHandle, const int key, const int scancode, const int action, const int mods) {
+            retrieveKeyboard(windowHandle).onKey(key, scancode, action, mods);
+        });
     }
 
     void Window::pushFrame() noexcept
@@ -81,16 +113,26 @@ namespace engine
         {
             glViewport(0, 0, width, height);
             resized = false;
+
+            WindowResizeEvent event(width, height);
+            resizeDispatcher.dispatch(event);
         }
 
-        glfwPollEvents();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    }
+        dFrameTime = glfwGetTime();
+        fFrameTime = static_cast<float>(dFrameTime);
 
+        inputManager->getMouse().processDeltas();
+    }
 
     void Window::popFrame() const noexcept
     {
+        glfwPollEvents();
         glfwSwapBuffers(window);
+    }
+
+    void Window::whenResized(const std::function<void(WindowResizeEvent&)> &callback)
+    {
+        resizeDispatcher.subscribe(callback);
     }
 
     /*
@@ -102,11 +144,6 @@ namespace engine
         return window != nullptr ? glfwWindowShouldClose(window) : true;
     }
 
-    int Window::getMonitorRefreshRate()
-    {
-        return glfwGetVideoMode(glfwGetPrimaryMonitor())->refreshRate;
-    }
-
     /*
        Setters
      */
@@ -115,5 +152,20 @@ namespace engine
     {
         this->title = std::move(title);
         glfwSetWindowTitle(window, this->title.c_str());
+    }
+
+    void Window::setGrabbed(const bool grabbed)
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, grabbed ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+        this->grabbed = grabbed;
+    }
+
+    /*
+     * Static Utils
+     */
+
+    int Window::getMonitorRefreshRate()
+    {
+        return glfwGetVideoMode(glfwGetPrimaryMonitor())->refreshRate;
     }
 }

@@ -7,6 +7,9 @@ namespace engine {
 
     ProfilerEntry* SteadyProfiler::newEntry(const std::string &name)
     {
+        if (entries.contains(name))
+            return &entries[name];
+
         auto [it, _] = entries.try_emplace(name, name);
         return &it->second;
     }
@@ -44,14 +47,10 @@ namespace engine {
     void ProfilerEntry::begin()
     {
         if (bClosed)
-        {
-            //TODO: throw error
-        }
+            throw std::runtime_error("Failed to begin profiler, it has been closed!");
 
         if (bProfiling)
-        {
-            //TODO: throw error
-        }
+            throw std::runtime_error("A profiler has already been started");
 
         beginTime = steady_clock::now();
         bProfiling = true;
@@ -60,14 +59,10 @@ namespace engine {
     void ProfilerEntry::end()
     {
         if (bClosed)
-        {
-            //TODO: throw error
-        }
+            throw std::runtime_error("Failed to end profiler, it has been closed!");
 
         if (!bProfiling)
-        {
-            //TODO: throw error
-        }
+            throw std::runtime_error("The profiler hasn't been started");
 
         const nanoseconds durationNs = steady_clock::now() - beginTime;
 
@@ -90,9 +85,7 @@ namespace engine {
     void ProfilerEntry::stop()
     {
         if (bClosed)
-        {
-            //TODO: throw error
-        }
+            throw std::runtime_error("Failed to begin profiler, it has been closed!");
 
         if(bProfiling)
             end();

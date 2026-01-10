@@ -1,16 +1,16 @@
 #pragma once
 
-#include "GameLifecycle.h"
+#include "IGameLifecycle.h"
 #include "window/Window.h"
 #include "clock/AbstractClock.h"
 
 namespace engine
 {
-    class AbstractGame : public GameLifecycle
+    class AbstractGame : public IGameLifecycle
     {
 
     public:
-        explicit AbstractGame(Window *window)
+        explicit AbstractGame(Window &window)
             : window(window) {}
 
         /*
@@ -38,11 +38,11 @@ namespace engine
            Getters
          */
 
-        Window* getWindow() const { return window; }
+        Window& getWindow() const { return window; }
         AbstractClock* getClock() const { return clock; }
 
     private:
-        Window *window;
+        Window &window;
         AbstractClock *clock = nullptr;
     };
 }

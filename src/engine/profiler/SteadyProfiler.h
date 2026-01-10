@@ -21,13 +21,10 @@ namespace engine {
         ProfilerEntry* newEntry(const std::string &name);
         void forEachEntries(const std::function<void(ProfilerEntry&)> &func);
 
-        uint64_t profilersCount() const
-        {
-            return entries.size();
-        }
-
         nanoseconds calculateTotalSpentTime();
         uint64_t calculateTotalNumCalls();
+
+        uint64_t profilersCount() const { return entries.size(); }
 
     private:
         std::unordered_map<std::string, ProfilerEntry> entries;

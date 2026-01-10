@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../window/Window.h"
-#include "../GameLifecycle.h"
+#include "../IGameLifecycle.h"
 
 namespace engine
 {
@@ -9,7 +9,7 @@ namespace engine
     {
 
     public:
-        explicit AbstractClock(Window *window, GameLifecycle *game)
+        explicit AbstractClock(Window &window, IGameLifecycle &game)
             : window(window), game(game) {}
 
         virtual ~AbstractClock() = default;
@@ -26,12 +26,16 @@ namespace engine
          */
 
         virtual int getFPS() const = 0;
-        bool isRunning() const { return running; }
+        bool isRunning() const { return bRunning; }
+
+        float getDeltaTime() const { return deltaTime; }
 
     protected:
-        Window *window;
-        GameLifecycle *game;
+        Window &window;
+        IGameLifecycle &game;
 
-        bool running = false;
+        bool bRunning = false;
+
+        float deltaTime;
     };
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "UniformAccess.h"
@@ -9,8 +10,6 @@ namespace engine {
     class ShaderProgram {
 
     public:
-        static unsigned int createShader(const char *source, unsigned int type);
-
         explicit ShaderProgram(std::string vertexPath, std::string fragmentPath)
             : vertexPath(std::move(vertexPath)), fragmentPath(std::move(fragmentPath)) {}
         virtual ~ShaderProgram();
@@ -20,10 +19,12 @@ namespace engine {
         void bind() const;
         static void unbind();
 
-        UniformAccess accessUniform(const std::string &name) const;
+        std::unique_ptr<UniformAccess> accessUniform(const std::string &name) const;
+
+        static unsigned int createShader(const char *source, unsigned int type);
 
     private:
-        std::string vertexPath, fragmentPath;
+        const std::string vertexPath, fragmentPath;
         unsigned int programId = 0;
 
     protected:

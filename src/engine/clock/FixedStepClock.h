@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AbstractClock.h"
+#include "../profiler/SteadyProfiler.h"
 
 namespace engine
 {
@@ -23,19 +24,12 @@ namespace engine
            Getters
          */
 
-        bool isIgnoreFpsCap() const { return bIgnoreFpsCap; }
-
         int getUPS() const { return ups; }
         int getFPS() const override { return fps; }
 
         /*
            Setters
          */
-
-        void setIgnoreFpsCap(const bool ignoreFpsCap)
-        {
-            this->bIgnoreFpsCap = ignoreFpsCap;
-        }
 
         void setTargetUPS(const int targetUps)
         {
@@ -49,14 +43,20 @@ namespace engine
             renderTime = NANO / targetFps;
         }
 
+        bool bIgnoreFpsCap = false;
+
     private:
         int targetUps = 30, targetFps = 60;
         int64_t updateTime = NANO / targetUps, renderTime = NANO / targetFps;
 
-        bool bIgnoreFpsCap = false;
-
         int ups = 0, fps = 0;
 
+        SteadyProfiler gameProfiler;
+
+        ProfilerEntry *updateProfiler = nullptr;
+        ProfilerEntry *renderProfiler = nullptr;
+
+        void setupProfilers();
         void loop();
     };
 }
