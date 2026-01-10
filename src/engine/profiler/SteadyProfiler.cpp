@@ -7,9 +7,6 @@ namespace engine {
 
     ProfilerEntry* SteadyProfiler::newEntry(const std::string &name)
     {
-        if (entries.contains(name))
-            return &entries[name];
-
         auto [it, _] = entries.try_emplace(name, name);
         return &it->second;
     }
