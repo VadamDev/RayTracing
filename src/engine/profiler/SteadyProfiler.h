@@ -2,7 +2,6 @@
 
 #include <chrono>
 #include <unordered_map>
-#include <spdlog/spdlog.h>
 
 namespace engine {
     using namespace std::chrono;

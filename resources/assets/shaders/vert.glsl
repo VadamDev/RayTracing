@@ -1,16 +1,14 @@
 #version 460
 
+//In
 layout(location = 0) in vec2 aPos;
 
-uniform float time;
-
+//Out
 out vec2 pTextureCoords;
 
-void main() {
+//Shader
+void main()
+{
     pTextureCoords = aPos * 0.5 + 0.5;
-
-    vec3 pos = vec3(aPos, 1);
-    pos.y += sin(time * 2);
-
-    gl_Position = vec4(pos, 1);
+    gl_Position = vec4(aPos, 0, 1);
 }

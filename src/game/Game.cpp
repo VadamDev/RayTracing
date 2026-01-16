@@ -1,39 +1,18 @@
 #include "Game.h"
 
-#include "../engine/graphics/shader/ShaderProgram.h"
-#include "../engine/graphics/shader/exceptions/ShaderException.h"
-#include <spdlog/spdlog.h>
-
-#include "TestShader.h"
-#include "../engine/graphics/mesh/VertexArrayObject.h"
-
 namespace game
 {
     void Game::init()
     {
-        try
-        {
-            shader = std::make_unique<TestShader>();
-            shader->create();
-        }
-        catch (engine::exceptions::ProgramException &e)
-        {
-            spdlog::critical(e.what());
-        }
-        catch (engine::exceptions::ShaderException &e)
-        {
-            spdlog::critical(e.what());
-        }
+        //Renderer
+        renderer = std::make_shared<Renderer>();
+        renderer->init(window);
 
-        vao = std::make_unique<engine::VertexArrayObject>();
-        vao->createAndBind(4, engine::RenderType::STRIP);
+        //Controller
+        cameraController = std::make_unique<CameraController>(renderer->getCamera(), window.getInputsManager());
 
-        const std::vector<float> vertices = { -1, 1, -1, -1, 1, 1, 1, -1 };
-        vao->genBuffer(sizeof(float) * 2 * 4, vertices.data(), GL_STATIC_DRAW, 2, GL_FLOAT);
-
-        vao->ready();
-
-        gui = std::make_shared<Gui>(this);
+        //Gui
+        gui = std::make_unique<Gui>(this, renderer.get());
         window.registerImGuiWindow(gui);
     }
 
@@ -50,23 +29,22 @@ namespace game
             window.setGrabbed(true);
         else if (inputManager->isKeyDown(engine::KeyboardKeys::KEY_ESCAPE) && window.isGrabbed())
             window.setGrabbed(false);
+
+        if (!window.isGrabbed())
+            return;
+
+        cameraController->processInputs(deltaTime);
     }
 
-    void Game::render(float deltaTime)
+    void Game::render(const float deltaTime)
     {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
 
-        shader->bind();
-
-        shader->frameTime->set1f(window.getFrameTimeF());
-        vao->render();
-
-        TestShader::unbind();
+        renderer->render();
     }
 
     void Game::destroy() noexcept
     {
 
     }
-
 }

@@ -1,5 +1,7 @@
 #include "SteadyProfiler.h"
 
+#include <ranges>
+
 namespace engine {
     /*
      * SteadyProfiler

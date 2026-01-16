@@ -3,6 +3,7 @@
 #include "../../engine/window/imgui/ImGuiWindow.h"
 #include "../../engine/AbstractGame.h"
 #include "../../engine/clock/FixedStepClock.h"
+#include "../rendering/Renderer.h"
 
 namespace game
 {
@@ -10,8 +11,8 @@ namespace game
     {
 
     public:
-        explicit Gui(const engine::AbstractGame *game)
-            : window(game->getWindow()), clock(dynamic_cast<engine::FixedStepClock*>(game->getClock())) {}
+        explicit Gui(const engine::AbstractGame *game, Renderer *renderer)
+            : window(game->getWindow()), clock(dynamic_cast<engine::FixedStepClock*>(game->getClock())), renderer(renderer) {}
 
         void draw() override;
 
@@ -23,6 +24,8 @@ namespace game
     private:
         engine::Window &window;
         engine::FixedStepClock *clock;
+
+        const Renderer *renderer;
 
         bool bUnlimitedFps = false;
     };

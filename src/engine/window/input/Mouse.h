@@ -41,8 +41,8 @@ namespace engine
          * Getters
          */
 
-        glm::dvec2 getPos() const { return pos; }
-        glm::dvec2 getDelta() const { return mouseDelta; }
+        glm::dvec2& getPos() { return pos; }
+        glm::dvec2& getDelta() { return mouseDelta; }
 
         float scrollX = 0, scrollY = 0;
     private:

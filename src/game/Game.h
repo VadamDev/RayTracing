@@ -2,10 +2,10 @@
 
 #include <memory>
 
-#include "TestShader.h"
 #include "../engine/AbstractGame.h"
-#include "../engine/graphics/mesh/VertexArrayObject.h"
+#include "controller/CameraController.h"
 #include "gui/Gui.h"
+#include "rendering/Renderer.h"
 
 namespace game
 {
@@ -24,10 +24,9 @@ namespace game
         void destroy() noexcept override;
 
     private:
-        std::unique_ptr<engine::VertexArrayObject> vao;
-        std::unique_ptr<TestShader> shader;
+        std::shared_ptr<Renderer> renderer;
+        std::unique_ptr<CameraController> cameraController;
 
         std::shared_ptr<Gui> gui;
     };
 }
-

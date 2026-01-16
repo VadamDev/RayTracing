@@ -16,8 +16,8 @@ namespace engine
         bool isMouseButtonDown(const int button) const { return mouse.isPressed(button); }
         bool isMouseButtonDown(const MouseButton button) const { return isMouseButtonDown(static_cast<int>(button)); }
 
-        glm::dvec2 getMousePos() const { return mouse.getPos(); }
-        glm::dvec2 getMouseDelta() const { return mouse.getDelta(); }
+        glm::dvec2& getMousePos() { return mouse.getPos(); }
+        glm::dvec2& getMouseDelta() { return mouse.getDelta(); }
 
         float getMouseScrollX() const { return mouse.scrollX; }
         float getMouseScrollY() const { return mouse.scrollY; }
