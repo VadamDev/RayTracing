@@ -1,7 +1,5 @@
 #include "Renderer.h"
 
-#include <spdlog/spdlog.h>
-
 namespace game
 {
     void Renderer::init(engine::Window &window)

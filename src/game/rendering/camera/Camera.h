@@ -3,7 +3,6 @@
 #include "../../../engine/window/Window.h"
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
-#include "glm/mat4x4.hpp"
 #include <glm/ext/matrix_transform.hpp>
 
 namespace game

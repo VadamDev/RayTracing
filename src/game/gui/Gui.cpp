@@ -20,8 +20,8 @@ namespace game
         {
             Camera *camera = renderer->getCamera();
 
-            ImGui::Text(std::format("Position: {}, {}, {}", camera->position.x, camera->position.y, camera->position.z).c_str());
-            ImGui::Text(std::format("Rotation: {}, {}", camera->rotation.x, camera->rotation.y).c_str());
+            ImGui::Text(std::format("Position: {:.3f}, {:.3f}, {:.3f}", camera->position.x, camera->position.y, camera->position.z).c_str());
+            ImGui::Text(std::format("Yaw: {:.2f} | Pitch: {:.2f}", camera->rotation.y, camera->rotation.x).c_str());
 
             ImGui::NewLine();
 

@@ -2,7 +2,6 @@
 
 #include <functional>
 #include <vector>
-#include <spdlog/spdlog.h>
 
 #include "IEvent.h"
 

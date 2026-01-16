@@ -106,8 +106,8 @@ namespace engine
 
                 spdlog::info("FPS: {} [{:.3f}ms, avg {:.3f}ms] | UPS: {}",
                     fps,
-                    renderProfiler->getLastSpentTime().count() / 1e6f,
-                    renderProfiler->calculateSpentTimeAvg().count() / 1e6f,
+                    renderProfiler->getLastSpentTimeMs(),
+                    renderProfiler->calculateSpentTimeAvgMs(),
 
                     ups
                 );

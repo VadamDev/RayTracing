@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "../../engine/graphics/mesh/VertexArrayObject.h"
 #include "camera/Camera.h"
 #include "shader/TracingShader.h"

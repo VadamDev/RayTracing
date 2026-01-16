@@ -1,5 +1,6 @@
 #include "VertexArrayObject.h"
 
+#include <ranges>
 #include <glad/glad.h>
 #include <spdlog/spdlog.h>
 
@@ -14,7 +15,7 @@ namespace engine
         disableVertexAttribArrays();
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        for (const auto& [bufferId, _] : buffersMap)
+        for (const auto &bufferId: buffersMap | std::views::keys)
             glDeleteBuffers(1, &bufferId);
 
         if (ebo != 0)
@@ -114,13 +115,13 @@ namespace engine
 
     void VertexArrayObject::enableVertexAttribArrays() const
     {
-        for(const auto& [_, attribPointer] : buffersMap)
+        for(const auto &attribPointer: buffersMap | std::views::values)
             glEnableVertexAttribArray(attribPointer);
     }
 
     void VertexArrayObject::disableVertexAttribArrays() const
     {
-        for(const auto& [_, attribPointer] : buffersMap)
+        for(const auto &attribPointer: buffersMap | std::views::values)
             glDisableVertexAttribArray(attribPointer);
     }
 
