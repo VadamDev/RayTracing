@@ -1,7 +1,7 @@
 #version 460
 
 //In
-in vec2 pTextureCoords;
+in vec2 pPixelCoords;
 
 //Uniforms
 uniform vec3 viewParams; //planeWidth, planeHeight, focalLength;
@@ -21,7 +21,7 @@ struct Ray
 
 void main()
 {
-    vec3 viewPointLocal = vec3(pTextureCoords - 0.5, 1) * viewParams;
+    vec3 viewPointLocal = vec3(pPixelCoords - 0.5, 1) * viewParams;
     vec3 viewPoint = (localToWorld * vec4(viewPointLocal, 1)).xyz;
 
     Ray ray;
