@@ -1,5 +1,7 @@
 #include "CameraController.h"
 
+#include <spdlog/spdlog.h>
+
 namespace game
 {
     static constexpr float SENSITIVITY = 0.2f;
@@ -85,10 +87,8 @@ namespace game
     {
         const float yawRad = glm::radians(camera->rotation.y);
 
-        glm::vec3 forward(sin(yawRad), 0, cos(yawRad));
-        forward = glm::normalize(forward);
-
-        const glm::vec3 right = glm::normalize(glm::cross(WORLD_UP, forward));
+        const glm::vec3 forward(glm::sin(yawRad), 0, glm::cos(yawRad));
+        const glm::vec3 right = glm::cross(WORLD_UP, forward);
 
         glm::vec3 &pos = camera->position;
         pos += forward * zOffset;
