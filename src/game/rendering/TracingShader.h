@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../../engine/graphics/shader/ShaderProgram.h"
-#include "../camera/Camera.h"
+#include "../../engine/graphics/shader/ShaderProgram.h"
+#include "Camera.h"
 
-namespace game
+namespace application
 {
     class TracingShader : public engine::ShaderProgram
     {

@@ -1,6 +1,6 @@
 #include "Renderer.h"
 
-namespace game
+namespace application
 {
     void Renderer::init(engine::Window &window)
     {

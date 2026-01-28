@@ -2,11 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
-namespace game
+namespace application
 {
-    static constexpr float SENSITIVITY = 0.2f;
-    static constexpr float CAMERA_SPEED = 8;
-
     static constexpr glm::vec3 WORLD_UP(0, 1, 0);
 
     void CameraController::processInputs(float deltaTime)
@@ -26,13 +23,13 @@ namespace game
 
         if (mouseDelta.x != 0)
         {
-            rotation.y += mouseDelta.x * SENSITIVITY;
+            rotation.y += mouseDelta.x * sensitivity;
             hasProcessed = true;
         }
 
         if (mouseDelta.y != 0)
         {
-            rotation.x += mouseDelta.y * SENSITIVITY;
+            rotation.x += mouseDelta.y * sensitivity;
             hasProcessed = true;
         }
 
@@ -57,22 +54,22 @@ namespace game
         float xOffset = 0, yOffset = 0, zOffset = 0;
 
         if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_W))
-            zOffset += CAMERA_SPEED;
+            zOffset += cameraSpeed;
 
         if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_A))
-            xOffset -= CAMERA_SPEED;
+            xOffset -= cameraSpeed;
 
         if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_S))
-            zOffset -= CAMERA_SPEED;
+            zOffset -= cameraSpeed;
 
         if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_D))
-            xOffset += CAMERA_SPEED;
+            xOffset += cameraSpeed;
 
         if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_SPACE))
-            yOffset += CAMERA_SPEED;
+            yOffset += cameraSpeed;
 
         if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_LEFT_CONTROL))
-            yOffset -= CAMERA_SPEED;
+            yOffset -= cameraSpeed;
 
         if (xOffset != 0 || yOffset != 0 || zOffset != 0)
         {

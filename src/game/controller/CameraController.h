@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../rendering/camera/Camera.h"
+#include "../rendering/Camera.h"
 
-namespace game
+namespace application
 {
     class CameraController
     {
@@ -11,6 +11,9 @@ namespace game
             : camera(camera), inputsManager(inputsManager) {}
 
         void processInputs(float deltaTime);
+
+        float sensitivity = 0.2f;
+        float cameraSpeed = 6;
 
     private:
         Camera *camera;

@@ -3,13 +3,13 @@
 
 #include "engine/clock/FixedStepClock.h"
 #include "engine/window/Window.h"
-#include "game/Game.h"
+#include "game/RaytracingApplication.h"
 
-using namespace game;
+using namespace application;
 
 int main()
 {
-    engine::Window window(1280, 720, "Raytracing");
+    engine::Window window(1280, 720, "Ray Tracing");
 
     try { window.create(); }
     catch (std::runtime_error &e)
@@ -18,12 +18,12 @@ int main()
         return -1;
     }
 
-    Game game(window);
+    RaytracingApplication app(window);
 
-    const auto clock = std::make_unique<engine::FixedStepClock>(window, game);
+    const auto clock = std::make_unique<engine::FixedStepClock>(window, app);
     clock->setTargetFPS(engine::Window::getMonitorRefreshRate());
 
-    game.start(clock.get());
+    app.start(clock.get());
 
     return 0;
 }

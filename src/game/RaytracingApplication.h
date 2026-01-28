@@ -1,20 +1,19 @@
 #pragma once
 
-#include <memory>
-
+#include "../engine/scene/Scene.h"
 #include "../engine/Application.h"
 #include "controller/CameraController.h"
-#include "gui/Gui.h"
+#include "interface/Interface.h"
 #include "rendering/Renderer.h"
 
-namespace game
+namespace application
 {
-    class Game : public engine::Application
+    class RaytracingApplication : public engine::Application
     {
 
-    public:
         using Application::Application;
 
+    public:
         void init() override;
 
         void update() override;
@@ -24,9 +23,11 @@ namespace game
         void destroy() noexcept override;
 
     private:
-        std::shared_ptr<Renderer> renderer;
-        std::unique_ptr<CameraController> cameraController;
+        engine::Scene scene;
 
-        std::shared_ptr<Gui> gui;
+        Renderer renderer;
+        std::unique_ptr<CameraController> controller;
+
+        std::shared_ptr<Interface> interface;
     };
 }
