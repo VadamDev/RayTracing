@@ -22,6 +22,8 @@ namespace application
 
         void destroy() noexcept override;
 
+        engine::Scene& getActiveScene() { return scene; }
+
     private:
         engine::Scene scene;
 

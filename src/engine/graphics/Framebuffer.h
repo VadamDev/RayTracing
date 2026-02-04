@@ -18,11 +18,15 @@ namespace engine
         void bind() const;
         void unbind() const;
 
+        int getWidth() const { return width; }
+        int getHeight() const { return height; }
+
+        unsigned int getColorTextureId() const { return colorTextureId; }
+
     private:
         int width, height;
         Window *window;
 
-        unsigned int framebufferHandle = 0;
-        unsigned int colorTextureId = 0;
+        unsigned int framebufferHandle = 0, colorTextureId = 0;
     };
 }

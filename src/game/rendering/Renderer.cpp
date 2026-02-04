@@ -16,16 +16,23 @@ namespace application
         shader = std::make_unique<TracingShader>();
         shader->create();
 
+        //Framebuffer
+        framebuffer = std::make_shared<engine::Framebuffer>(window.getWidth(), window.getHeight(), &window);
+        framebuffer->create();
+
         camera = std::make_unique<Camera>(75, 1, &window);
     }
 
     void Renderer::render()
     {
-        shader->bind();
+        framebuffer->bind();
+        glClear(GL_COLOR_BUFFER_BIT);
 
+        shader->bind();
         shader->sendViewParams(camera.get());
         canvasMesh->render();
-
         shader->unbind();
+
+        framebuffer->unbind();
     }
 }
