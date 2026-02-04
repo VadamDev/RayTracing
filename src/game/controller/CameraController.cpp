@@ -1,7 +1,5 @@
 #include "CameraController.h"
 
-#include <spdlog/spdlog.h>
-
 namespace application
 {
     static constexpr glm::vec3 WORLD_UP(0, 1, 0);

@@ -1,7 +1,6 @@
 #include "Interface.h"
 
 #include "imgui_internal.h"
-#include "panels/ViewportPanel.h"
 
 namespace application
 {
@@ -43,7 +42,7 @@ namespace application
 
         ImGui::DockSpaceOverViewport(DOCKSPACE_ID, viewport, ImGuiDockNodeFlags_PassthruCentralNode);
 
-        //Seriously I fucking hate writing UI, who the fuck is enjoying this??
+        //Seriously I fucking hate writing UI, who the fuck enjoy this??
         viewportPanel->draw();
         hierarchyPanel->draw();
         inspectorPanel->draw();

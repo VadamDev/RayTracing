@@ -4,9 +4,9 @@
 
 #include "../../engine/window/imgui/IImGuiWindow.h"
 #include "../rendering/Renderer.h"
+#include "panels/ViewportPanel.h"
 #include "panels/HierarchyPanel.h"
 #include "panels/InspectorPanel.h"
-#include "panels/ViewportPanel.h"
 
 namespace application
 {

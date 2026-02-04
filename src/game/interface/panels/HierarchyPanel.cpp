@@ -1,7 +1,6 @@
 #include "HierarchyPanel.h"
 
 #include <imgui.h>
-#include <spdlog/spdlog.h>
 
 #include "../../RaytracingApplication.h"
 
