@@ -1,0 +1,33 @@
+#pragma once
+
+#include "../engine/scene/Scene.h"
+#include "../engine/Application.h"
+#include "controller/CameraController.h"
+#include "interface/Interface.h"
+#include "rendering/Renderer.h"
+
+namespace application
+{
+    class RaytracingApplication : public engine::Application
+    {
+
+        using Application::Application;
+
+    public:
+        void init() override;
+
+        void update() override;
+        void processInputs(float deltaTime) override;
+        void render(float deltaTime) override;
+
+        void destroy() noexcept override;
+
+    private:
+        engine::Scene scene;
+
+        Renderer renderer;
+        std::unique_ptr<CameraController> controller;
+
+        std::shared_ptr<Interface> interface;
+    };
+}

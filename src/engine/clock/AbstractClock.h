@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../window/Window.h"
-#include "../IGameLifecycle.h"
+#include "../IAppLifecycle.h"
 
 namespace engine
 {
@@ -9,7 +9,7 @@ namespace engine
     {
 
     public:
-        explicit AbstractClock(Window &window, IGameLifecycle &game)
+        explicit AbstractClock(Window &window, IAppLifecycle &game)
             : window(window), game(game) {}
 
         virtual ~AbstractClock() = default;
@@ -32,7 +32,7 @@ namespace engine
 
     protected:
         Window &window;
-        IGameLifecycle &game;
+        IAppLifecycle &game;
 
         bool bRunning = false;
 

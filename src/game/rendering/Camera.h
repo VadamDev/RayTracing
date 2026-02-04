@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../../../engine/window/Window.h"
+#include "../../engine/window/Window.h"
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 #include <glm/ext/matrix_transform.hpp>
 
-namespace game
+namespace application
 {
     class Camera
     {
@@ -34,7 +34,7 @@ namespace game
         int windowWidth = 0, windowHeight = 0;
         float aspectRatio = 0;
 
-        glm::mat4 localToWorldMatrix = glm::identity<glm::mat4>();;
+        glm::mat4 localToWorldMatrix = glm::identity<glm::mat4>();
 
         void registerCallbacks(engine::Window *window);
     };

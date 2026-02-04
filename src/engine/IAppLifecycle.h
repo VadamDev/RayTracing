@@ -2,11 +2,11 @@
 
 namespace engine
 {
-    class IGameLifecycle
+    class IAppLifecycle
     {
 
     public:
-        virtual ~IGameLifecycle() = default;
+        virtual ~IAppLifecycle() = default;
 
         virtual void init() = 0;
 

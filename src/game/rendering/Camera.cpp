@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-namespace game
+namespace application
 {
     static constexpr glm::vec3 UP(0, 1, 0);
     static constexpr glm::vec3 RIGHT(1, 0, 0);

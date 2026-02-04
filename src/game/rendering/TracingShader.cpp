@@ -1,6 +1,6 @@
 #include "TracingShader.h"
 
-namespace game
+namespace application
 {
     void TracingShader::sendViewParams(Camera *camera) const
     {

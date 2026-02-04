@@ -1,16 +1,16 @@
 #pragma once
 
-#include "IGameLifecycle.h"
+#include "IAppLifecycle.h"
 #include "window/Window.h"
 #include "clock/AbstractClock.h"
 
 namespace engine
 {
-    class AbstractGame : public IGameLifecycle
+    class Application : public IAppLifecycle
     {
 
     public:
-        explicit AbstractGame(Window &window)
+        explicit Application(Window &window)
             : window(window) {}
 
         /*

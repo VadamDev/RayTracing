@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../../engine/graphics/mesh/VertexArrayObject.h"
-#include "camera/Camera.h"
-#include "shader/TracingShader.h"
+#include "Camera.h"
+#include "TracingShader.h"
 
-namespace game
+namespace application
 {
     class Renderer : public engine::IRenderable
     {
