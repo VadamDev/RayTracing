@@ -11,9 +11,9 @@ namespace application
     class RaytracingApplication : public engine::Application
     {
 
+    public:
         using Application::Application;
 
-    public:
         void init() override;
 
         void update() override;

@@ -1,6 +1,6 @@
 #include "RaytracingApplication.h"
 
-#include "scene/Components.h"
+#include "DefaultScene.h"
 
 namespace application
 {
@@ -12,8 +12,7 @@ namespace application
         interface = std::make_shared<Interface>(&window, &renderer, this);
         window.registerImGuiWindow(interface);
 
-        scene.newEntity("Empty Entity");
-        scene.newEntity("Moveable Entity").addComponent<TransformComponent>();
+        setupDefaultScene(scene);
     }
 
     void RaytracingApplication::update()
