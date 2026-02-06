@@ -9,15 +9,15 @@ namespace application
     {
 
     public:
-        explicit ViewportPanel(engine::Window *window, engine::Framebuffer *framebuffer)
-            : IPanel("Viewport"), window(window), framebuffer(framebuffer) {}
+        explicit ViewportPanel(engine::Window *window, Renderer *renderer)
+            : IPanel("Viewport"), window(window), renderer(renderer), framebuffer(renderer->getFramebuffer().get()) {}
 
         void draw() override;
 
-        float aspectRatio = 16.0f / 9.0f;
-
     private:
         engine::Window *window;
+        Renderer *renderer;
+
         engine::Framebuffer *framebuffer;
     };
 }

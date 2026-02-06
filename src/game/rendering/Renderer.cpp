@@ -20,7 +20,7 @@ namespace application
         framebuffer = std::make_shared<engine::Framebuffer>(window.getWidth(), window.getHeight(), &window);
         framebuffer->create();
 
-        camera = std::make_unique<Camera>(75, 1, &window);
+        camera = std::make_unique<Camera>(75, 1, this);
     }
 
     void Renderer::render()
@@ -34,5 +34,15 @@ namespace application
         shader->unbind();
 
         framebuffer->unbind();
+    }
+
+    void Renderer::onViewportResize(const std::function<void(engine::WindowResizeEvent &)> &callback)
+    {
+        viewportResizeDispatcher.subscribe(callback);
+    }
+
+    void Renderer::dispatchViewportResize(engine::WindowResizeEvent event)
+    {
+        viewportResizeDispatcher.dispatch(event);
     }
 }

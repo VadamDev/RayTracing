@@ -20,7 +20,6 @@ namespace application
         bool shouldDraw() override { return true; }
 
     private:
-        engine::Window *window;
         Renderer *renderer;
 
         std::unique_ptr<ViewportPanel> viewportPanel;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+#include "../../engine/window/input/InputsManager.h"
 #include "../rendering/Camera.h"
 
 namespace application

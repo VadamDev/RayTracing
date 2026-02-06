@@ -1,21 +1,20 @@
 #pragma once
 
-#include "../../engine/window/Window.h"
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
 #include <glm/ext/matrix_transform.hpp>
 
 namespace application
 {
+    static constexpr float DEFAULT_ASPECT_RATIO = 16.0f / 9.0f;
+
+    class Renderer;
+
     class Camera
     {
 
     public:
-        explicit Camera(const float fov, const float nearClipPlane, engine::Window *window)
-            : fov(fov), nearClipPlane(nearClipPlane)
-        {
-            registerCallbacks(window);
-        }
+        explicit Camera(float fov, float nearClipPlane, Renderer *renderer);
 
         void updateLocalToWorldMatrix();
 
@@ -26,16 +25,15 @@ namespace application
         glm::mat4& getLocalToWorldMatrix() { return localToWorldMatrix; }
 
         float fov, nearClipPlane;
+        float targetAspectRatio = DEFAULT_ASPECT_RATIO;
 
         glm::vec3 position = glm::vec3(0, 0, 0);
         glm::vec2 rotation = glm::vec2(0, 0);
 
     private:
         int windowWidth = 0, windowHeight = 0;
-        float aspectRatio = 0;
+        float aspectRatio = DEFAULT_ASPECT_RATIO;
 
         glm::mat4 localToWorldMatrix = glm::identity<glm::mat4>();
-
-        void registerCallbacks(engine::Window *window);
     };
 }

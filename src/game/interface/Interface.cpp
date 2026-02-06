@@ -5,12 +5,12 @@
 namespace application
 {
     Interface::Interface(engine::Window *window, Renderer *renderer, RaytracingApplication *application)
-        : window(window), renderer(renderer)
+        : renderer(renderer)
     {
         ImGuiIO &io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
-        viewportPanel = std::make_unique<ViewportPanel>(window, renderer->getFramebuffer().get());
+        viewportPanel = std::make_unique<ViewportPanel>(window, renderer);
         hierarchyPanel = std::make_unique<HierarchyPanel>(application);
         inspectorPanel = std::make_unique<InspectorPanel>(hierarchyPanel.get());
     }

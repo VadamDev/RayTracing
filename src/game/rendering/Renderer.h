@@ -14,6 +14,9 @@ namespace application
         void init(engine::Window &window);
         void render() override;
 
+        void onViewportResize(const std::function<void(engine::WindowResizeEvent&)> &callback);
+        void dispatchViewportResize(engine::WindowResizeEvent event);
+
         Camera* getCamera() const { return camera.get(); }
         std::shared_ptr<engine::Framebuffer> getFramebuffer() const { return framebuffer; }
 
@@ -24,5 +27,7 @@ namespace application
         std::shared_ptr<engine::Framebuffer> framebuffer;
 
         std::unique_ptr<Camera> camera;
+
+        engine::EventDispatcher<engine::WindowResizeEvent> viewportResizeDispatcher;
     };
 }
