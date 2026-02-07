@@ -12,10 +12,7 @@ namespace application
         ImGui::Begin(name.c_str());
 
         if (const engine::Entity &selectedEntity = hierarchyPanel->selectedEntity)
-        {
             drawComponents(selectedEntity);
-            drawAddComponentsPopup(selectedEntity);
-        }
 
         ImGui::End();
     }
@@ -26,7 +23,7 @@ namespace application
 
     void InspectorPanel::drawComponents(const engine::Entity &entity)
     {
-        //Tag component
+        //Display Tag
         if (entity.hasComponent<engine::TagComponent>())
         {
             auto &tag = entity.getComponent<engine::TagComponent>().tag;
@@ -34,8 +31,12 @@ namespace application
             char buffer[256] = {};
             strcpy_s(buffer, tag.c_str());
 
-            if (ImGui::InputText("Tag", buffer, sizeof(buffer)))
+            if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
                 tag = std::string(buffer);
+
+            //Add components button
+            ImGui::SameLine();
+            drawAddComponentsPopup(entity);
 
             ImGui::NewLine();
         }
@@ -48,6 +49,8 @@ namespace application
         });
     }
 
+    static constexpr ImGuiTreeNodeFlags DEFAULT_COMPONENTS_FLAGS = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowOverlap | ImGuiTreeNodeFlags_FramePadding;
+
     template<typename T>
     void InspectorPanel::drawComponent(const engine::Entity &entity, const std::string &name, std::function<void(T&)> drawFunc, const bool removable)
     {
@@ -55,20 +58,21 @@ namespace application
             return;
 
         auto &component = entity.getComponent<T>();
-        if (ImGui::TreeNodeEx((void*) typeid(T).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, name.c_str()))
+        if (ImGui::TreeNodeEx((void*) typeid(T).hash_code(), DEFAULT_COMPONENTS_FLAGS, name.c_str()))
         {
-            drawFunc(component);
-
             if (removable)
             {
-                ImGui::NewLine();
+                ImGui::SameLine(ImGui::GetWindowWidth() - 65);
 
                 if (ImGui::Button("Remove"))
                     entity.removeComponent<T>();
             }
 
+            drawFunc(component);
             ImGui::TreePop();
         }
+
+        ImGui::NewLine();
     }
 
     /*
@@ -77,7 +81,6 @@ namespace application
 
     void InspectorPanel::drawAddComponentsPopup(const engine::Entity &entity)
     {
-        ImGui::NewLine();
         if(ImGui::Button("Add Components"))
             ImGui::OpenPopup("AddComponents");
 

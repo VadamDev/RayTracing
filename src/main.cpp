@@ -9,7 +9,7 @@ using namespace application;
 
 int main()
 {
-    engine::Window window(1280, 720, "Ray Tracing");
+    engine::Window window(1280, 720, "Ray Tracing - GPU Melter 3000");
 
     try { window.create(); }
     catch (std::runtime_error &e)

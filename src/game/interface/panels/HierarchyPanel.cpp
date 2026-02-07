@@ -46,7 +46,7 @@ namespace application
         if (entity.hasComponent<engine::TagComponent>())
             tag = entity.getComponent<engine::TagComponent>().tag;
 
-        const ImGuiTreeNodeFlags FLAGS = (selectedEntity == entity ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
+        const ImGuiTreeNodeFlags FLAGS = (selectedEntity == entity ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Bullet;
         const bool opened = ImGui::TreeNodeEx((void*) (uint64_t) (uint32_t) handle, FLAGS, tag.c_str());
 
         //Select the clicked entity
