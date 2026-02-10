@@ -19,5 +19,8 @@ namespace application
         Renderer *renderer;
 
         engine::Framebuffer *framebuffer;
+
+        void resizeViewport(int newWidth, int newHeight) const;
+        glm::ivec2 calculateViewportSize(float windowWidth, float windowHeight) const;
     };
 }
