@@ -1,6 +1,5 @@
 #include "InspectorPanel.h"
 
-#include <imgui.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "../../scene/Components.h"
@@ -31,6 +30,7 @@ namespace application
             char buffer[256] = {};
             strcpy_s(buffer, tag.c_str());
 
+            ImGui::SetNextItemWidth(196);
             if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
                 tag = std::string(buffer);
 
@@ -43,9 +43,9 @@ namespace application
 
         //Transform
         drawComponent<TransformComponent>(entity, "Transform", [](TransformComponent &transform) {
-            ImGui::DragFloat3("Position", glm::value_ptr(transform.position), 0.1f);
-            ImGui::DragFloat3("Rotation", glm::value_ptr(transform.rotation), 0.1f);
-            ImGui::DragFloat("Scale", &transform.scale, 0.1f);
+            Drag3f("Position", transform.position, 0.01f, 0, 0, "%.2f");
+            Drag3f("Rotation", transform.rotation, 0.01f, 0, 0, "%.2f");
+            Drag1f("Scale", transform.scale, 0.01f, 0, 0, "%.2f");
         });
     }
 
@@ -62,11 +62,11 @@ namespace application
         {
             if (removable)
             {
-                ImGui::SameLine(ImGui::GetWindowWidth() - 65);
+                ImGui::SameLine(ImGui::GetWindowWidth() - 62);
 
                 if (ImGui::Button("Remove"))
                     entity.removeComponent<T>();
-            }
+           }
 
             drawFunc(component);
             ImGui::TreePop();

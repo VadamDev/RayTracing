@@ -1,6 +1,5 @@
 #include "ViewportPanel.h"
 
-#include <imgui.h>
 #include <spdlog/spdlog.h>
 
 namespace application
@@ -17,7 +16,7 @@ namespace application
 
         const glm::ivec2 accurateDims = calculateViewportSize(windowWidth, windowHeight);
 
-        //Terrible! way of detecting resizes Todo: resize BEFORE rendering (framebuffer swap?)
+        //Terrible! way of detecting resizes
         if(accurateDims.x != framebuffer->getWidth() || accurateDims.y != framebuffer->getHeight())
             resizeViewport(accurateDims.x, accurateDims.y);
 

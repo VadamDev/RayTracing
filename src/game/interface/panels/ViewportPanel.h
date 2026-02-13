@@ -1,16 +1,16 @@
 #pragma once
 
-#include "IPanel.h"
+#include "UIPanel.h"
 #include "../../rendering/Renderer.h"
 
 namespace application
 {
-    class ViewportPanel : public IPanel
+    class ViewportPanel : public UIPanel
     {
 
     public:
         explicit ViewportPanel(engine::Window *window, Renderer *renderer)
-            : IPanel("Viewport"), window(window), renderer(renderer), framebuffer(renderer->getFramebuffer().get()) {}
+            : UIPanel("Viewport"), window(window), renderer(renderer), framebuffer(renderer->getFramebuffer().get()) {}
 
         void draw() override;
 

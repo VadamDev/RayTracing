@@ -1,16 +1,16 @@
 #pragma once
 
 #include "HierarchyPanel.h"
-#include "IPanel.h"
+#include "UIPanel.h"
 
 namespace application
 {
-    class InspectorPanel : public IPanel
+    class InspectorPanel : public UIPanel
     {
 
     public:
         explicit InspectorPanel(HierarchyPanel *hierarchyPanel)
-            : IPanel("Inspector"), hierarchyPanel(hierarchyPanel) {}
+            : UIPanel("Inspector"), hierarchyPanel(hierarchyPanel) {}
 
         void draw() override;
 

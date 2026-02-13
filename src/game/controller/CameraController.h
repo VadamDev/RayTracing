@@ -15,7 +15,7 @@ namespace application
         void processInputs(float deltaTime);
 
         float sensitivity = 0.2f;
-        float cameraSpeed = 6;
+        float cameraSpeed = 4;
 
     private:
         Camera *camera;

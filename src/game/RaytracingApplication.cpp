@@ -9,7 +9,7 @@ namespace application
         renderer.init(window);
         controller = std::make_unique<CameraController>(renderer.getCamera(), window.getInputsManager());
 
-        interface = std::make_shared<Interface>(&window, &renderer, this);
+        interface = std::make_shared<Interface>(&window, &renderer, this, controller.get());
         window.registerImGuiWindow(interface);
 
         setupDefaultScene(scene);

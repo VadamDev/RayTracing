@@ -1,11 +1,63 @@
 #include "Interface.h"
 
 #include "imgui_internal.h"
+#include "panels/HierarchyPanel.h"
+#include "panels/InspectorPanel.h"
+#include "panels/SettingsPanel.h"
+#include "panels/ViewportPanel.h"
 
 namespace application
 {
-    Interface::Interface(engine::Window *window, Renderer *renderer, RaytracingApplication *application)
-        : renderer(renderer)
+    Interface::Interface(engine::Window *window, Renderer *renderer, RaytracingApplication *application, CameraController *controller)
+    {
+        setupImGuiStyle();
+
+        /*
+         * Create Panels
+         */
+
+        const auto settingsPanel = registerPanel<SettingsPanel>(application, renderer, controller);
+        const auto viewportPanel = registerPanel<ViewportPanel>(window, renderer);
+        const auto hierarchyPanel = registerPanel<HierarchyPanel>(application);
+        const auto inspectorPanel = registerPanel<InspectorPanel>(hierarchyPanel.get());
+    }
+
+    void Interface::draw()
+    {
+        static const ImGuiID DOCKSPACE_ID = ImGui::GetID("My Dockspace");
+
+        const ImGuiViewport *viewport = ImGui::GetMainViewport();
+        if (ImGui::DockBuilderGetNode(DOCKSPACE_ID) == nullptr)
+        {
+            ImGui::DockBuilderAddNode(DOCKSPACE_ID, ImGuiDockNodeFlags_DockSpace);
+            ImGui::DockBuilderSetNodeSize(DOCKSPACE_ID, viewport->Size);
+
+            ImGuiID dockId_Left = 0;
+            ImGuiID dockId_Main = DOCKSPACE_ID;
+            ImGui::DockBuilderSplitNode(dockId_Main, ImGuiDir_Left, 0.28, &dockId_Left, &dockId_Main);
+
+            ImGuiID dockId_Settings = 0;
+            ImGui::DockBuilderSplitNode(dockId_Main, ImGuiDir_Right, 0.225f, &dockId_Settings, &dockId_Main);
+
+            ImGuiID dockId_Hierarchy = 0;
+            ImGuiID dockId_Inspector = 0;
+            ImGui::DockBuilderSplitNode(dockId_Left, ImGuiDir_Up, 0.50f, &dockId_Hierarchy, &dockId_Inspector);
+
+            ImGui::DockBuilderDockWindow("Settings", dockId_Settings);
+            ImGui::DockBuilderDockWindow("Viewport", dockId_Main);
+            ImGui::DockBuilderDockWindow("Hierarchy", dockId_Hierarchy);
+            ImGui::DockBuilderDockWindow("Inspector", dockId_Inspector);
+
+            ImGui::DockBuilderFinish(DOCKSPACE_ID);
+        }
+
+        ImGui::DockSpaceOverViewport(DOCKSPACE_ID, ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+
+        for (const auto &panel : panels)
+            panel->draw();
+    }
+
+    void Interface::setupImGuiStyle()
     {
         /*
          * Config
@@ -20,7 +72,7 @@ namespace application
          */
 
         ImGuiStyle &style = ImGui::GetStyle();
-        style.WindowMinSize.x = 350;
+        style.WindowMinSize.x = 256;
 
         //Roundings
         style.FrameRounding = 5.0f;
@@ -53,46 +105,14 @@ namespace application
         //Title
         colors[ImGuiCol_TitleBg] = { 0.100f, 0.100f, 0.100f, 1 };
         colors[ImGuiCol_TitleBgActive] = colors[ImGuiCol_TitleBg];
-
-        /*
-         * Create Panels
-         */
-
-        viewportPanel = std::make_unique<ViewportPanel>(window, renderer);
-        hierarchyPanel = std::make_unique<HierarchyPanel>(application);
-        inspectorPanel = std::make_unique<InspectorPanel>(hierarchyPanel.get());
     }
 
-    void Interface::draw()
+    template<std::derived_from<UIPanel> T, typename... Args>
+    std::shared_ptr<T> Interface::registerPanel(Args&&... args)
     {
-        static ImGuiID DOCKSPACE_ID = ImGui::GetID("My Dockspace");
+        auto panel = std::make_shared<T>(std::forward<Args>(args)...);
+        panels.push_back(panel);
 
-        const ImGuiViewport *viewport = ImGui::GetMainViewport();
-        if (ImGui::DockBuilderGetNode(DOCKSPACE_ID) == nullptr)
-        {
-            ImGui::DockBuilderAddNode(DOCKSPACE_ID, ImGuiDockNodeFlags_DockSpace);
-            ImGui::DockBuilderSetNodeSize(DOCKSPACE_ID, viewport->Size);
-
-            ImGuiID dock_id_left = 0;
-            ImGuiID dock_id_main = DOCKSPACE_ID;
-            ImGui::DockBuilderSplitNode(dock_id_main, ImGuiDir_Left, 0.20f, &dock_id_left, &dock_id_main);
-
-            ImGuiID dock_id_left_top = 0;
-            ImGuiID dock_id_left_bottom = 0;
-            ImGui::DockBuilderSplitNode(dock_id_left, ImGuiDir_Up, 0.50f, &dock_id_left_top, &dock_id_left_bottom);
-
-            ImGui::DockBuilderDockWindow(viewportPanel->getName(), dock_id_main);
-            ImGui::DockBuilderDockWindow(hierarchyPanel->getName(), dock_id_left_top);
-            ImGui::DockBuilderDockWindow(inspectorPanel->getName(), dock_id_left_bottom);
-
-            ImGui::DockBuilderFinish(DOCKSPACE_ID);
-        }
-
-        ImGui::DockSpaceOverViewport(DOCKSPACE_ID, viewport, ImGuiDockNodeFlags_PassthruCentralNode);
-
-        //Seriously I fucking hate writing UI, who the fuck enjoy this??
-        viewportPanel->draw();
-        hierarchyPanel->draw();
-        inspectorPanel->draw();
+        return panel;
     }
 }

@@ -1,7 +1,5 @@
 #include "HierarchyPanel.h"
 
-#include <imgui.h>
-
 #include "../../RaytracingApplication.h"
 
 namespace application

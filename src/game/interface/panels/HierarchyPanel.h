@@ -1,18 +1,18 @@
 #pragma once
 
-#include "IPanel.h"
+#include "UIPanel.h"
 #include "../../../engine/scene/Entity.h"
 
 namespace application
 {
     class RaytracingApplication;
 
-    class HierarchyPanel : public IPanel
+    class HierarchyPanel : public UIPanel
     {
 
     public:
         explicit HierarchyPanel(RaytracingApplication *application)
-            : IPanel("Hierarchy"), application(application) {}
+            : UIPanel("Hierarchy"), application(application) {}
 
         void draw() override;
 

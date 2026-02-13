@@ -1,29 +1,28 @@
 #pragma once
 
-#include <memory>
-
 #include "../../engine/window/imgui/IImGuiWindow.h"
 #include "../rendering/Renderer.h"
-#include "panels/ViewportPanel.h"
-#include "panels/HierarchyPanel.h"
-#include "panels/InspectorPanel.h"
+#include "panels/UIPanel.h"
 
 namespace application
 {
+    class CameraController;
+    class RaytracingApplication;
+
     class Interface : public engine::IImGuiWindow
     {
 
     public:
-        explicit Interface(engine::Window *window, Renderer *renderer, RaytracingApplication *application);
+        explicit Interface(engine::Window *window, Renderer *renderer, RaytracingApplication *application, CameraController *controller);
 
         void draw() override;
-        bool shouldDraw() override { return true; }
 
     private:
-        Renderer *renderer;
+        template<std::derived_from<UIPanel> T, typename... Args>
+        std::shared_ptr<T> registerPanel(Args&&... args);
 
-        std::unique_ptr<ViewportPanel> viewportPanel;
-        std::unique_ptr<HierarchyPanel> hierarchyPanel;
-        std::unique_ptr<InspectorPanel> inspectorPanel;
+        std::vector<std::shared_ptr<UIPanel>> panels;
+
+        static void setupImGuiStyle();
     };
 }

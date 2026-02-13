@@ -2,6 +2,7 @@
 
 #include "../engine/scene/Scene.h"
 #include "scene/Components.h"
+#include "../engine/scene/Entity.h"
 
 namespace application
 {
