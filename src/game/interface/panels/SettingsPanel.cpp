@@ -48,7 +48,7 @@ namespace application
 
             Drag1f("Fov", camera->fov, 1, 75, 130, "%.0f", 128);
             Drag1f("Sensitivity", controller->sensitivity, 0.01f, 0.01f, 1, "%.2f", 128);
-            Drag1f("Camera Speed", controller->cameraSpeed, 0.05, 1, 8, "%.1f", 128);
+            Drag1f("Camera Speed", controller->cameraSpeed, 0.05f, 1, 8, "%.1f", 128);
         }
 
         ImGui::End();

@@ -1,7 +1,5 @@
 #include "InspectorPanel.h"
 
-#include <glm/gtc/type_ptr.hpp>
-
 #include "../../scene/Components.h"
 
 namespace application
@@ -45,7 +43,7 @@ namespace application
         drawComponent<TransformComponent>(entity, "Transform", [](TransformComponent &transform) {
             Drag3f("Position", transform.position, 0.01f, 0, 0, "%.2f");
             Drag3f("Rotation", transform.rotation, 0.01f, 0, 0, "%.2f");
-            Drag1f("Scale", transform.scale, 0.01f, 0, 0, "%.2f");
+            Drag1f("Scale", transform.scale, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f");
         });
     }
 
