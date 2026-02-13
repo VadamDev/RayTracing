@@ -66,7 +66,7 @@ namespace engine
             throw std::runtime_error("Failed to initialize OpenGL context");
 
         //Show OpenGL version
-        spdlog::info("OpenGL version is {}", std::string_view(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
+        spdlog::info("OpenGL version {}", std::string_view(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
 
         //Show the window
         glfwShowWindow(window);
@@ -146,18 +146,14 @@ namespace engine
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+
+        //ImGui is currently rendered before world rendering. We're always rendering to a framebuffer so it'll never cause issues
+        for (auto &imguiWindow : imguiWindows)
+            imguiWindow->draw();
     }
 
     void Window::popFrame() const noexcept
     {
-        for (auto &imguiWindow : imguiWindows)
-        {
-            if (!imguiWindow->shouldDraw())
-                continue;
-
-            imguiWindow->draw();
-        }
-
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

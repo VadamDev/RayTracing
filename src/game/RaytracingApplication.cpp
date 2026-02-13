@@ -1,5 +1,7 @@
 #include "RaytracingApplication.h"
 
+#include "DefaultScene.h"
+
 namespace application
 {
     void RaytracingApplication::init()
@@ -7,8 +9,10 @@ namespace application
         renderer.init(window);
         controller = std::make_unique<CameraController>(renderer.getCamera(), window.getInputsManager());
 
-        interface = std::make_shared<Interface>();
+        interface = std::make_shared<Interface>(&window, &renderer, this, controller.get());
         window.registerImGuiWindow(interface);
+
+        setupDefaultScene(scene);
     }
 
     void RaytracingApplication::update()
@@ -18,20 +22,22 @@ namespace application
 
     void RaytracingApplication::processInputs(const float deltaTime)
     {
+        if (!window.isGrabbed())
+            return;
+
         const auto inputsManager = window.getInputsManager();
-        if (inputsManager->isMouseButtonDown(engine::MouseButton::BUTTON_1) && !window.isGrabbed() && !window.wantCapturePeripherals())
-            window.setGrabbed(true);
-        else if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_ESCAPE) && window.isGrabbed())
+
+        //Ungrab Viewport
+        if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_ESCAPE))
             window.setGrabbed(false);
 
-        if (window.isGrabbed())
-        {
-            controller->processInputs(deltaTime);
-        }
+        //Camera controls
+        controller->processInputs(deltaTime);
     }
 
     void RaytracingApplication::render(const float deltaTime)
     {
+        glClear(GL_COLOR_BUFFER_BIT);
         renderer.render();
     }
 

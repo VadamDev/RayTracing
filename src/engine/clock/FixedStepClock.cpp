@@ -104,13 +104,13 @@ namespace engine
 
                 timer = now;
 
-                spdlog::info("FPS: {} [{:.3f}ms, avg {:.3f}ms] | UPS: {}",
+                /*spdlog::info("FPS: {} [{:.3f}ms, avg {:.3f}ms] | UPS: {}",
                     fps,
                     renderProfiler->getLastSpentTimeMs(),
                     renderProfiler->calculateSpentTimeAvgMs(),
 
                     ups
-                );
+                );*/
             }
         }
 

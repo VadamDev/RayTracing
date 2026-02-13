@@ -11,9 +11,9 @@ namespace application
     class RaytracingApplication : public engine::Application
     {
 
+    public:
         using Application::Application;
 
-    public:
         void init() override;
 
         void update() override;
@@ -21,6 +21,8 @@ namespace application
         void render(float deltaTime) override;
 
         void destroy() noexcept override;
+
+        engine::Scene& getActiveScene() { return scene; }
 
     private:
         engine::Scene scene;

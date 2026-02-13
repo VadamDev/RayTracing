@@ -4,7 +4,7 @@ namespace application
 {
     void TracingShader::sendViewParams(Camera *camera) const
     {
-        const float planeHeight = camera->nearClipPlane * glm::tan(glm::radians(camera->fov / 2)) * 2;
+        const float planeHeight = camera->nearClipPlane * tan(glm::radians(camera->fov / 2)) * 2;
         const float planeWidth = planeHeight * camera->getAspectRatio();
 
         screenParams->set2f(camera->getWindowWidth(), camera->getWindowHeight());

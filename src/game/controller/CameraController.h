@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+#include "../../engine/window/input/InputsManager.h"
 #include "../rendering/Camera.h"
 
 namespace application
@@ -13,7 +15,7 @@ namespace application
         void processInputs(float deltaTime);
 
         float sensitivity = 0.2f;
-        float cameraSpeed = 6;
+        float cameraSpeed = 4;
 
     private:
         Camera *camera;

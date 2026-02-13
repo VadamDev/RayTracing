@@ -10,7 +10,9 @@ namespace engine
     {
 
     public:
-        Entity newEntity();
+        Entity newEntity(const std::string &name);
+        Entity copyEntity(const Entity &source, const std::string &name);
+        void destroyEntity(const Entity &entity);
 
         entt::registry registry;
     };

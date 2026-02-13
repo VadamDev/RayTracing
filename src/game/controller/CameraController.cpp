@@ -1,12 +1,10 @@
 #include "CameraController.h"
 
-#include <spdlog/spdlog.h>
-
 namespace application
 {
     static constexpr glm::vec3 WORLD_UP(0, 1, 0);
 
-    void CameraController::processInputs(float deltaTime)
+    void CameraController::processInputs(const float deltaTime)
     {
         const bool processedMouse = processMouseMovements(), processedKeyboard = processKeyboardMovements(deltaTime);
 
@@ -41,7 +39,7 @@ namespace application
                 rotation.x = -90;
 
             if (rotation.y > 360)
-                rotation.y = 0;
+                rotation.y -= 360;
             else if (rotation.y < 0)
                 rotation.y += 360;
         }
@@ -49,7 +47,7 @@ namespace application
         return hasProcessed;
     }
 
-    bool CameraController::processKeyboardMovements(float deltaTime) const
+    bool CameraController::processKeyboardMovements(const float deltaTime) const
     {
         float xOffset = 0, yOffset = 0, zOffset = 0;
 
