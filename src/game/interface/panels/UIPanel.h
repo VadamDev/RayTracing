@@ -4,6 +4,8 @@
 #include <utility>
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <glm/vec4.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "glm/vec3.hpp"
 
@@ -80,7 +82,10 @@ namespace application
         static void Drag1f(const std::string &label, float &value, const float speed = 1, const float min = 0, const float max = 0, const char *format = "%.3f", const float columnWidth = 96.0f)
         {
             const int disabledStyles = BeginColumnAlignedControl(label, columnWidth);
+
+            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x + 1);
             ImGui::DragFloat("##value", &value, speed, min, max, format);
+
             EndColumnAlignedControl(disabledStyles);
         }
 
@@ -128,6 +133,16 @@ namespace application
             ImGui::SameLine();
             ImGui::DragFloat("##Z", &values.z, speed, min, max, format);
             ImGui::PopItemWidth();
+
+            EndColumnAlignedControl(disabledStyles);
+        }
+
+        static void Color4f(const std::string &label, glm::vec4 &value, const float columnWidth = 96.0f)
+        {
+            const int disabledStyles = BeginColumnAlignedControl(label, columnWidth);
+
+            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+            ImGui::ColorEdit4("##color", glm::value_ptr(value), ImGuiColorEditFlags_NoLabel);
 
             EndColumnAlignedControl(disabledStyles);
         }

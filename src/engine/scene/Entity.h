@@ -47,7 +47,7 @@ namespace engine
         }
 
         operator bool() const { return handle != entt::null && scene != nullptr; }
-        operator uint32_t() const { return (uint32_t) handle; }
+        operator uint32_t() const { return static_cast<uint32_t>(handle); }
         operator entt::entity() const { return handle; }
 
         bool operator==(const Entity &other) const { return handle == other.handle && scene == other.scene; }
