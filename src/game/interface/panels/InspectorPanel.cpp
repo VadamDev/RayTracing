@@ -50,7 +50,9 @@ namespace application
 
         //Raytraced Material
         drawComponent<RaytracedMaterialComponent>(entity, "Raytraced Material", [](RaytracedMaterialComponent &material) {
-            Color4f("Color", material.color);
+            Color3f("Color", material.color);
+            Color3f("Emission Color", material.emissionColor);
+            Drag1f("Emission Strength", material.emissionStrength, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f");
         });
 
         //Raytraced Sphere

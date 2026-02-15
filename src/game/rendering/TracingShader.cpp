@@ -1,5 +1,7 @@
 #include "TracingShader.h"
 
+#include <spdlog/spdlog.h>
+
 namespace application
 {
     void TracingShader::sendViewParams(Camera *camera) const
@@ -7,7 +9,7 @@ namespace application
         const float planeHeight = camera->nearClipPlane * tan(glm::radians(camera->fov / 2)) * 2;
         const float planeWidth = planeHeight * camera->getAspectRatio();
 
-        screenParams->set2f(camera->getWindowWidth(), camera->getWindowHeight());
+        screenParams->set2i(camera->getWindowWidth(), camera->getWindowHeight());
         viewParams->set3f(planeWidth, planeHeight, camera->nearClipPlane);
         cameraPos->set3f(camera->position);
 
@@ -16,6 +18,7 @@ namespace application
 
     void TracingShader::setupUniforms()
     {
+        currentFrameTime = accessUniform("currentFrameTime");
         screenParams = accessUniform("screenParams");
         viewParams = accessUniform("viewParams");
         cameraPos = accessUniform("cameraPos");
@@ -23,5 +26,7 @@ namespace application
         localToWorldMatrix = accessUniform("localToWorld");
 
         numSpheres = accessUniform("numSpheres");
+        maxBounces = accessUniform("maxBounces");
+        raysPerPixel = accessUniform("raysPerPixel");
     }
 }

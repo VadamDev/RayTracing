@@ -23,6 +23,8 @@ namespace application
         Camera* getCamera() const { return camera.get(); }
         std::shared_ptr<engine::Framebuffer> getFramebuffer() const { return framebuffer; }
 
+        int maxBounces = 8;
+        int raysPerPixel = 16;
     private:
         RaytracingApplication *application = nullptr;
 

@@ -36,10 +36,14 @@ namespace application
     {
         framebuffer->bind();
         glClear(GL_COLOR_BUFFER_BIT);
-        shader->bind();
 
+        shader->bind();
         updateSpheres();
+        shader->currentFrameTime->set1f(application->getWindow().getFrameTimeF());
+        shader->maxBounces->set1i(maxBounces);
+        shader->raysPerPixel->set1i(raysPerPixel);
         shader->sendViewParams(camera.get());
+
         canvasMesh->render();
 
         shader->unbind();

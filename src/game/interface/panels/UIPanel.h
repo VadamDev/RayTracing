@@ -79,6 +79,16 @@ namespace application
          * Drag Floats
          */
 
+        static void Drag1i(const std::string &label, int &value, const int speed = 1, const int min = 0, const int max = 0, const float columnWidth = 96.0f)
+        {
+            const int disabledStyles = BeginColumnAlignedControl(label, columnWidth);
+
+            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x + 1);
+            ImGui::DragInt("##value", &value, speed, min, max);
+
+            EndColumnAlignedControl(disabledStyles);
+        }
+
         static void Drag1f(const std::string &label, float &value, const float speed = 1, const float min = 0, const float max = 0, const char *format = "%.3f", const float columnWidth = 96.0f)
         {
             const int disabledStyles = BeginColumnAlignedControl(label, columnWidth);
@@ -137,12 +147,12 @@ namespace application
             EndColumnAlignedControl(disabledStyles);
         }
 
-        static void Color4f(const std::string &label, glm::vec4 &value, const float columnWidth = 96.0f)
+        static void Color3f(const std::string &label, glm::vec3 &value, const float columnWidth = 96.0f)
         {
             const int disabledStyles = BeginColumnAlignedControl(label, columnWidth);
 
             ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-            ImGui::ColorEdit4("##color", glm::value_ptr(value), ImGuiColorEditFlags_NoLabel);
+            ImGui::ColorEdit3("##color", glm::value_ptr(value), ImGuiColorEditFlags_NoLabel);
 
             EndColumnAlignedControl(disabledStyles);
         }

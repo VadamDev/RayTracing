@@ -45,10 +45,13 @@ namespace application
                 camera->targetAspectRatio = ASPECT_RATIOS[selectedAspectRatio];
 
             ImGui::NewLine();
+            Drag1f("Fov", camera->fov, 1, 75, 130, "%.0f", 150);
+            Drag1f("Sensitivity", controller->sensitivity, 0.01f, 0.01f, 1, "%.2f", 150);
+            Drag1f("Camera Speed", controller->cameraSpeed, 0.05f, 1, 8, "%.1f", 150);
 
-            Drag1f("Fov", camera->fov, 1, 75, 130, "%.0f", 128);
-            Drag1f("Sensitivity", controller->sensitivity, 0.01f, 0.01f, 1, "%.2f", 128);
-            Drag1f("Camera Speed", controller->cameraSpeed, 0.05f, 1, 8, "%.1f", 128);
+            ImGui::NewLine();
+            Drag1i("Max Bounces", renderer->maxBounces, 1, 1, 32, 150);
+            Drag1i("Rays Per Pixel", renderer->raysPerPixel, 1, 1, 256, 150);
         }
 
         ImGui::End();

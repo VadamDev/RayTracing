@@ -16,7 +16,8 @@ namespace application
 
         void setupUniforms() override;
 
-        UniformAccess numSpheres;
+        UniformAccess currentFrameTime;
+        UniformAccess numSpheres, maxBounces, raysPerPixel;
     private:
         UniformAccess screenParams, viewParams, cameraPos; //planeWidth, planeHeight, focalLength
 
