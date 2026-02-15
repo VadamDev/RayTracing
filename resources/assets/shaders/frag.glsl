@@ -1,19 +1,24 @@
 #version 460
 
-//In
-in vec2 pPixelCoords;
+/*
+  Structs
+*/
 
-//Uniforms
-uniform vec2 screenParams;
-uniform vec3 viewParams; //planeWidth, planeHeight, focalLength;
-uniform vec3 cameraPos;
+// Raytraced Objects
+struct Material
+{
+    vec4 color;
+};
 
-uniform mat4 localToWorld;
+struct Sphere
+{
+    vec3 position;
+    float radius;
 
-//Out
-out vec4 fragColor;
+    Material material;
+};
 
-//Shader
+// Rays management
 struct Ray
 {
     vec3 origin, dir;
@@ -24,10 +29,38 @@ struct HitInfo
     bool didHit;
     float dst;
     vec3 hitPos, normal;
+
+    Material material;
 };
 
-//Thanks to: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html and https://www.youtube.com/watch?v=Qz0KTGYJtUk
-HitInfo raySphere(Ray ray, vec3 position, float radius)
+/*
+  IO
+*/
+
+in vec2 pPixelCoords;
+
+out vec4 fragColor;
+
+uniform vec2 screenParams;
+uniform vec3 viewParams; // planeWidth, planeHeight, focalLength;
+uniform vec3 cameraPos;
+
+uniform mat4 localToWorld;
+
+uniform int numSpheres;
+
+layout(std430, binding = 0) buffer SphereBuffer {
+    Sphere spheres[];
+};
+
+/*
+  Shader
+*/
+
+const float INFINITY = 1.0 / 0.0;
+
+// Thanks to: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html and https://www.youtube.com/watch?v=Qz0KTGYJtUk
+HitInfo intersectSphere(Ray ray, vec3 position, float radius)
 {
     HitInfo result;
     result.didHit = false;
@@ -56,8 +89,30 @@ HitInfo raySphere(Ray ray, vec3 position, float radius)
     return result;
 }
 
+HitInfo intersectScene(Ray ray)
+{
+    HitInfo result;
+    result.didHit = false;
+    result.dst = INFINITY;
+
+    for(int i = 0; i < numSpheres; i++)
+    {
+        Sphere sphere = spheres[i];
+
+        HitInfo intersection = intersectSphere(ray, sphere.position, sphere.radius);
+        if(!intersection.didHit || intersection.dst > result.dst)
+            continue;
+
+        result = intersection;
+        result.material = sphere.material;
+    }
+
+    return result;
+}
+
 void main()
 {
+    //Create ray
     vec3 viewPointLocal = vec3(pPixelCoords - 0.5, 1) * viewParams;
     vec3 viewPoint = (localToWorld * vec4(viewPointLocal, 1)).xyz;
 
@@ -65,7 +120,9 @@ void main()
     ray.origin = cameraPos;
     ray.dir = normalize(viewPoint - ray.origin);
 
-    HitInfo a = raySphere(ray, vec3(0, 0, 1), 1);
+    //Find the nearest object
+    HitInfo hitResult = intersectScene(ray);
+    Material material = hitResult.material;
 
-    fragColor = vec4(ray.dir * float(a.didHit), 1);
+    fragColor = vec4(material.color.rgb, 1);
 }

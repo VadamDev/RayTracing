@@ -17,10 +17,11 @@ namespace application
     void TracingShader::setupUniforms()
     {
         screenParams = accessUniform("screenParams");
-
         viewParams = accessUniform("viewParams");
         cameraPos = accessUniform("cameraPos");
 
         localToWorldMatrix = accessUniform("localToWorld");
+
+        numSpheres = accessUniform("numSpheres");
     }
 }

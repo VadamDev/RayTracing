@@ -1,12 +1,17 @@
 #version 460
 
-//In
+/*
+  IO
+*/
+
 layout(location = 0) in vec2 aPos;
 
-//Out
 out vec2 pPixelCoords;
 
-//Shader
+/*
+  Shader
+*/
+
 void main()
 {
     pPixelCoords = aPos * 0.5 + 0.5;

@@ -2,16 +2,19 @@
 
 #include "../../engine/graphics/mesh/VertexArrayObject.h"
 #include "Camera.h"
+#include "SpheresShaderBuffer.h"
 #include "TracingShader.h"
 #include "../../engine/graphics/Framebuffer.h"
 
 namespace application
 {
+    class RaytracingApplication;
+
     class Renderer : public engine::IRenderable
     {
 
     public:
-        void init(engine::Window &window);
+        void init(engine::Window &window, RaytracingApplication *application);
         void render() override;
 
         void onViewportResize(const std::function<void(engine::WindowResizeEvent&)> &callback);
@@ -21,6 +24,8 @@ namespace application
         std::shared_ptr<engine::Framebuffer> getFramebuffer() const { return framebuffer; }
 
     private:
+        RaytracingApplication *application = nullptr;
+
         std::unique_ptr<engine::VertexArrayObject> canvasMesh;
         std::unique_ptr<TracingShader> shader;
 
@@ -29,5 +34,9 @@ namespace application
         std::unique_ptr<Camera> camera;
 
         engine::EventDispatcher<engine::WindowResizeEvent> viewportResizeDispatcher;
+
+        SpheresShaderBuffer spheresBuffer;
+
+        void updateSpheres();
     };
 }

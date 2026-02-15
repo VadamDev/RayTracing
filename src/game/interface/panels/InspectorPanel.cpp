@@ -1,6 +1,5 @@
 #include "InspectorPanel.h"
 
-#include <glm/gtc/type_ptr.hpp>
 #include <spdlog/spdlog.h>
 
 #include "../../scene/Components.h"
@@ -49,15 +48,13 @@ namespace application
             Drag1f("Scale", transform.scale, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f");
         });
 
-        //Raytraced Sphere
-        drawComponent<RaytracedSphereComponent>(entity, "Raytraced Sphere", [](RaytracedSphereComponent &sphere) {
-
-        });
-
         //Raytraced Material
         drawComponent<RaytracedMaterialComponent>(entity, "Raytraced Material", [](RaytracedMaterialComponent &material) {
             Color4f("Color", material.color);
         });
+
+        //Raytraced Sphere
+        drawComponent<RaytracedSphereComponent>(entity, "Raytraced Sphere", [](RaytracedSphereComponent &sphere) {});
     }
 
     static constexpr ImGuiTreeNodeFlags DEFAULT_COMPONENTS_FLAGS = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowOverlap | ImGuiTreeNodeFlags_FramePadding;
