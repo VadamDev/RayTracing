@@ -6,9 +6,11 @@
 
 namespace application
 {
-    //Temp until scene serialization/deserialization is finished
+    /*
+     * Temp until scene serialization/deserialization is finished
+     */
 
-    static void createSphere(engine::Scene &scene ,const std::string &label, glm::vec3 position, float scale, glm::vec3 color)
+    static void createSphere(engine::Scene &scene ,const std::string &label, const glm::vec3 &position, const float scale, const glm::vec3 &color)
     {
         const engine::Entity sphere = scene.newEntity(label);
 
