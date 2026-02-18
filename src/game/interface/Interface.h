@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../engine/window/imgui/IImGuiWindow.h"
+#include "../../engine/window/IImGuiWindow.h"
 #include "../rendering/Renderer.h"
 #include "panels/UIPanel.h"
 

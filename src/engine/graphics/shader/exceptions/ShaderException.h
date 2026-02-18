@@ -1,7 +1,7 @@
 #pragma once
 
-#include <glad/glad.h>
 #include <stdexcept>
+#include <glad/glad.h>
 
 namespace engine::exceptions
 {
@@ -9,7 +9,7 @@ namespace engine::exceptions
        Utils
      */
 
-    static std::string formatShaderType(const unsigned int type)
+    inline std::string formatShaderType(const unsigned int type)
     {
         switch (type)
         {
@@ -17,6 +17,8 @@ namespace engine::exceptions
                 return "VERTEX_SHADER";
             case GL_FRAGMENT_SHADER:
                 return "FRAGMENT_SHADER";
+            case GL_COMPUTE_SHADER:
+                return "COMPUTE_SHADER";
             default:
                 return "UNKNOWN";
         }

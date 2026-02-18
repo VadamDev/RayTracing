@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <spdlog/spdlog.h>
+#include "../window/Window.h"
 
 using namespace std::chrono;
 
@@ -103,14 +104,6 @@ namespace engine
                 frames = 0;
 
                 timer = now;
-
-                /*spdlog::info("FPS: {} [{:.3f}ms, avg {:.3f}ms] | UPS: {}",
-                    fps,
-                    renderProfiler->getLastSpentTimeMs(),
-                    renderProfiler->calculateSpentTimeAvgMs(),
-
-                    ups
-                );*/
             }
         }
 

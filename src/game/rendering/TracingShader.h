@@ -7,13 +7,13 @@ namespace application
 {
     class TracingShader : public engine::ShaderProgram
     {
-
         using UniformAccess = std::unique_ptr<engine::IUniformAccess>;
+
     public:
-        TracingShader() : ShaderProgram("resources/assets/shaders/vert.glsl", "resources/assets/shaders/frag.glsl") {}
+        explicit TracingShader()
+            : ShaderProgram("resources/assets/shaders/vert.glsl", "resources/assets/shaders/frag.glsl") {}
 
         void sendViewParams(Camera *camera) const;
-
         void setupUniforms() override;
 
         UniformAccess currentFrameTime;

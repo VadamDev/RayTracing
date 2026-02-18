@@ -64,7 +64,6 @@ namespace application
      * TODO: this is heavily temporary, we do not need update every frame, just check for changes (with imgui?), and update the buffer if necessary
      * this requires some serious rework, so just leave it as it is for now
      * also this approach might seems a bit stupid, since data is duplicated between components. Only RaytracedSphereComponent is actually sent to the renderer
-     *
      */
     void Renderer::updateSpheres()
     {

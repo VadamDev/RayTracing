@@ -1,9 +1,9 @@
 #include <stdexcept>
 #include <spdlog/spdlog.h>
 
-#include "engine/clock/FixedStepClock.h"
 #include "engine/window/Window.h"
 #include "game/RaytracingApplication.h"
+#include "engine/clock/FixedStepClock.h"
 
 using namespace application;
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "IAppLifecycle.h"
-#include "window/Window.h"
 #include "clock/AbstractClock.h"
 
 namespace engine

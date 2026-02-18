@@ -59,7 +59,7 @@ layout(std430, binding = 0) buffer SphereBuffer {
 
 const float INFINITY = 1.0 / 0.0;
 
-const float PI = 3.14159265358;
+const float PI = 3.1415926;
 const float TAU = PI * 2;
 
 /*
@@ -156,7 +156,7 @@ HitInfo intersectScene(Ray ray)
 
 vec3 traceRay(Ray ray, inout uint rgnState)
 {
-    vec3 outColor = vec3(0);
+    vec3 outColor;
     vec3 rayColor = vec3(1);
 
     for(int i = 0; i <= maxBounces; i++)
@@ -182,7 +182,7 @@ void main()
 {
     //Generate Random Seed
     ivec2 pixelCoords = ivec2(pPixelCoords * screenParams);
-    uint rgnState = uint((pixelCoords.y * screenParams.x + pixelCoords.x) + currentFrameTime * 719393);
+    uint rgnState = uint((pixelCoords.y * screenParams.x + pixelCoords.x) /*+ currentFrameTime * 719393*/);
 
     //Create ray
     vec3 viewPointLocal = vec3(pPixelCoords - 0.5, 1) * viewParams;
@@ -193,7 +193,7 @@ void main()
     ray.dir = normalize(viewPoint - ray.origin);
 
     //Shoot ray and average color
-    vec3 totalLight = vec3(0);
+    vec3 totalLight;
     for(int i = 0; i < raysPerPixel; i++)
         totalLight += traceRay(ray, rgnState);
 

@@ -1,7 +1,5 @@
 #include "TracingShader.h"
 
-#include <spdlog/spdlog.h>
-
 namespace application
 {
     void TracingShader::sendViewParams(Camera *camera) const

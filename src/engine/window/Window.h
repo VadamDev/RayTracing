@@ -7,7 +7,7 @@
 
 #include "../event/EventDispatcher.h"
 #include "event/WindowResizeEvent.h"
-#include "imgui/IImGuiWindow.h"
+#include "IImGuiWindow.h"
 #include "input/InputsManager.h"
 
 namespace engine

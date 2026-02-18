@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../engine/window/Window.h"
-
 namespace engine
 {
+    class Window;
+
     class Framebuffer
     {
 

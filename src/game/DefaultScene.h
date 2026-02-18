@@ -39,7 +39,7 @@ namespace application
 
     static void setupDefaultScene(engine::Scene &scene)
     {
-        createLight(scene, "Light", glm::vec3(3.5, 10, 10), 4, glm::vec3(1, 1, 1), 8);
+        createLight(scene, "Light", glm::vec3(3.5, 10, 10), 4, glm::vec3(1, 1, 1), 1);
 
         createSphere(scene, "White Sphere", glm::vec3(-1.5, 0, 2), 1, glm::vec3(1, 1, 1));
         createSphere(scene, "Red Sphere", glm::vec3(2, 0, 2), 1.5, glm::vec3(1, 0, 0));

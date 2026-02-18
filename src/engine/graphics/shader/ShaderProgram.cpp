@@ -1,18 +1,9 @@
 #include "ShaderProgram.h"
 
 #include "../../utils/FileReader.h"
-#include "UniformAccess.h"
 #include "exceptions/ShaderException.h"
 
 namespace engine {
-    ShaderProgram::~ShaderProgram()
-    {
-        unbind();
-
-        if (programId != 0)
-            glDeleteProgram(programId);
-    }
-
     void ShaderProgram::create()
     {
         const std::string vertexSource = utils::readFile(vertexPath);
@@ -33,67 +24,7 @@ namespace engine {
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
 
-        int success;
-        glGetProgramiv(programId, GL_LINK_STATUS, &success);
-        if (!success)
-        {
-            char log[1024];
-            glGetProgramInfoLog(programId, 1024, nullptr, log);
-
-            glDeleteProgram(programId);
-
-            throw exceptions::ProgramLinkException(log, programId);
-        }
-
+        assertProgramLinked();
         setupUniforms();
-    }
-
-    void ShaderProgram::bind() const
-    {
-        glUseProgram(programId);
-    }
-
-    void ShaderProgram::unbind()
-    {
-        glUseProgram(0);
-    }
-
-    std::unique_ptr<IUniformAccess> ShaderProgram::accessUniform(const std::string &name) const
-    {
-        const int location = glGetUniformLocation(programId, name.c_str());
-        if (location < 0)
-        {
-            spdlog::warn(std::format("Failed to retrieve uniform location for {}, returned a placeholder instead", name));
-            return std::make_unique<NoOpUniformAccess>();
-        }
-
-        return std::make_unique<UniformAccess>(location);
-    }
-
-    /*
-       Static Utils
-     */
-
-    unsigned int ShaderProgram::createShader(const char *source, const unsigned int type)
-    {
-        const unsigned int shaderId = glCreateShader(type);
-        if (shaderId == 0)
-            throw exceptions::ShaderException("Failed to create shader", type);
-
-        glShaderSource(shaderId, 1, &source, nullptr);
-        glCompileShader(shaderId);
-
-        int success;
-        glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
-            char infoLog[1024];
-            glGetShaderInfoLog(shaderId, 1024, nullptr, infoLog);
-
-            glDeleteShader(shaderId);
-            throw exceptions::ShaderCompileException(infoLog, type);
-        }
-
-        return shaderId;
     }
 }

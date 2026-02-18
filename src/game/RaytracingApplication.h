@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../engine/scene/Scene.h"
 #include "../engine/Application.h"
+#include "../engine/scene/Scene.h"
 #include "controller/CameraController.h"
 #include "interface/Interface.h"
 #include "rendering/Renderer.h"

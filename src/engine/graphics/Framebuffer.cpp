@@ -1,6 +1,8 @@
 #include "Framebuffer.h"
 
-#include "glad/glad.h"
+#include <glad/glad.h>
+
+#include "../../engine/window/Window.h"
 
 namespace engine
 {

@@ -45,7 +45,8 @@ namespace engine
         virtual void setBool(bool b) const = 0;
     };
 
-    //Since GLSL compiler scrap every unused variable, it's impossible to create a regular UniformAccess class
+    //Since GLSL compiler scrap every unused variable, we just use a no operation placeholder.
+    //It might be smarter to only return this class on test builds.
     class NoOpUniformAccess : public IUniformAccess
     {
 

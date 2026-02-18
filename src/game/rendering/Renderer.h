@@ -5,6 +5,7 @@
 #include "SpheresShaderBuffer.h"
 #include "TracingShader.h"
 #include "../../engine/graphics/Framebuffer.h"
+#include "../../engine/window/Window.h"
 
 namespace application
 {
