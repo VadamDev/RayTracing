@@ -17,8 +17,8 @@ namespace application
         const glm::ivec2 accurateDims = calculateViewportSize(windowWidth, windowHeight);
 
         //Terrible! way of detecting resizes
-        if(accurateDims.x != framebuffer->getWidth() || accurateDims.y != framebuffer->getHeight())
-            resizeViewport(accurateDims.x, accurateDims.y);
+        if(accurateDims.x != canvas->getWidth() || accurateDims.y != canvas->getHeight())
+            renderer->dispatchCanvasResize(engine::WindowResizeEvent(accurateDims.x, accurateDims.y));
 
         ImGui::PushStyleColor(ImGuiCol_Button, BLANK4);
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, BLANK4);
@@ -26,19 +26,13 @@ namespace application
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, BLANK2);
 
         ImGui::SetCursorPos(ImVec2((windowWidth - accurateDims.x) / 2, (windowHeight - accurateDims.y) / 2));
-        if (ImGui::ImageButton("viewport", framebuffer->getColorTextureId(), ImVec2(accurateDims.x, accurateDims.y), {0, 1}, {1, 0}) && !window->isGrabbed())
+        if (ImGui::ImageButton("viewport", canvas->getTextureHandle(), ImVec2(accurateDims.x, accurateDims.y), {0, 1}, {1, 0}) && !window->isGrabbed())
             window->setGrabbed(true);
 
         ImGui::PopStyleVar();
         ImGui::PopStyleColor(3);
 
         ImGui::End();
-    }
-
-    void ViewportPanel::resizeViewport(const int newWidth, const int newHeight) const
-    {
-        framebuffer->resize(newWidth, newHeight);
-        renderer->dispatchViewportResize(engine::WindowResizeEvent(newWidth, newHeight));
     }
 
     glm::ivec2 ViewportPanel::calculateViewportSize(const float windowWidth, const float windowHeight) const

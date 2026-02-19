@@ -1,5 +1,9 @@
 #version 460
 
+layout(local_size_x = 8, local_size_y = 4, local_size_z = 1) in;
+
+layout(rgba32f, binding = 0) uniform writeonly image2D resultImage;
+
 /*
   Structs
 */
@@ -38,18 +42,12 @@ struct HitInfo
   IO
 */
 
-in vec2 pPixelCoords;
-
-out vec4 fragColor;
-
 uniform float currentFrameTime;
-uniform ivec2 screenParams;
 uniform vec3 viewParams; // planeWidth, planeHeight, focalLength;
 uniform vec3 cameraPos;
 
 uniform mat4 localToWorld;
 
-uniform int numSpheres;
 uniform int maxBounces;
 uniform int raysPerPixel;
 
@@ -58,7 +56,7 @@ layout(std430, binding = 0) buffer SphereBuffer {
 };
 
 const float INFINITY = 1.0 / 0.0;
-
+const float EPSILON = 0.00001;
 const float PI = 3.1415926;
 const float TAU = PI * 2;
 
@@ -87,12 +85,6 @@ vec3 randomDir(inout uint rgnState)
     float y = randNormalDistribution(rgnState);
     float z = randNormalDistribution(rgnState);
     return normalize(vec3(x, y, z));
-}
-
-vec3 randomDirInEmisphere(vec3 normal, inout uint rgnState)
-{
-    vec3 dir = randomDir(rgnState);
-    return dir * sign(dot(normal, dir));
 }
 
 /*
@@ -139,7 +131,7 @@ HitInfo intersectScene(Ray ray)
     result.didHit = false;
     result.dst = INFINITY;
 
-    for(int i = 0; i < numSpheres; i++)
+    for(int i = 0; i < spheres.length(); i++)
     {
         Sphere sphere = spheres[i];
 
@@ -156,7 +148,7 @@ HitInfo intersectScene(Ray ray)
 
 vec3 traceRay(Ray ray, inout uint rgnState)
 {
-    vec3 outColor;
+    vec3 outColor = vec3(0);
     vec3 rayColor = vec3(1);
 
     for(int i = 0; i <= maxBounces; i++)
@@ -171,8 +163,8 @@ vec3 traceRay(Ray ray, inout uint rgnState)
         outColor += emittedLight * rayColor;
         rayColor *= material.color;
 
-        ray.origin = hitResult.hitPos;
-        ray.dir = randomDirInEmisphere(hitResult.normal, rgnState);
+        ray.origin = hitResult.hitPos + hitResult.normal * EPSILON;
+        ray.dir = normalize(hitResult.normal + randomDir(rgnState));
     }
 
     return outColor;
@@ -180,22 +172,24 @@ vec3 traceRay(Ray ray, inout uint rgnState)
 
 void main()
 {
+    ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 screenSize = imageSize(resultImage);
+
     //Generate Random Seed
-    ivec2 pixelCoords = ivec2(pPixelCoords * screenParams);
-    uint rgnState = uint((pixelCoords.y * screenParams.x + pixelCoords.x) /*+ currentFrameTime * 719393*/);
+    uint rgnState = uint(pixelCoords.y * screenSize.x + pixelCoords.x /*+ (currentFrameTime * 719393)*/);
 
     //Create ray
-    vec3 viewPointLocal = vec3(pPixelCoords - 0.5, 1) * viewParams;
-    vec3 viewPoint = (localToWorld * vec4(viewPointLocal, 1)).xyz;
+    vec3 viewPointLocal = vec3(vec2(pixelCoords) / screenSize - 0.5, 1) * viewParams;
+    vec3 viewPoint = vec4(localToWorld * vec4(viewPointLocal, 1)).xyz;
 
     Ray ray;
     ray.origin = cameraPos;
     ray.dir = normalize(viewPoint - ray.origin);
 
     //Shoot ray and average color
-    vec3 totalLight;
+    vec3 totalLight = vec3(0);
     for(int i = 0; i < raysPerPixel; i++)
         totalLight += traceRay(ray, rgnState);
 
-    fragColor = vec4(totalLight / raysPerPixel, 1);
+    imageStore(resultImage, pixelCoords, vec4(totalLight / raysPerPixel, 1));
 }

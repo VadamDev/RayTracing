@@ -34,9 +34,9 @@ namespace application
 
         if (ImGui::CollapsingHeader("Viewport", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            const auto framebuffer = renderer->getFramebuffer();
-            int viewportWidth = framebuffer->getWidth();
-            int viewportHeight = framebuffer->getHeight();
+            const Canvas *canvas = renderer->getCanvas();
+            int viewportWidth = canvas->getWidth();
+            int viewportHeight = canvas->getHeight();
 
             const auto camera = renderer->getCamera();
 
@@ -50,8 +50,8 @@ namespace application
             Drag1f("Camera Speed", controller->cameraSpeed, 0.05f, 1, 8, "%.1f", 150);
 
             ImGui::NewLine();
-            Drag1i("Max Bounces", renderer->maxBounces, 1, 1, 32, 150);
-            Drag1i("Rays Per Pixel", renderer->raysPerPixel, 1, 1, 256, 150);
+            Drag1i("Max Bounces", renderer->maxBounces, 1, 1, 16, 150);
+            Drag1i("Rays Per Pixel", renderer->raysPerPixel, 1, 1, 512, 150);
         }
 
         ImGui::End();

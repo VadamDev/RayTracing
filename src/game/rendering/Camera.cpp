@@ -10,7 +10,7 @@ namespace application
     Camera::Camera(const float fov, const float nearClipPlane, Renderer *renderer)
         : fov(fov), nearClipPlane(nearClipPlane)
     {
-        renderer->onViewportResize([this](const engine::WindowResizeEvent &event) {
+        renderer->onCanvasResize([this](const engine::WindowResizeEvent &event) {
             this->windowWidth = event.getNewWidth();
             this->windowHeight = event.getNewHeight();
 

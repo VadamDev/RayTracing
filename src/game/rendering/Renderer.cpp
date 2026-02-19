@@ -4,59 +4,50 @@
 
 #include "../RaytracingApplication.h"
 #include "../../engine/scene/Entity.h"
+#include "../scene/Components.h"
 
 namespace application
 {
-    void Renderer::init(engine::Window &window, RaytracingApplication *application)
+    void Renderer::init(engine::Window *window, RaytracingApplication *application)
     {
+        this->window = window;
         this->application = application;
 
-        //Screen Mesh
-        canvasMesh = std::make_unique<engine::VertexArrayObject>();
-        canvasMesh->createAndBind(4, engine::RenderType::STRIP);
+        //Canvas
+        canvas = std::make_unique<Canvas>();
+        canvas->create();
 
-        const std::vector<float> vertices = { -1, 1, -1, -1, 1, 1, 1, -1 };
-        canvasMesh->genBuffer(sizeof(float) * 2 * 4, vertices.data(), GL_STATIC_DRAW, 2, GL_FLOAT);
-        canvasMesh->ready();
-
-        //Shader
-        shader = std::make_unique<TracingShader>();
-        shader->create();
-
-        //Framebuffer
-        framebuffer = std::make_shared<engine::Framebuffer>(window.getWidth(), window.getHeight(), &window);
-        framebuffer->create();
-
+        //Camera
         camera = std::make_unique<Camera>(75, 1, this);
 
-        spheresBuffer.create();
+        //Shader
+        shader = std::make_unique<RaytracingShader>();
+        shader->create();
     }
 
     void Renderer::render()
     {
-        framebuffer->bind();
-        glClear(GL_COLOR_BUFFER_BIT);
-
         shader->bind();
+
         updateSpheres();
-        shader->currentFrameTime->set1f(application->getWindow().getFrameTimeF());
+        shader->currentFrameTime->set1f(window->getFrameTimeF());
         shader->maxBounces->set1i(maxBounces);
         shader->raysPerPixel->set1i(raysPerPixel);
         shader->sendViewParams(camera.get());
 
-        canvasMesh->render();
+        shader->dispatchCompute(ceil(canvas->getWidth() / 8), ceil(canvas->getHeight() / 4), 1, GL_ALL_BARRIER_BITS);
 
         shader->unbind();
-        framebuffer->unbind();
     }
 
-    void Renderer::onViewportResize(const std::function<void(engine::WindowResizeEvent &)> &callback)
+    void Renderer::onCanvasResize(const std::function<void(engine::WindowResizeEvent &)> &callback)
     {
         viewportResizeDispatcher.subscribe(callback);
     }
 
-    void Renderer::dispatchViewportResize(engine::WindowResizeEvent event)
+    void Renderer::dispatchCanvasResize(engine::WindowResizeEvent event)
     {
+        canvas->resize(event.getNewWidth(), event.getNewHeight());
         viewportResizeDispatcher.dispatch(event);
     }
 
@@ -65,7 +56,7 @@ namespace application
      * this requires some serious rework, so just leave it as it is for now
      * also this approach might seems a bit stupid, since data is duplicated between components. Only RaytracedSphereComponent is actually sent to the renderer
      */
-    void Renderer::updateSpheres()
+    void Renderer::updateSpheres() const
     {
         std::vector<RaytracedSphereComponent> allSpheres;
 
@@ -87,7 +78,6 @@ namespace application
             allSpheres.push_back(sphere);
         }
 
-        spheresBuffer.update(allSpheres);
-        shader->numSpheres->set1i(spheresBuffer.size());
+        shader->updateSpheresBuffer(allSpheres);
     }
 }
