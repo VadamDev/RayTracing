@@ -13,7 +13,7 @@ namespace application
 
     public:
         explicit RaytracingShader()
-            : ComputeShader("resources/assets/shaders/raytracing.comp") {}
+            : ComputeShader("resources/assets/shaders/raytracing_comp.glsl") {}
 
         void create() override;
 
