@@ -65,25 +65,25 @@ const float TAU = PI * 2;
   Thanks to: https://www.pcg-random.org/index.html and https://observablehq.com/@riccardoscalco/pcg-random-number-generators-in-glsl
 */
 
-float rand(inout uint rgnState)
+float rand(inout uint rngState)
 {
-    rgnState = rgnState * 747796405 + 2891336453;
-    uint result = ((rgnState >> ((rgnState >> 28) + 4)) ^ rgnState) * 277803737;
+    rngState = rngState * 747796405 + 2891336453;
+    uint result = ((rngState >> ((rngState >> 28) + 4)) ^ rngState) * 277803737;
     result = (result >> 22) ^ result;
     return result / 4294967295.0;
 }
 
-float randNormalDistribution(inout uint rgnState)
+float randNormalDistribution(inout uint rngState)
 {
-    float theta = TAU * rand(rgnState);
-    return sqrt(-2 * log(rand(rgnState))) * cos(theta);
+    float theta = TAU * rand(rngState);
+    return sqrt(-2 * log(rand(rngState))) * cos(theta);
 }
 
-vec3 randomDir(inout uint rgnState)
+vec3 randomDir(inout uint rngState)
 {
-    float x = randNormalDistribution(rgnState);
-    float y = randNormalDistribution(rgnState);
-    float z = randNormalDistribution(rgnState);
+    float x = randNormalDistribution(rngState);
+    float y = randNormalDistribution(rngState);
+    float z = randNormalDistribution(rngState);
     return normalize(vec3(x, y, z));
 }
 
@@ -146,7 +146,7 @@ HitInfo intersectScene(Ray ray)
     return result;
 }
 
-vec3 traceRay(Ray ray, inout uint rgnState)
+vec3 traceRay(Ray ray, inout uint rngState)
 {
     vec3 outColor = vec3(0);
     vec3 rayColor = vec3(1);
@@ -164,7 +164,7 @@ vec3 traceRay(Ray ray, inout uint rgnState)
         rayColor *= material.color;
 
         ray.origin = hitResult.hitPos + hitResult.normal * EPSILON;
-        ray.dir = normalize(hitResult.normal + randomDir(rgnState));
+        ray.dir = normalize(hitResult.normal + randomDir(rngState));
     }
 
     return outColor;
@@ -176,7 +176,7 @@ void main()
     ivec2 screenSize = imageSize(resultImage);
 
     //Generate Random Seed
-    uint rgnState = uint(pixelCoords.y * screenSize.x + pixelCoords.x /*+ (currentFrameTime * 719393)*/);
+    uint rngState = uint(pixelCoords.y * screenSize.x + pixelCoords.x /*+ (currentFrameTime * 719393)*/);
 
     //Create ray
     vec3 viewPointLocal = vec3(vec2(pixelCoords) / screenSize - 0.5, 1) * viewParams;
@@ -189,7 +189,7 @@ void main()
     //Shoot ray and average color
     vec3 totalLight = vec3(0);
     for(int i = 0; i < raysPerPixel; i++)
-        totalLight += traceRay(ray, rgnState);
+        totalLight += traceRay(ray, rngState);
 
     imageStore(resultImage, pixelCoords, vec4(totalLight / raysPerPixel, 1));
 }
