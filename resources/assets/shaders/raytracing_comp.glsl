@@ -13,6 +13,8 @@ struct Material
 {
     vec3 color, emissionColor;
     float emissionStrenght;
+
+    float smoothness;
 };
 
 struct Sphere
@@ -23,10 +25,17 @@ struct Sphere
     Material material;
 };
 
+struct Box
+{
+    vec3 boxMin, boxMax;
+    Material material;
+};
+
 // Rays management
 struct Ray
 {
-    vec3 origin, dir;
+    vec3 origin;
+    vec3 dir, invDir;
 };
 
 struct HitInfo
@@ -48,11 +57,16 @@ uniform vec3 cameraPos;
 
 uniform mat4 localToWorld;
 
+uniform bool accumulate;
 uniform int maxBounces;
 uniform int raysPerPixel;
 
 layout(std430, binding = 0) buffer SphereBuffer {
     Sphere spheres[];
+};
+
+layout(std430, binding = 1) buffer BoxBuffer {
+    Box boxes[];
 };
 
 const float INFINITY = 1.0 / 0.0;
@@ -121,6 +135,32 @@ HitInfo intersectSphere(Ray ray, vec3 position, float radius)
     return result;
 }
 
+//Based from https://gist.github.com/DomNomNom/46bb1ce47f68d255fd5d
+HitInfo intersectAABB(Ray ray, vec3 boxMin, vec3 boxMax)
+{
+    HitInfo result;
+    result.didHit = false;
+
+    vec3 tMin = (boxMin - ray.origin) * ray.invDir;
+    vec3 tMax = (boxMax - ray.origin) * ray.invDir;
+
+    vec3 t1 = min(tMin, tMax);
+    vec3 t2 = max(tMin, tMax);
+
+    float tNear = max(max(t1.x, t1.y), t1.z);;
+    float tFar = min(min(t2.x, t2.y), t2.z);
+
+    if(tNear <= tFar && tFar >= 0)
+    {
+        result.didHit = true;
+        result.dst = tNear;
+        result.hitPos = ray.origin + ray.dir * tNear;
+        result.normal = -sign(ray.dir) * step(vec3(tNear - EPSILON), t1); //TODO: verify if normalize is required here
+    }
+
+    return result;
+}
+
 /*
   Shader
 */
@@ -131,6 +171,7 @@ HitInfo intersectScene(Ray ray)
     result.didHit = false;
     result.dst = INFINITY;
 
+    //Spheres
     for(int i = 0; i < spheres.length(); i++)
     {
         Sphere sphere = spheres[i];
@@ -141,6 +182,19 @@ HitInfo intersectScene(Ray ray)
 
         result = intersection;
         result.material = sphere.material;
+    }
+
+    //Boxes
+    for(int i = 0; i < boxes.length(); i++)
+    {
+        Box box = boxes[i];
+
+        HitInfo intersection = intersectAABB(ray, box.boxMin, box.boxMax);
+        if(!intersection.didHit || intersection.dst > result.dst)
+            continue;
+
+        result = intersection;
+        result.material = box.material;
     }
 
     return result;
@@ -157,14 +211,20 @@ vec3 traceRay(Ray ray, inout uint rngState)
         if(!hitResult.didHit)
             break;
 
+        //Calculate lighting
         Material material = hitResult.material;
         vec3 emittedLight = material.emissionColor * material.emissionStrenght;
 
         outColor += emittedLight * rayColor;
         rayColor *= material.color;
 
+        //Bounce ray
         ray.origin = hitResult.hitPos + hitResult.normal * EPSILON;
-        ray.dir = normalize(hitResult.normal + randomDir(rngState));
+
+        vec3 diffuseDir = normalize(hitResult.normal + randomDir(rngState));
+        vec3 specularDir = reflect(ray.dir, hitResult.normal);
+        ray.dir = mix(diffuseDir, specularDir, material.smoothness);
+        ray.invDir = 1 / ray.dir;
     }
 
     return outColor;
@@ -176,7 +236,7 @@ void main()
     ivec2 screenSize = imageSize(resultImage);
 
     //Generate Random Seed
-    uint rngState = uint(pixelCoords.y * screenSize.x + pixelCoords.x + (frameIndex * 719393));
+    uint rngState = uint(pixelCoords.y * screenSize.x + pixelCoords.x + (frameIndex * 719393 * int(accumulate)));
 
     //Create ray
     vec3 viewPointLocal = vec3(vec2(pixelCoords) / screenSize - 0.5, 1) * viewParams;
@@ -185,15 +245,21 @@ void main()
     Ray ray;
     ray.origin = cameraPos;
     ray.dir = normalize(viewPoint - ray.origin);
+    ray.invDir = 1 / ray.dir;
 
     //Shoot ray and average color
     vec3 totalLight = vec3(0);
     for(int i = 0; i < raysPerPixel; i++)
         totalLight += traceRay(ray, rngState);
 
-    float weight = 1.0 / frameIndex;
-    vec3 accumulatedColor = imageLoad(resultImage, pixelCoords).rgb;
-    vec3 finalColor = mix(accumulatedColor, totalLight / raysPerPixel, weight);
+    //Accumulate
+    vec3 finalColor = totalLight / raysPerPixel;
+    if(accumulate)
+    {
+        float weight = 1.0 / frameIndex;
+        vec3 accumulatedColor = imageLoad(resultImage, pixelCoords).rgb;
+        finalColor = mix(accumulatedColor, finalColor, weight);
+    }
 
     imageStore(resultImage, pixelCoords, vec4(finalColor, 1));
 }

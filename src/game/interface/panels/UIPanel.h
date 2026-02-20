@@ -79,6 +79,16 @@ namespace application
          * Drag Floats
          */
 
+        static void Checkbox(const std::string &label, bool &value, const float columnWidth = 96.0f)
+        {
+            const int disabledStyles = BeginColumnAlignedControl(label, columnWidth);
+
+            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x + 1);
+            ImGui::Checkbox("##value", &value);
+
+            EndColumnAlignedControl(disabledStyles);
+        }
+
         static void Drag1i(const std::string &label, int &value, const int speed = 1, const int min = 0, const int max = 0, const float columnWidth = 96.0f)
         {
             const int disabledStyles = BeginColumnAlignedControl(label, columnWidth);

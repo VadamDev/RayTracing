@@ -31,10 +31,13 @@ namespace application
 
     void Renderer::render()
     {
+        updateSpheres();
+        updateBoxes();
+
         shader->bind();
 
-        updateSpheres();
         shader->frameIndex->set1i(frameIndex++);
+        shader->accumulate->setBool(accumulate);
         shader->maxBounces->set1i(maxBounces);
         shader->raysPerPixel->set1i(raysPerPixel);
         shader->sendViewParams(camera.get());
@@ -82,10 +85,35 @@ namespace application
             }
 
             sphere.material = entity.getComponent<RaytracedMaterialComponent>();
-
             allSpheres.push_back(sphere);
         }
 
         shader->updateSpheresBuffer(allSpheres);
+    }
+
+    void Renderer::updateBoxes() const
+    {
+        std::vector<RaytracedBoxComponent> allBoxes;
+
+        engine::Scene &currentScene = application->getActiveScene();
+        for (auto &entityHandle : currentScene.registry.view<RaytracedMaterialComponent, RaytracedBoxComponent>())
+        {
+            const engine::Entity entity = { entityHandle, &currentScene };
+
+            auto &box = entity.getComponent<RaytracedBoxComponent>();
+            if (entity.hasComponent<TransformComponent>())
+            {
+                const auto &transform = entity.getComponent<TransformComponent>();
+
+                const auto halfScale = glm::vec3(transform.scale / 2);
+                box.boxMin = transform.position - halfScale;
+                box.boxMax = transform.position + halfScale;
+            }
+
+            box.material = entity.getComponent<RaytracedMaterialComponent>();
+            allBoxes.push_back(box);
+        }
+
+        shader->updateBoxesBuffer(allBoxes);
     }
 }

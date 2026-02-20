@@ -36,14 +36,14 @@ namespace engine
             bBound = false;
         }
 
-        void update(const std::vector<T> &data, const unsigned int usage)
+        void update(const std::vector<T> &data, const unsigned int binding, const unsigned int usage)
         {
             currentSize = data.size();
 
             bind();
 
             glNamedBufferData(ssbo, sizeof(T) * currentSize, data.data(), usage);
-            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, ssbo);
 
             unbind();
         }

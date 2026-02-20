@@ -24,6 +24,7 @@ namespace application
         Canvas* getCanvas() const { return canvas.get(); }
         Camera* getCamera() const { return camera.get(); }
 
+        bool accumulate = true;
         int maxBounces = 8;
         int raysPerPixel = 32;
     private:
@@ -39,5 +40,6 @@ namespace application
         engine::EventDispatcher<engine::WindowResizeEvent> viewportResizeDispatcher;
 
         void updateSpheres() const;
+        void updateBoxes() const;
     };
 }

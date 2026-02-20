@@ -8,6 +8,7 @@ namespace application
     {
         ComputeShader::create();
         spheresBuffer.create();
+        boxesBuffer.create();
     }
 
     void RaytracingShader::sendViewParams(Camera *camera) const
@@ -29,12 +30,18 @@ namespace application
 
         localToWorldMatrix = accessUniform("localToWorld");
 
+        accumulate = accessUniform("accumulate");
         maxBounces = accessUniform("maxBounces");
         raysPerPixel = accessUniform("raysPerPixel");
     }
 
     void RaytracingShader::updateSpheresBuffer(const std::vector<RaytracedSphereComponent> &spheres)
     {
-        spheresBuffer.update(spheres, GL_DYNAMIC_DRAW);
+        spheresBuffer.update(spheres, 0, GL_DYNAMIC_DRAW);
+    }
+
+    void RaytracingShader::updateBoxesBuffer(const std::vector<RaytracedBoxComponent> &boxes)
+    {
+        boxesBuffer.update(boxes, 1, GL_DYNAMIC_DRAW);
     }
 }

@@ -21,11 +21,14 @@ namespace application
         void setupUniforms() override;
 
         void updateSpheresBuffer(const std::vector<RaytracedSphereComponent> &spheres);
+        void updateBoxesBuffer(const std::vector<RaytracedBoxComponent> &boxes);
 
         UniformAccess frameIndex;
+        UniformAccess accumulate;
         UniformAccess maxBounces, raysPerPixel;
     private:
         engine::ShaderStorageBuffer<RaytracedSphereComponent> spheresBuffer;
+        engine::ShaderStorageBuffer<RaytracedBoxComponent> boxesBuffer;
 
         UniformAccess screenParams, viewParams, cameraPos; //planeWidth, planeHeight, focalLength
         UniformAccess localToWorldMatrix;

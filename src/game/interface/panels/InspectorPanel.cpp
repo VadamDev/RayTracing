@@ -53,10 +53,14 @@ namespace application
             Color3f("Color", material.color);
             Color3f("Emission Color", material.emissionColor);
             Drag1f("Emission Strength", material.emissionStrength, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f");
+            Drag1f("Smoothness", material.smoothness, 0.01f, 0, 1, "%.2f");
         });
 
         //Raytraced Sphere
         drawComponent<RaytracedSphereComponent>(entity, "Raytraced Sphere", [](RaytracedSphereComponent &sphere) {});
+
+        //Raytraced Box
+        drawComponent<RaytracedBoxComponent>(entity, "Raytraced Box", [](RaytracedBoxComponent &box) {});
     }
 
     static constexpr ImGuiTreeNodeFlags DEFAULT_COMPONENTS_FLAGS = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowOverlap | ImGuiTreeNodeFlags_FramePadding;
@@ -105,6 +109,9 @@ namespace application
 
         //Raytraced Sphere
         drawAddComponent<RaytracedSphereComponent>(entity, "Raytraced Sphere");
+
+        //Raytraced Box
+        drawAddComponent<RaytracedBoxComponent>(entity, "Raytraced Box");
 
         ImGui::EndPopup();
     }

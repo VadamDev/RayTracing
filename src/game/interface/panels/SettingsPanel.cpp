@@ -50,6 +50,7 @@ namespace application
             Drag1f("Camera Speed", controller->cameraSpeed, 0.05f, 1, 8, "%.1f", 150);
 
             ImGui::NewLine();
+            Checkbox("Accumulate", renderer->accumulate, 150);
             Drag1i("Max Bounces", renderer->maxBounces, 1, 1, 16, 150);
             Drag1i("Rays Per Pixel", renderer->raysPerPixel, 1, 1, 512, 150);
         }
