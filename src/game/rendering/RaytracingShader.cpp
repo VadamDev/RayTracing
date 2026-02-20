@@ -23,7 +23,7 @@ namespace application
 
     void RaytracingShader::setupUniforms()
     {
-        currentFrameTime = accessUniform("currentFrameTime");
+        frameIndex = accessUniform("frameIndex");
         viewParams = accessUniform("viewParams");
         cameraPos = accessUniform("cameraPos");
 

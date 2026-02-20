@@ -25,8 +25,10 @@ namespace application
         Camera* getCamera() const { return camera.get(); }
 
         int maxBounces = 8;
-        int raysPerPixel = 16;
+        int raysPerPixel = 32;
     private:
+        unsigned int frameIndex = 1;
+
         engine::Window *window = nullptr;
         RaytracingApplication *application = nullptr;
 

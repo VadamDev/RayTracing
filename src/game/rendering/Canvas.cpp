@@ -6,13 +6,13 @@ namespace application
 {
     Canvas::~Canvas()
     {
-        if(texHandle != 0)
-            glDeleteTextures(1, &texHandle);
+        if(mainTexHandle != 0)
+            glDeleteTextures(1, &mainTexHandle);
     }
 
     void Canvas::create()
     {
-        texHandle = createTexture();
+        createTextures();
     }
 
     void Canvas::resize(const int width, const int height)
@@ -20,13 +20,18 @@ namespace application
         this->width = width;
         this->height = height;
 
-        if (texHandle != 0)
-            glDeleteTextures(1, &texHandle);
+        if (mainTexHandle != 0)
+            glDeleteTextures(1, &mainTexHandle);
 
-        texHandle = createTexture();
+        createTextures();
     }
 
-    unsigned int Canvas::createTexture() const
+    void Canvas::createTextures()
+    {
+        mainTexHandle = createTexture(0, GL_READ_WRITE);
+    }
+
+    unsigned int Canvas::createTexture(const unsigned int binding, const unsigned int access) const
     {
         unsigned int texHandle = 0;
         glCreateTextures(GL_TEXTURE_2D, 1, &texHandle);
@@ -38,7 +43,7 @@ namespace application
         glTexParameteri(texHandle, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(texHandle, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-        glBindImageTexture(0, texHandle, 0, GL_FALSE, GL_FALSE, GL_WRITE_ONLY, GL_RGBA32F);
+        glBindImageTexture(binding, texHandle, 0, GL_FALSE, GL_FALSE, access, GL_RGBA32F);
 
         return texHandle;
     }

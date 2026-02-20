@@ -18,11 +18,15 @@ namespace application
         canvas->create();
 
         //Camera
-        camera = std::make_unique<Camera>(75, 1, this);
+        camera = std::make_unique<Camera>(90, 1, this);
 
         //Shader
         shader = std::make_unique<RaytracingShader>();
         shader->create();
+
+        camera->onCameraMove([this](CameraMovedEvent &_) {
+            frameIndex = 1;
+        });
     }
 
     void Renderer::render()
@@ -30,7 +34,7 @@ namespace application
         shader->bind();
 
         updateSpheres();
-        shader->currentFrameTime->set1f(window->getFrameTimeF());
+        shader->frameIndex->set1i(frameIndex++);
         shader->maxBounces->set1i(maxBounces);
         shader->raysPerPixel->set1i(raysPerPixel);
         shader->sendViewParams(camera.get());
@@ -48,6 +52,8 @@ namespace application
     void Renderer::dispatchCanvasResize(engine::WindowResizeEvent event)
     {
         canvas->resize(event.getNewWidth(), event.getNewHeight());
+        frameIndex = 1;
+
         viewportResizeDispatcher.dispatch(event);
     }
 
@@ -58,6 +64,8 @@ namespace application
      */
     void Renderer::updateSpheres() const
     {
+        //TODO: if any changes are detected here, we need to reset the frame index to 1
+
         std::vector<RaytracedSphereComponent> allSpheres;
 
         engine::Scene &currentScene = application->getActiveScene();

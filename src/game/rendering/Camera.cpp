@@ -24,5 +24,8 @@ namespace application
         localToWorldMatrix = glm::translate(localToWorldMatrix, position);
         localToWorldMatrix = glm::rotate(localToWorldMatrix, glm::radians(rotation.y), UP);
         localToWorldMatrix = glm::rotate(localToWorldMatrix, glm::radians(rotation.x), RIGHT);
+
+        CameraMovedEvent event;
+        moveDispatcher.dispatch(event);
     }
 }

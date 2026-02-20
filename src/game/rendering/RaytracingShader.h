@@ -22,7 +22,7 @@ namespace application
 
         void updateSpheresBuffer(const std::vector<RaytracedSphereComponent> &spheres);
 
-        UniformAccess currentFrameTime;
+        UniformAccess frameIndex;
         UniformAccess maxBounces, raysPerPixel;
     private:
         engine::ShaderStorageBuffer<RaytracedSphereComponent> spheresBuffer;

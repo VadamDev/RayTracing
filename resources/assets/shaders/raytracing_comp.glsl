@@ -2,7 +2,7 @@
 
 layout(local_size_x = 8, local_size_y = 4, local_size_z = 1) in;
 
-layout(rgba32f, binding = 0) uniform writeonly image2D resultImage;
+layout(rgba32f, binding = 0) uniform image2D resultImage;
 
 /*
   Structs
@@ -42,7 +42,7 @@ struct HitInfo
   IO
 */
 
-uniform float currentFrameTime;
+uniform int frameIndex;
 uniform vec3 viewParams; // planeWidth, planeHeight, focalLength;
 uniform vec3 cameraPos;
 
@@ -176,7 +176,7 @@ void main()
     ivec2 screenSize = imageSize(resultImage);
 
     //Generate Random Seed
-    uint rngState = uint(pixelCoords.y * screenSize.x + pixelCoords.x /*+ (currentFrameTime * 719393)*/);
+    uint rngState = uint(pixelCoords.y * screenSize.x + pixelCoords.x + (frameIndex * 719393));
 
     //Create ray
     vec3 viewPointLocal = vec3(vec2(pixelCoords) / screenSize - 0.5, 1) * viewParams;
@@ -191,5 +191,9 @@ void main()
     for(int i = 0; i < raysPerPixel; i++)
         totalLight += traceRay(ray, rngState);
 
-    imageStore(resultImage, pixelCoords, vec4(totalLight / raysPerPixel, 1));
+    float weight = 1.0 / frameIndex;
+    vec3 accumulatedColor = imageLoad(resultImage, pixelCoords).rgb;
+    vec3 finalColor = mix(accumulatedColor, totalLight / raysPerPixel, weight);
+
+    imageStore(resultImage, pixelCoords, vec4(finalColor, 1));
 }
