@@ -81,7 +81,7 @@ namespace application
             {
                 const auto &transform = entity.getComponent<TransformComponent>();
                 sphere.position = transform.position;
-                sphere.radius = transform.scale;
+                sphere.radius = (transform.scale.x + transform.scale.y + transform.scale.z) / 3;
             }
 
             sphere.material = entity.getComponent<RaytracedMaterialComponent>();
@@ -105,7 +105,7 @@ namespace application
             {
                 const auto &transform = entity.getComponent<TransformComponent>();
 
-                const auto halfScale = glm::vec3(transform.scale / 2);
+                glm::vec3 halfScale = transform.scale * 0.5f;
                 box.boxMin = transform.position - halfScale;
                 box.boxMax = transform.position + halfScale;
             }

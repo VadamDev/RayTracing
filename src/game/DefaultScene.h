@@ -6,6 +6,12 @@
 
 namespace application
 {
+    inline constexpr glm::vec3 COLOR_RED(1, 0, 0);
+    inline constexpr glm::vec3 COLOR_GREEN(0, 1, 0);
+    inline constexpr glm::vec3 COLOR_BLUE(0, 0, 1);
+    inline constexpr glm::vec3 COLOR_PURPLE(1, 0, 1);
+    inline constexpr glm::vec3 COLOR_WHITE(1);
+
     /*
      * Temp until scene serialization/deserialization is finished
      */
@@ -16,7 +22,7 @@ namespace application
 
         auto &transform = sphere.addComponent<TransformComponent>();
         transform.position = position;
-        transform.scale = scale;
+        transform.scale = glm::vec3(scale);
 
         auto &material = sphere.addComponent<RaytracedMaterialComponent>();
         material.color = glm::vec4(color, 1);
@@ -37,7 +43,7 @@ namespace application
         return light;
     }
 
-    inline engine::Entity createBox(engine::Scene &scene, const std::string &label, const glm::vec3 &position, const float scale, const glm::vec3 &color)
+    inline engine::Entity createBox(engine::Scene &scene, const std::string &label, const glm::vec3 &position, const glm::vec3 scale, const glm::vec3 &color)
     {
         const engine::Entity box = scene.newEntity(label);
 
@@ -55,15 +61,14 @@ namespace application
 
     inline void setupDefaultScene(engine::Scene &scene)
     {
-        createLight(scene, "Light", glm::vec3(3.5, 10, 10), 4, glm::vec3(1, 1, 1), 6);
+        createBox(scene, "Floor Box", glm::vec3(5, -27.20, 0), glm::vec3(50), COLOR_WHITE);
+        createBox(scene, "Purple Box", glm::vec3(4.39, -1.67, 7.52), glm::vec3(1), COLOR_PURPLE);
 
-        createSphere(scene, "White Sphere", glm::vec3(-1.5, 0, 2), 1, glm::vec3(1, 1, 1));
-        createSphere(scene, "Red Sphere", glm::vec3(2, 0, 2), 1.5, glm::vec3(1, 0, 0));
-        createSphere(scene, "Green Sphere", glm::vec3(6, 0, 2), 2, glm::vec3(0, 1, 0));
-        createSphere(scene, "Blue Sphere", glm::vec3(11, 0, 2), 2.5, glm::vec3(0, 0, 1));
+        createSphere(scene, "Blue Sphere", glm::vec3(11, 0, 2), 2.5, COLOR_BLUE);
+        createSphere(scene, "Green Sphere", glm::vec3(6, -0.23, 2), 2, COLOR_GREEN);
+        createSphere(scene, "Red Sphere", glm::vec3(2, -0.73, 2), 1.5, COLOR_RED);
+        createSphere(scene, "White Sphere", glm::vec3(-1.5, -1.21, 2), 1, COLOR_WHITE);
 
-        createSphere(scene, "BIG Sphere", glm::vec3(6, -52, 2), 50, glm::vec3(1, 1, 1));
-
-        createBox(scene, "Box", glm::vec3(0, 5, 0), 1, glm::vec3(1, 0, 1));
+        createLight(scene, "Light", glm::vec3(3.5, 10, 10),4, COLOR_WHITE, 6);
     }
 }

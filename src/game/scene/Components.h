@@ -8,7 +8,7 @@ namespace application
     {
         glm::vec3 position;
         glm::vec3 rotation;
-        float scale;
+        glm::vec3 scale;
     };
 
     struct RaytracedMaterialComponent

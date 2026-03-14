@@ -157,6 +157,96 @@ namespace application
             EndColumnAlignedControl(disabledStyles);
         }
 
+        static void DragLinked3f(const std::string &label, glm::vec3 &values, bool &linked, const float speed = 1, const float min = 0, const float max = 0, const char *format = "%.3f", const float defaultValue = 0.0, const float columnWidth = 96.0f)
+        {
+            /*
+             * This approach set the 2 axis to the modified axis if linked
+             * The another way to do it would be to calculate the difference between old and new value and adding it to the other 2 axis.
+             * Also, I hate imgui this is such a mess
+             */
+
+            //Modified version of BeginColumnAlignedControl
+            ImGui::PushID(label.c_str());
+            int disabledStyles = PushDisableRounding();
+
+            ImGui::Columns(2);
+            ImGui::SetColumnWidth(0, columnWidth);
+            ImGui::Text(label.c_str());
+
+            ImGui::SameLine();
+            ImGui::SetWindowFontScale(0.6f);
+            ImGui::SetCursorPosX(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x - (GImGui->FontSize + GImGui->Style.FramePadding.x * 2));
+            ImGui::Checkbox("##Link", &linked);
+            ImGui::SetWindowFontScale(1);
+
+            ImGui::NextColumn();
+            disabledStyles += PushDisableSpacing();
+
+            //Modified version of Drag3f
+            ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+
+            const ImVec2 buttonSize = calculateButtonSize();
+
+            //X
+            ImGui::PushStyleColor(ImGuiCol_Button, { 0.8f, 0.1f, 0.1f, 1 });
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.7f, 0.15f, 0.15f, 1 });
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered));
+            if (ImGui::Button("X", buttonSize))
+            {
+                if (linked)
+                    values = glm::vec3(defaultValue);
+                else
+                    values.x = defaultValue;
+            }
+            ImGui::PopStyleColor(3);
+
+            ImGui::SameLine();
+            if (ImGui::DragFloat("##X", &values.x, speed, min, max, format) && linked)
+                values.y = values.z = values.x;
+            ImGui::PopItemWidth();
+            ImGui::SameLine();
+
+            //Y
+            ImGui::PushStyleColor(ImGuiCol_Button, { 0.1f, 0.8f, 0.1f, 1 });
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.15f, 0.7f, 0.15f, 1 });
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered));
+            if (ImGui::Button("Y", buttonSize))
+            {
+                if (linked)
+                    values = glm::vec3(defaultValue);
+                else
+                    values.y = defaultValue;
+            }
+            ImGui::PopStyleColor(3);
+
+            ImGui::SameLine();
+            if (ImGui::DragFloat("##Y", &values.y, speed, min, max, format) && linked)
+                values.x = values.z = values.y;
+            ImGui::PopItemWidth();
+            ImGui::SameLine();
+
+            //Z
+            ImGui::PushStyleColor(ImGuiCol_Button, { 0.1f, 0.1f, 0.8f, 1 });
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.15f, 0.15f, 0.7f, 1 });
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered));
+            if (ImGui::Button("Z", buttonSize))
+            {
+                if (linked)
+                    values = glm::vec3(defaultValue);
+                else
+                    values.z = defaultValue;
+            }
+            ImGui::PopStyleColor(3);
+
+            ImGui::SameLine();
+            if (ImGui::DragFloat("##Z", &values.z, speed, min, max, format) && linked)
+                values.x = values.y = values.z;
+            ImGui::PopItemWidth();
+
+            //Original EndColumnAlignedControl
+            EndColumnAlignedControl(disabledStyles);
+        }
+
         static void Color3f(const std::string &label, glm::vec3 &value, const float columnWidth = 96.0f)
         {
             const int disabledStyles = BeginColumnAlignedControl(label, columnWidth);

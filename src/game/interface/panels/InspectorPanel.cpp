@@ -41,11 +41,13 @@ namespace application
             ImGui::NewLine();
         }
 
+        static bool linked = false;
+
         //Transform
         drawComponent<TransformComponent>(entity, "Transform", [](TransformComponent &transform) {
             Drag3f("Position", transform.position, 0.01f, 0, 0, "%.2f");
-            Drag3f("Rotation", transform.rotation, 0.01f, 0, 0, "%.2f");
-            Drag1f("Scale", transform.scale, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f");
+            Drag3f("Rotation", transform.rotation, 0.1f, 0, 0, "%.1f");
+            DragLinked3f("Scale", transform.scale, linked, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f");
         });
 
         //Raytraced Material
