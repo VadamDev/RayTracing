@@ -31,6 +31,7 @@ namespace engine
          */
 
         virtual void set1i(int value) const = 0;
+        virtual void set1ui(unsigned int value) const = 0;
 
         virtual void set2i(int x, int y) const = 0;
         virtual void set2i(const glm::ivec2 &vector) const = 0;
@@ -61,6 +62,7 @@ namespace engine
 
         void setMatrix4f(const glm::mat4 &matrix) const override {}
 
+        void set1ui(unsigned int value) const override {}
         void set1i(int value) const override {}
 
         void set2i(int x, int y) const override {}

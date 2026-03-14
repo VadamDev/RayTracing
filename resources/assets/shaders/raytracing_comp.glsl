@@ -51,7 +51,7 @@ struct HitInfo
   IO
 */
 
-uniform int frameIndex;
+uniform uint frameIndex;
 uniform vec3 viewParams; // planeWidth, planeHeight, focalLength;
 uniform vec3 cameraPos;
 
@@ -105,23 +105,23 @@ vec3 randomDir(inout uint rngState)
   Intersections
 */
 
-// Thanks to: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection.html and https://www.youtube.com/watch?v=Qz0KTGYJtUk
+// Thanks to: https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects/simplifyingtheray-sphereintersectioncode
 HitInfo intersectSphere(Ray ray, vec3 position, float radius)
 {
     HitInfo result;
     result.didHit = false;
 
-    vec3 offsetRayOrigin = ray.origin - position;
+    vec3 oc = position - ray.origin;
 
     float a = dot(ray.dir, ray.dir);
-    float b = dot(offsetRayOrigin, ray.dir) * 2;
-    float c = dot(offsetRayOrigin, offsetRayOrigin) - radius * radius;
+    float h = dot(ray.dir, oc);
+    float c = dot(oc, oc) - radius * radius;
 
-    float discreminant = b * b - 4 * a * c;
+    float discreminant = h * h - a * c;
 
     if(discreminant >= 0)
     {
-        float dst = (-b - sqrt(discreminant)) / (2 * a);
+        float dst = (h - sqrt(discreminant)) / a;
 
         if(dst >= 0)
         {
@@ -155,10 +155,24 @@ HitInfo intersectAABB(Ray ray, vec3 boxMin, vec3 boxMax)
         result.didHit = true;
         result.dst = tNear;
         result.hitPos = ray.origin + ray.dir * tNear;
-        result.normal = -sign(ray.dir) * step(vec3(tNear - EPSILON), t1); //TODO: verify if normalize is required here
+        result.normal = -sign(ray.dir) * step(vec3(tNear - EPSILON), t1);
     }
 
     return result;
+}
+
+bool intersectAABB_simple(Ray ray, vec3 boxMin, vec3 boxMax)
+{
+    vec3 tMin = (boxMin - ray.origin) * ray.invDir;
+    vec3 tMax = (boxMax - ray.origin) * ray.invDir;
+
+    vec3 t1 = min(tMin, tMax);
+    vec3 t2 = max(tMin, tMax);
+
+    float tNear = max(max(t1.x, t1.y), t1.z);;
+    float tFar = min(min(t2.x, t2.y), t2.z);
+
+    return tNear <= tFar && tFar >= 0;
 }
 
 /*
@@ -236,7 +250,7 @@ void main()
     ivec2 screenSize = imageSize(resultImage);
 
     //Generate Random Seed
-    uint rngState = uint(pixelCoords.y * screenSize.x + pixelCoords.x + (frameIndex * 719393 * int(accumulate)));
+    uint rngState = uint(pixelCoords.y * screenSize.x + pixelCoords.x + (frameIndex * 719393 * uint(accumulate)));
 
     //Create ray
     vec3 viewPointLocal = vec3(vec2(pixelCoords) / screenSize - 0.5, 1) * viewParams;
@@ -256,7 +270,7 @@ void main()
     vec3 finalColor = totalLight / raysPerPixel;
     if(accumulate)
     {
-        float weight = 1.0 / frameIndex;
+        float weight = 1 / frameIndex;
         vec3 accumulatedColor = imageLoad(resultImage, pixelCoords).rgb;
         finalColor = mix(accumulatedColor, finalColor, weight);
     }

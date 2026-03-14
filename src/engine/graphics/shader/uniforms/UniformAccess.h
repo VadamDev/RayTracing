@@ -29,6 +29,7 @@ namespace engine {
          */
 
         void set1i(int value) const override;
+        void set1ui(unsigned int value) const override;
 
         void set2i(int x, int y) const override;
         void set2i(const glm::ivec2 &vector) const override;

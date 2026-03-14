@@ -36,7 +36,7 @@ namespace application
 
         shader->bind();
 
-        shader->frameIndex->set1i(frameIndex++);
+        shader->frameIndex->set1ui(frameIndex++);
         shader->accumulate->setBool(accumulate);
         shader->maxBounces->set1i(maxBounces);
         shader->raysPerPixel->set1i(raysPerPixel);

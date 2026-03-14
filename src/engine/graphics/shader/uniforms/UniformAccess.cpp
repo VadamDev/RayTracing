@@ -39,6 +39,11 @@ namespace engine {
         glUniform1i(location, value);
     }
 
+    void UniformAccess::set1ui(const unsigned int value) const
+    {
+        glUniform1ui(location, value);
+    }
+
     void UniformAccess::set2i(const int x, const int y) const
     {
         glUniform2i(location, x, y);
