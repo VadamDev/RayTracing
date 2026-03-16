@@ -1,7 +1,5 @@
 #include "Renderer.h"
 
-#include <spdlog/spdlog.h>
-
 #include "../RaytracingApplication.h"
 #include "../../engine/clock/FixedStepClock.h"
 #include "../../engine/scene/Entity.h"

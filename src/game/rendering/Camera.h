@@ -4,7 +4,6 @@
 #include "glm/vec3.hpp"
 #include <glm/ext/matrix_transform.hpp>
 
-#include "CameraMovedEvent.h"
 #include "../../engine/event/EventDispatcher.h"
 
 namespace application
@@ -12,6 +11,7 @@ namespace application
     static constexpr float DEFAULT_ASPECT_RATIO = 16.0f / 9.0f;
 
     class Renderer;
+    class CameraMovedEvent : public engine::IEvent {};
 
     class Camera
     {

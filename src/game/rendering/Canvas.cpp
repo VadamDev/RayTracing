@@ -12,7 +12,7 @@ namespace application
 
     void Canvas::create()
     {
-        createTextures();
+        mainTexHandle = createTexture(0, GL_READ_WRITE);
     }
 
     void Canvas::resize(const int width, const int height)
@@ -23,11 +23,6 @@ namespace application
         if (mainTexHandle != 0)
             glDeleteTextures(1, &mainTexHandle);
 
-        createTextures();
-    }
-
-    void Canvas::createTextures()
-    {
         mainTexHandle = createTexture(0, GL_READ_WRITE);
     }
 

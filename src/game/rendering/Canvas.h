@@ -21,7 +21,6 @@ namespace application
         int width = 0, height = 0;
         unsigned int mainTexHandle = 0, accumulatorTexHandle = 0;
 
-        void createTextures();
         unsigned int createTexture(unsigned int binding, unsigned int access) const;
     };
 }
