@@ -33,6 +33,7 @@ namespace application
         accumulate = accessUniform("accumulate");
         maxBounces = accessUniform("maxBounces");
         raysPerPixel = accessUniform("raysPerPixel");
+        environmentLight = accessUniform("environmentLight");
     }
 
     void RaytracingShader::updateSpheresBuffer(const std::vector<RaytracedSphereComponent> &spheres)

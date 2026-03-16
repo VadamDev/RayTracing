@@ -26,6 +26,7 @@ namespace application
         UniformAccess frameIndex;
         UniformAccess accumulate;
         UniformAccess maxBounces, raysPerPixel;
+        UniformAccess environmentLight;
     private:
         engine::ShaderStorageBuffer<RaytracedSphereComponent> spheresBuffer;
         engine::ShaderStorageBuffer<RaytracedBoxComponent> boxesBuffer;

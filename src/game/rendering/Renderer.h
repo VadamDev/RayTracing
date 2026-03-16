@@ -6,6 +6,11 @@
 #include "RaytracingShader.h"
 #include "../../engine/window/Window.h"
 
+namespace engine
+{
+    class ProfilerEntry;
+}
+
 namespace application
 {
     class RaytracingApplication;
@@ -26,7 +31,8 @@ namespace application
 
         bool accumulate = true;
         int maxBounces = 8;
-        int raysPerPixel = 32;
+        int raysPerPixel = 16;
+        bool environmentLight = true;
     private:
         unsigned int frameIndex = 1;
 

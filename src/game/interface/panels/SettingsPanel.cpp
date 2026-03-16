@@ -53,6 +53,7 @@ namespace application
             Checkbox("Accumulate", renderer->accumulate, 150);
             Drag1i("Max Bounces", renderer->maxBounces, 1, 1, 16, 150);
             Drag1i("Rays Per Pixel", renderer->raysPerPixel, 1, 1, 512, 150);
+            Checkbox("Environment Light", renderer->environmentLight, 150);
         }
 
         ImGui::End();

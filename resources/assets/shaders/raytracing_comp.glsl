@@ -1,6 +1,6 @@
 #version 460
 
-layout(local_size_x = 8, local_size_y = 4, local_size_z = 1) in;
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
 layout(rgba32f, binding = 0) uniform image2D resultImage;
 
@@ -19,7 +19,7 @@ struct Material
 
 struct Sphere
 {
-    vec3 position;
+    vec3 pos;
     float radius;
 
     Material material;
@@ -28,6 +28,23 @@ struct Sphere
 struct Box
 {
     vec3 boxMin, boxMax;
+
+    Material material;
+};
+
+struct Triangle
+{
+    vec3 posA, posB, posC;
+    vec3 normalA, normalB, normalC;
+};
+
+struct TriangleMesh
+{
+    int triangleIndex;
+    int numTriangles;
+
+    vec3 boxMin, boxMax;
+
     Material material;
 };
 
@@ -56,10 +73,10 @@ uniform vec3 viewParams; // planeWidth, planeHeight, focalLength;
 uniform vec3 cameraPos;
 
 uniform mat4 localToWorld;
-
 uniform bool accumulate;
 uniform int maxBounces;
 uniform int raysPerPixel;
+uniform bool environmentLight;
 
 layout(std430, binding = 0) buffer SphereBuffer {
     Sphere spheres[];
@@ -69,16 +86,24 @@ layout(std430, binding = 1) buffer BoxBuffer {
     Box boxes[];
 };
 
+layout(std430, binding = 1) buffer TriangleBuffer {
+    Triangle triangles[];
+};
+
+layout(std430, binding = 1) buffer MeshesBuffer {
+    TriangleMesh meshes[];
+};
+
 const float INFINITY = 1.0 / 0.0;
 const float EPSILON = 0.00001;
 const float PI = 3.1415926;
 const float TAU = PI * 2;
 
 /*
-  Random Number Generation
-  Thanks to: https://www.pcg-random.org/index.html and https://observablehq.com/@riccardoscalco/pcg-random-number-generators-in-glsl
+  Random Generation
 */
 
+// Permuted congruential generator, thanks to https://observablehq.com/@riccardoscalco/pcg-random-number-generators-in-glsl
 float rand(inout uint rngState)
 {
     rngState = rngState * 747796405 + 2891336453;
@@ -87,6 +112,7 @@ float rand(inout uint rngState)
     return result / 4294967295.0;
 }
 
+// Cosine weighted distribution
 float randNormalDistribution(inout uint rngState)
 {
     float theta = TAU * rand(rngState);
@@ -106,16 +132,16 @@ vec3 randomDir(inout uint rngState)
 */
 
 // Thanks to: https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects/simplifyingtheray-sphereintersectioncode
-HitInfo intersectSphere(Ray ray, vec3 position, float radius)
+HitInfo intersectSphere(Ray ray, Sphere sphere)
 {
     HitInfo result;
     result.didHit = false;
 
-    vec3 oc = position - ray.origin;
+    vec3 oc = sphere.pos - ray.origin;
 
     float a = dot(ray.dir, ray.dir);
     float h = dot(ray.dir, oc);
-    float c = dot(oc, oc) - radius * radius;
+    float c = dot(oc, oc) - sphere.radius * sphere.radius;
 
     float discreminant = h * h - a * c;
 
@@ -128,21 +154,56 @@ HitInfo intersectSphere(Ray ray, vec3 position, float radius)
             result.didHit = true;
             result.dst = dst;
             result.hitPos = ray.origin + ray.dir * dst;
-            result.normal = normalize(result.hitPos - position);
+            result.normal = normalize(result.hitPos - sphere.pos);
         }
     }
 
     return result;
 }
 
-//Based from https://gist.github.com/DomNomNom/46bb1ce47f68d255fd5d
-HitInfo intersectAABB(Ray ray, vec3 boxMin, vec3 boxMax)
+// Möller–Trumbore intersection algorithm, thanks to https://youtu.be/Qz0KTGYJtUk
+HitInfo intersectTriangle(Ray ray, Triangle tri)
 {
     HitInfo result;
     result.didHit = false;
 
-    vec3 tMin = (boxMin - ray.origin) * ray.invDir;
-    vec3 tMax = (boxMax - ray.origin) * ray.invDir;
+    vec3 edgeAB = tri.posB - tri.posA;
+    vec3 edgeAC = tri.posC - tri.posA;
+    vec3 normal = cross(edgeAB, edgeAC);
+
+    float discreminant = -dot(ray.dir, normal);
+    if(discreminant >= EPSILON)
+    {
+        float invDiscreminant = 1.0 / discreminant;
+
+        vec3 ao = ray.origin - tri.posA;
+        vec3 dao = cross(ao, ray.dir);
+
+        float dst = dot(ao, normal) * invDiscreminant;
+        float u = dot(edgeAC, dao) * invDiscreminant;
+        float v = -dot(edgeAB, dao) * invDiscreminant;
+        float w = 1 - u - v;
+
+        if(dst >= 0 && u >= 0 && v >= 0 && w >= 0)
+        {
+            result.didHit = true;
+            result.dst = dst;
+            result.hitPos = ray.origin + ray.dir * dst;
+            result.normal = normalize(tri.normalA * w + tri.normalB * u + tri.normalC * v);
+        }
+    }
+
+    return result;
+}
+
+// AABB intersection based of https://gist.github.com/DomNomNom/46bb1ce47f68d255fd5d
+HitInfo intersectAABB(Ray ray, Box box)
+{
+    HitInfo result;
+    result.didHit = false;
+
+    vec3 tMin = (box.boxMin - ray.origin) * ray.invDir;
+    vec3 tMax = (box.boxMax - ray.origin) * ray.invDir;
 
     vec3 t1 = min(tMin, tMax);
     vec3 t2 = max(tMin, tMax);
@@ -161,7 +222,7 @@ HitInfo intersectAABB(Ray ray, vec3 boxMin, vec3 boxMax)
     return result;
 }
 
-bool intersectAABB_simple(Ray ray, vec3 boxMin, vec3 boxMax)
+bool intersectAABB(Ray ray, vec3 boxMin, vec3 boxMax)
 {
     vec3 tMin = (boxMin - ray.origin) * ray.invDir;
     vec3 tMax = (boxMax - ray.origin) * ray.invDir;
@@ -190,7 +251,7 @@ HitInfo intersectScene(Ray ray)
     {
         Sphere sphere = spheres[i];
 
-        HitInfo intersection = intersectSphere(ray, sphere.position, sphere.radius);
+        HitInfo intersection = intersectSphere(ray, sphere);
         if(!intersection.didHit || intersection.dst > result.dst)
             continue;
 
@@ -203,7 +264,7 @@ HitInfo intersectScene(Ray ray)
     {
         Box box = boxes[i];
 
-        HitInfo intersection = intersectAABB(ray, box.boxMin, box.boxMax);
+        HitInfo intersection = intersectAABB(ray, box);
         if(!intersection.didHit || intersection.dst > result.dst)
             continue;
 
@@ -211,7 +272,41 @@ HitInfo intersectScene(Ray ray)
         result.material = box.material;
     }
 
+    //Meshes
+    for(int i = 0; i < meshes.length(); i++)
+    {
+        TriangleMesh mesh = meshes[i];
+        if(!intersectAABB(ray, mesh.boxMin, mesh.boxMax))
+            continue;
+
+        for(int j = mesh.triangleIndex; j < mesh.numTriangles; j++)
+        {
+            Triangle tri = triangles[j];
+
+            HitInfo intersection = intersectTriangle(ray, tri);
+            if(!intersection.didHit || intersection.dst > result.dst)
+                continue;
+
+            result = intersection;
+            result.material = mesh.material;
+        }
+    }
+
     return result;
+}
+
+vec3 calculateEnvironmentLight(Ray ray)
+{
+    if(!environmentLight)
+        return vec3(0);
+
+    float verticalPos = clamp(ray.dir.y, 0, 1);
+    vec3 skyColor = mix(vec3(0.5, 0.7, 1.0), vec3(0.1, 0.3, 0.8), verticalPos);
+
+    float haze = pow(1.0 - verticalPos, 4.0);
+    skyColor = mix(skyColor, vec3(0.8, 0.8, 0.9), haze);
+
+    return skyColor * vec3(1.0, 0.9, 0.7);
 }
 
 vec3 traceRay(Ray ray, inout uint rngState)
@@ -222,8 +317,10 @@ vec3 traceRay(Ray ray, inout uint rngState)
     for(int i = 0; i <= maxBounces; i++)
     {
         HitInfo hitResult = intersectScene(ray);
-        if(!hitResult.didHit)
+        if(!hitResult.didHit) {
+            outColor += calculateEnvironmentLight(ray) * rayColor;
             break;
+        }
 
         //Calculate lighting
         Material material = hitResult.material;
@@ -238,7 +335,7 @@ vec3 traceRay(Ray ray, inout uint rngState)
         vec3 diffuseDir = normalize(hitResult.normal + randomDir(rngState));
         vec3 specularDir = reflect(ray.dir, hitResult.normal);
         ray.dir = mix(diffuseDir, specularDir, material.smoothness);
-        ray.invDir = 1 / ray.dir;
+        ray.invDir = 1.0 / ray.dir;
     }
 
     return outColor;
@@ -259,7 +356,7 @@ void main()
     Ray ray;
     ray.origin = cameraPos;
     ray.dir = normalize(viewPoint - ray.origin);
-    ray.invDir = 1 / ray.dir;
+    ray.invDir = 1.0 / ray.dir;
 
     //Shoot ray and average color
     vec3 totalLight = vec3(0);
@@ -270,7 +367,7 @@ void main()
     vec3 finalColor = totalLight / raysPerPixel;
     if(accumulate)
     {
-        float weight = 1 / frameIndex;
+        float weight = 1.0 / frameIndex;
         vec3 accumulatedColor = imageLoad(resultImage, pixelCoords).rgb;
         finalColor = mix(accumulatedColor, finalColor, weight);
     }

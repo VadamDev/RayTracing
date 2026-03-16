@@ -4,7 +4,6 @@
 #include <utility>
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <glm/vec4.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "glm/vec3.hpp"

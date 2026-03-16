@@ -3,6 +3,7 @@
 #include <spdlog/spdlog.h>
 
 #include "../RaytracingApplication.h"
+#include "../../engine/clock/FixedStepClock.h"
 #include "../../engine/scene/Entity.h"
 #include "../scene/Components.h"
 
@@ -40,9 +41,10 @@ namespace application
         shader->accumulate->setBool(accumulate);
         shader->maxBounces->set1i(maxBounces);
         shader->raysPerPixel->set1i(raysPerPixel);
+        shader->environmentLight->setBool(environmentLight);
         shader->sendViewParams(camera.get());
 
-        shader->dispatchCompute(ceil(canvas->getWidth() / 8), ceil(canvas->getHeight() / 4), 1, GL_ALL_BARRIER_BITS);
+        shader->dispatchCompute(ceil(canvas->getWidth() / 8), ceil(canvas->getHeight() / 8), 1, GL_TEXTURE_FETCH_BARRIER_BIT);
 
         shader->unbind();
     }
