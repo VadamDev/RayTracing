@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "../event/EventDispatcher.h"
-#include "event/WindowResizeEvent.h"
+#include "WindowResizeEvent.h"
 #include "IImGuiWindow.h"
 #include "input/InputsManager.h"
 

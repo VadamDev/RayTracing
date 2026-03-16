@@ -15,11 +15,11 @@ namespace engine
         try { game.init(); }
         catch (std::exception &e)
         {
-            spdlog::critical("A critical exception has been caught during game init:\n{}", e.what());
+            spdlog::critical("A critical exception has been caught during init:\n{}", e.what());
             return;
         }
 
-        spdlog::info("Starting game clock with target FPS: {} and target UPS: {}", targetFps, targetUps);
+        spdlog::info("Starting clock with target FPS: {} and target UPS: {}", targetFps, targetUps);
         loop();
     }
 
