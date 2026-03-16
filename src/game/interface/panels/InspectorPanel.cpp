@@ -59,10 +59,10 @@ namespace application
         });
 
         //Raytraced Sphere
-        drawComponent<RaytracedSphereComponent>(entity, "Raytraced Sphere", [](RaytracedSphereComponent &sphere) {});
+        drawEmptyComponent<RaytracedSphereComponent>(entity, "Raytraced Sphere");
 
         //Raytraced Box
-        drawComponent<RaytracedBoxComponent>(entity, "Raytraced Box", [](RaytracedBoxComponent &box) {});
+        drawEmptyComponent<RaytracedBoxComponent>(entity, "Raytraced Box");
     }
 
     static constexpr ImGuiTreeNodeFlags DEFAULT_COMPONENTS_FLAGS = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowOverlap | ImGuiTreeNodeFlags_FramePadding;
@@ -73,19 +73,49 @@ namespace application
         if(!entity.hasComponent<T>())
             return;
 
-        auto &component = entity.getComponent<T>();
-        if (ImGui::TreeNodeEx((void*) typeid(T).hash_code(), DEFAULT_COMPONENTS_FLAGS, name.c_str()))
+        const bool opened = ImGui::TreeNodeEx((void*) typeid(T).hash_code(), DEFAULT_COMPONENTS_FLAGS, name.c_str());
+
+        if (removable)
         {
-            if (removable)
-            {
-                ImGui::SameLine(ImGui::GetWindowWidth() - 62);
+            ImGui::PushID(typeid(T).name());
 
-                if (ImGui::Button("Remove"))
-                    entity.removeComponent<T>();
-           }
+            ImGui::SameLine(ImGui::GetWindowWidth() - 62);
+            if (ImGui::Button("Remove"))
+                entity.removeComponent<T>();
 
-            drawFunc(component);
+            ImGui::PopID();
+        }
+
+        if (opened)
+        {
+            drawFunc(entity.getComponent<T>());
             ImGui::TreePop();
+        }
+
+        ImGui::NewLine();
+    }
+
+    static constexpr ImGuiTreeNodeFlags DEFAULT_EMPTY_COMPONENTS_FLAGS = ImGuiTreeNodeFlags_Bullet | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowOverlap | ImGuiTreeNodeFlags_FramePadding;
+
+    template<typename T>
+    void InspectorPanel::drawEmptyComponent(const engine::Entity &entity, const std::string &name, const bool removable)
+    {
+        if (!entity.hasComponent<T>())
+            return;
+
+        ImGui::BeginDisabled();
+        ImGui::TreeNodeEx((void*) typeid(T).hash_code(), DEFAULT_EMPTY_COMPONENTS_FLAGS, name.c_str());
+        ImGui::EndDisabled();
+
+        if (removable)
+        {
+            ImGui::PushID(typeid(T).name());
+
+            ImGui::SameLine(ImGui::GetWindowWidth() - 62);
+            if (ImGui::Button("Remove"))
+                entity.removeComponent<T>();
+
+            ImGui::PopID();
         }
 
         ImGui::NewLine();

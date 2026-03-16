@@ -26,6 +26,9 @@ namespace application
         template<typename T>
         static void drawComponent(const engine::Entity &entity, const std::string &name, std::function<void(T&)> drawFunc, bool removable = true);
 
+        template<typename T>
+        static void drawEmptyComponent(const engine::Entity &entity, const std::string &name, bool removable = true);
+
         /*
          * Add Components
          */
