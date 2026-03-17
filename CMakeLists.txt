@@ -8,6 +8,7 @@ find_package(spdlog REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
+find_package(tinyobjloader CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 
 file(GLOB_RECURSE PROJECT_SOURCE_FILES src/*.cpp)
@@ -21,6 +22,7 @@ target_link_libraries(${PROJECT_NAME}
         glad::glad
         glfw
         glm::glm
+        tinyobjloader::tinyobjloader
         imgui::imgui
 )
 

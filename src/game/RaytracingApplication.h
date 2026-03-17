@@ -4,6 +4,7 @@
 #include "../engine/scene/Scene.h"
 #include "controller/CameraController.h"
 #include "interface/Interface.h"
+#include "model/ModelManager.h"
 #include "rendering/Renderer.h"
 
 namespace application
@@ -23,8 +24,11 @@ namespace application
         void destroy() noexcept override;
 
         engine::Scene& getActiveScene() { return scene; }
+        ModelManager& getModelManager() { return modelManager; }
 
     private:
+        ModelManager modelManager;
+
         engine::Scene scene;
 
         Renderer renderer;

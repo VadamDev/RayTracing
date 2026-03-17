@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "../../engine/graphics/shader/ComputeShader.h"
 #include "../../engine/graphics/shader/ShaderStorageBuffer.h"
+#include "../model/ModelManager.h"
 #include "../scene/Components.h"
 
 namespace application
@@ -22,6 +23,8 @@ namespace application
 
         void updateSpheresBuffer(const std::vector<RaytracedSphereComponent> &spheres);
         void updateBoxesBuffer(const std::vector<RaytracedBoxComponent> &boxes);
+        void updateTrianglesBuffer(const std::vector<Triangle> &triangles);
+        void updateMeshesBuffer(const std::vector<TriangleMeshData> &meshes);
 
         UniformAccess frameIndex;
         UniformAccess accumulate;
@@ -30,6 +33,8 @@ namespace application
     private:
         engine::ShaderStorageBuffer<RaytracedSphereComponent> spheresBuffer;
         engine::ShaderStorageBuffer<RaytracedBoxComponent> boxesBuffer;
+        engine::ShaderStorageBuffer<Triangle> trianglesBuffer;
+        engine::ShaderStorageBuffer<TriangleMeshData> meshesBuffer;
 
         UniformAccess screenParams, viewParams, cameraPos; //planeWidth, planeHeight, focalLength
         UniformAccess localToWorldMatrix;

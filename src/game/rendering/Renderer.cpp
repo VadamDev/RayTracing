@@ -1,5 +1,7 @@
 #include "Renderer.h"
 
+#include <spdlog/spdlog.h>
+
 #include "../RaytracingApplication.h"
 #include "../../engine/clock/FixedStepClock.h"
 #include "../../engine/scene/Entity.h"
@@ -30,8 +32,12 @@ namespace application
 
     void Renderer::render()
     {
-        updateSpheres();
-        updateBoxes();
+        //TODO: hack, until i add an event for accumulation reset
+        if(accumulatedBefore != accumulate)
+            frameIndex = 1;
+        accumulatedBefore = accumulate;
+
+        updateBuffers();
 
         shader->bind();
 
@@ -58,6 +64,14 @@ namespace application
         frameIndex = 1;
 
         viewportResizeDispatcher.dispatch(event);
+    }
+
+    void Renderer::updateBuffers() const
+    {
+        updateSpheres();
+        updateBoxes();
+        updateTriangles();
+        updateTriangleMeshes();
     }
 
     /*
@@ -115,5 +129,57 @@ namespace application
         }
 
         shader->updateBoxesBuffer(allBoxes);
+    }
+
+    void Renderer::updateTriangles() const
+    {
+        shader->updateTrianglesBuffer(application->getModelManager().getAllTriangles());
+    }
+
+    void Renderer::updateTriangleMeshes() const
+    {
+        const auto &meshesMap = application->getModelManager().getAllMeshes();
+
+        std::vector<TriangleMeshData> allMeshes;
+
+        engine::Scene &currentScene = application->getActiveScene();
+        for (auto &entityHandle : currentScene.registry.view<RaytracedMaterialComponent, RaytracedMeshComponent>())
+        {
+            const engine::Entity entity = { entityHandle, &currentScene };
+
+            const std::string &meshName = entity.getComponent<RaytracedMeshComponent>().name;
+            if (!meshesMap.contains(meshName))
+                continue;
+
+            auto transformMatrix = glm::identity<glm::mat4>();
+            if (entity.hasComponent<TransformComponent>())
+            {
+                const auto &transform = entity.getComponent<TransformComponent>();
+
+                transformMatrix = glm::translate(transformMatrix, transform.position);
+                transformMatrix = glm::rotate(transformMatrix, glm::radians(transform.rotation.x), glm::vec3(1, 0, 0));
+                transformMatrix = glm::rotate(transformMatrix, glm::radians(transform.rotation.y), glm::vec3(0, 1, 0));
+                transformMatrix = glm::rotate(transformMatrix, glm::radians(transform.rotation.z), glm::vec3(0, 0, 1));
+                transformMatrix = glm::scale(transformMatrix, transform.scale);
+            }
+
+            const TriangleMesh &mesh = meshesMap.at(meshName);
+            const TriangleMeshData data {
+                .triIndex = mesh.triIndex,
+                .triCount = mesh.numTri,
+
+                .boxMin = mesh.boxMin,
+                .boxMax = mesh.boxMax,
+
+                .localToWorld = transformMatrix,
+                .worldToLocal = glm::inverse(transformMatrix),
+
+                .material = entity.getComponent<RaytracedMaterialComponent>()
+            };
+
+            allMeshes.push_back(data);
+        }
+
+        shader->updateMeshesBuffer(allMeshes);
     }
 }

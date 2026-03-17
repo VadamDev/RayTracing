@@ -6,6 +6,8 @@ namespace application
 {
     void RaytracingApplication::init()
     {
+        modelManager.loadAll();
+
         renderer.init(&window, this);
         controller = std::make_unique<CameraController>(renderer.getCamera(), window.getInputsManager());
 

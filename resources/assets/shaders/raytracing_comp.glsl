@@ -40,10 +40,12 @@ struct Triangle
 
 struct TriangleMesh
 {
-    int triangleIndex;
-    int numTriangles;
+    uint triIndex;
+    uint numTri;
 
     vec3 boxMin, boxMax;
+
+    mat4 localToWorld, worldToLocal;
 
     Material material;
 };
@@ -86,11 +88,11 @@ layout(std430, binding = 1) buffer BoxBuffer {
     Box boxes[];
 };
 
-layout(std430, binding = 1) buffer TriangleBuffer {
+layout(std430, binding = 2) buffer TriangleBuffer {
     Triangle triangles[];
 };
 
-layout(std430, binding = 1) buffer MeshesBuffer {
+layout(std430, binding = 3) buffer MeshesBuffer {
     TriangleMesh meshes[];
 };
 
@@ -208,10 +210,10 @@ HitInfo intersectAABB(Ray ray, Box box)
     vec3 t1 = min(tMin, tMax);
     vec3 t2 = max(tMin, tMax);
 
-    float tNear = max(max(t1.x, t1.y), t1.z);;
+    float tNear = max(max(t1.x, t1.y), t1.z);
     float tFar = min(min(t2.x, t2.y), t2.z);
 
-    if(tNear <= tFar && tFar >= 0)
+    if(tNear <= tFar && tFar >= 0.0)
     {
         result.didHit = true;
         result.dst = tNear;
@@ -230,10 +232,10 @@ bool intersectAABB(Ray ray, vec3 boxMin, vec3 boxMax)
     vec3 t1 = min(tMin, tMax);
     vec3 t2 = max(tMin, tMax);
 
-    float tNear = max(max(t1.x, t1.y), t1.z);;
+    float tNear = max(max(t1.x, t1.y), t1.z);
     float tFar = min(min(t2.x, t2.y), t2.z);
 
-    return tNear <= tFar && tFar >= 0;
+    return tNear <= tFar && tFar > 0.0;
 }
 
 /*
@@ -276,18 +278,25 @@ HitInfo intersectScene(Ray ray)
     for(int i = 0; i < meshes.length(); i++)
     {
         TriangleMesh mesh = meshes[i];
-        if(!intersectAABB(ray, mesh.boxMin, mesh.boxMax))
+
+        Ray localRay;
+        localRay.origin = (mesh.worldToLocal * vec4(ray.origin, 1)).xyz;
+        localRay.dir = (mesh.worldToLocal * vec4(ray.dir, 0)).xyz;
+        localRay.invDir = 1.0 / localRay.dir;
+
+        if(!intersectAABB(localRay, mesh.boxMin, mesh.boxMax))
             continue;
 
-        for(int j = mesh.triangleIndex; j < mesh.numTriangles; j++)
+        for(uint j = mesh.triIndex; j <= (mesh.triIndex + mesh.numTri); j++)
         {
-            Triangle tri = triangles[j];
-
-            HitInfo intersection = intersectTriangle(ray, tri);
+            HitInfo intersection = intersectTriangle(localRay, triangles[j]);
             if(!intersection.didHit || intersection.dst > result.dst)
                 continue;
 
             result = intersection;
+
+            result.hitPos = (mesh.localToWorld * vec4(result.hitPos, 1)).xyz;
+            result.normal = (mesh.localToWorld * vec4(result.normal, 0)).xyz;
             result.material = mesh.material;
         }
     }

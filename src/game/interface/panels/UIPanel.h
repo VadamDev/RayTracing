@@ -78,42 +78,50 @@ namespace application
          * Drag Floats
          */
 
-        static void Checkbox(const std::string &label, bool &value, const float columnWidth = 96.0f)
+        static bool Checkbox(const std::string &label, bool &value, const float columnWidth = 96.0f)
         {
             const int disabledStyles = BeginColumnAlignedControl(label, columnWidth);
 
             ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x + 1);
-            ImGui::Checkbox("##value", &value);
+            const bool changed = ImGui::Checkbox("##value", &value);
 
             EndColumnAlignedControl(disabledStyles);
+
+            return changed;
         }
 
-        static void Drag1i(const std::string &label, int &value, const int speed = 1, const int min = 0, const int max = 0, const float columnWidth = 96.0f)
+        static bool Drag1i(const std::string &label, int &value, const int speed = 1, const int min = 0, const int max = 0, const float columnWidth = 96.0f)
         {
             const int disabledStyles = BeginColumnAlignedControl(label, columnWidth);
 
             ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x + 1);
-            ImGui::DragInt("##value", &value, speed, min, max);
+            const bool changed = ImGui::DragInt("##value", &value, speed, min, max);
 
             EndColumnAlignedControl(disabledStyles);
+
+            return changed;
         }
 
-        static void Drag1f(const std::string &label, float &value, const float speed = 1, const float min = 0, const float max = 0, const char *format = "%.3f", const float columnWidth = 96.0f)
+        static bool Drag1f(const std::string &label, float &value, const float speed = 1, const float min = 0, const float max = 0, const char *format = "%.3f", const float columnWidth = 96.0f)
         {
             const int disabledStyles = BeginColumnAlignedControl(label, columnWidth);
 
             ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x + 1);
-            ImGui::DragFloat("##value", &value, speed, min, max, format);
+            const bool changed = ImGui::DragFloat("##value", &value, speed, min, max, format);
 
             EndColumnAlignedControl(disabledStyles);
+
+            return changed;
         }
 
-        static void Drag3f(const std::string &label, glm::vec3 &values, const float speed = 1, const float min = 0, const float max = 0, const char *format = "%.3f", const float defaultValue = 0.0, const float columnWidth = 96.0f)
+        static bool Drag3f(const std::string &label, glm::vec3 &values, const float speed = 1, const float min = 0, const float max = 0, const char *format = "%.3f", const float defaultValue = 0.0, const float columnWidth = 96.0f)
         {
             const int disabledStyles = BeginColumnAlignedControl(label, columnWidth);
             ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
 
             const ImVec2 buttonSize = calculateButtonSize();
+
+            bool changed = false;
 
             //X
             ImGui::PushStyleColor(ImGuiCol_Button, { 0.8f, 0.1f, 0.1f, 1 });
@@ -124,7 +132,8 @@ namespace application
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
-            ImGui::DragFloat("##X", &values.x, speed, min, max, format);
+            if (ImGui::DragFloat("##X", &values.x, speed, min, max, format))
+                changed = true;
             ImGui::PopItemWidth();
             ImGui::SameLine();
 
@@ -137,7 +146,8 @@ namespace application
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
-            ImGui::DragFloat("##Y", &values.y, speed, min, max, format);
+            if (ImGui::DragFloat("##Y", &values.y, speed, min, max, format))
+                changed = true;
             ImGui::PopItemWidth();
             ImGui::SameLine();
 
@@ -150,13 +160,16 @@ namespace application
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
-            ImGui::DragFloat("##Z", &values.z, speed, min, max, format);
+            if (ImGui::DragFloat("##Z", &values.z, speed, min, max, format))
+                changed = true;
             ImGui::PopItemWidth();
 
             EndColumnAlignedControl(disabledStyles);
+
+            return changed;
         }
 
-        static void DragLinked3f(const std::string &label, glm::vec3 &values, bool &linked, const float speed = 1, const float min = 0, const float max = 0, const char *format = "%.3f", const float defaultValue = 0.0, const float columnWidth = 96.0f)
+        static bool DragLinked3f(const std::string &label, glm::vec3 &values, bool &linked, const float speed = 1, const float min = 0, const float max = 0, const char *format = "%.3f", const float defaultValue = 0.0, const float columnWidth = 96.0f)
         {
             /*
              * This approach set the 2 axis to the modified axis if linked
@@ -184,6 +197,8 @@ namespace application
             //Modified version of Drag3f
             ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
 
+            bool changed = false;
+
             const ImVec2 buttonSize = calculateButtonSize();
 
             //X
@@ -201,7 +216,10 @@ namespace application
 
             ImGui::SameLine();
             if (ImGui::DragFloat("##X", &values.x, speed, min, max, format) && linked)
+            {
                 values.y = values.z = values.x;
+                changed = true;
+            }
             ImGui::PopItemWidth();
             ImGui::SameLine();
 
@@ -220,7 +238,10 @@ namespace application
 
             ImGui::SameLine();
             if (ImGui::DragFloat("##Y", &values.y, speed, min, max, format) && linked)
+            {
                 values.x = values.z = values.y;
+                changed = true;
+            }
             ImGui::PopItemWidth();
             ImGui::SameLine();
 
@@ -239,21 +260,52 @@ namespace application
 
             ImGui::SameLine();
             if (ImGui::DragFloat("##Z", &values.z, speed, min, max, format) && linked)
+            {
                 values.x = values.y = values.z;
+                changed = true;
+            }
             ImGui::PopItemWidth();
 
             //Original EndColumnAlignedControl
             EndColumnAlignedControl(disabledStyles);
+
+            return changed;
         }
 
-        static void Color3f(const std::string &label, glm::vec3 &value, const float columnWidth = 96.0f)
+        static bool Color3f(const std::string &label, glm::vec3 &value, const float columnWidth = 96.0f)
         {
             const int disabledStyles = BeginColumnAlignedControl(label, columnWidth);
 
             ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
-            ImGui::ColorEdit3("##color", glm::value_ptr(value), ImGuiColorEditFlags_NoLabel);
+            const bool changed = ImGui::ColorEdit3("##color", glm::value_ptr(value), ImGuiColorEditFlags_NoLabel);
 
             EndColumnAlignedControl(disabledStyles);
+
+            return changed;
+        }
+
+        static bool InputText(const std::string &label, std::string &value, const float columnWidth = 96.0f)
+        {
+            const int disabledStyles = BeginColumnAlignedControl(label, columnWidth);
+
+            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+
+            char buffer[128] = {};
+            strcpy_s(buffer, value.c_str());
+
+            bool changed = false;
+
+            ImGui::PushID(label.c_str());
+            if (ImGui::InputText("##text", buffer, sizeof(buffer)))
+            {
+                value = std::string(buffer);
+                changed = true;
+            }
+            ImGui::PopID();
+
+            EndColumnAlignedControl(disabledStyles);
+
+            return changed;
         }
     };
 }

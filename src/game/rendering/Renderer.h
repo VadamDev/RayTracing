@@ -31,10 +31,11 @@ namespace application
 
         bool accumulate = true;
         int maxBounces = 8;
-        int raysPerPixel = 16;
+        int raysPerPixel = 1;
         bool environmentLight = true;
     private:
         unsigned int frameIndex = 1;
+        bool accumulatedBefore = true; //TODO: hack, until i add an event for accumulation reset
 
         engine::Window *window = nullptr;
         RaytracingApplication *application = nullptr;
@@ -45,7 +46,11 @@ namespace application
 
         engine::EventDispatcher<engine::WindowResizeEvent> viewportResizeDispatcher;
 
+        void updateBuffers() const;
+
         void updateSpheres() const;
         void updateBoxes() const;
+        void updateTriangles() const;
+        void updateTriangleMeshes() const;
     };
 }

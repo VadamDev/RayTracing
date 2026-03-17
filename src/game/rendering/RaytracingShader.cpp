@@ -7,8 +7,11 @@ namespace application
     void RaytracingShader::create()
     {
         ComputeShader::create();
+
         spheresBuffer.create();
         boxesBuffer.create();
+        trianglesBuffer.create();
+        meshesBuffer.create();
     }
 
     void RaytracingShader::sendViewParams(Camera *camera) const
@@ -44,5 +47,15 @@ namespace application
     void RaytracingShader::updateBoxesBuffer(const std::vector<RaytracedBoxComponent> &boxes)
     {
         boxesBuffer.update(boxes, 1, GL_DYNAMIC_DRAW);
+    }
+
+    void RaytracingShader::updateTrianglesBuffer(const std::vector<Triangle> &triangles)
+    {
+        trianglesBuffer.update(triangles, 2, GL_DYNAMIC_DRAW);
+    }
+
+    void RaytracingShader::updateMeshesBuffer(const std::vector<TriangleMeshData> &meshes)
+    {
+        meshesBuffer.update(meshes, 3, GL_DYNAMIC_DRAW);
     }
 }

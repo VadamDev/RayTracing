@@ -41,13 +41,13 @@ namespace application
             ImGui::NewLine();
         }
 
-        static bool linked = false;
 
         //Transform
+        static bool linkedTransformScale = true;
         drawComponent<TransformComponent>(entity, "Transform", [](TransformComponent &transform) {
             Drag3f("Position", transform.position, 0.01f, 0, 0, "%.2f");
             Drag3f("Rotation", transform.rotation, 0.1f, 0, 0, "%.1f");
-            DragLinked3f("Scale", transform.scale, linked, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f");
+            DragLinked3f("Scale", transform.scale, linkedTransformScale, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f");
         });
 
         //Raytraced Material
@@ -63,6 +63,11 @@ namespace application
 
         //Raytraced Box
         drawEmptyComponent<RaytracedBoxComponent>(entity, "Raytraced Box");
+
+        //Raytraced Mesh
+        drawComponent<RaytracedMeshComponent>(entity, "Raytraced Mesh", [](RaytracedMeshComponent &mesh) {
+            InputText("Mesh Name", mesh.name);
+        });
     }
 
     static constexpr ImGuiTreeNodeFlags DEFAULT_COMPONENTS_FLAGS = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowOverlap | ImGuiTreeNodeFlags_FramePadding;
@@ -144,6 +149,9 @@ namespace application
 
         //Raytraced Box
         drawAddComponent<RaytracedBoxComponent>(entity, "Raytraced Box");
+
+        //Raytraced Mesh
+        drawAddComponent<RaytracedMeshComponent>(entity, "Raytraced Mesh");
 
         ImGui::EndPopup();
     }
