@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../window/Window.h"
 #include "../IAppLifecycle.h"
+#include "../window/Window.h"
 
 namespace engine
 {
@@ -15,14 +15,14 @@ namespace engine
         virtual ~AbstractClock() = default;
 
         /*
-           Start / Stop
+         * Start / Stop
          */
 
         virtual void start() = 0;
         virtual void stop() = 0;
 
         /*
-           Getters
+         * Getters
          */
 
         virtual int getFPS() const = 0;

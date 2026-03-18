@@ -14,12 +14,14 @@ namespace engine
 
     Entity Scene::copyEntity(const Entity &source, const std::string &name)
     {
+        static const entt::id_type TAG_COMPONENT_ID = entt::type_id<TagComponent>().hash();
+
         const Entity entity = newEntity(name);
 
         for (auto&& [id, storage] : registry.storage())
         {
-            //Straight ignore TagComponent, since it's added above
-            if(id == entt::type_id<TagComponent>().hash())
+            // Ignore TagComponent, since it's added above
+            if(id == TAG_COMPONENT_ID)
                 continue;
 
             if(storage.contains(source))

@@ -148,8 +148,6 @@ namespace application
             aabb.max = glm::max(aabb.max, glm::vec3(tri.posC));
         }
 
-        spdlog::info("{}, {}, {} | {}, {}, {}", aabb.min.x, aabb.min.y, aabb.min.z, aabb.max.x, aabb.max.y, aabb.max.z);
-
         return aabb;
     }
 }

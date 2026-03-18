@@ -1,7 +1,5 @@
 #include "InspectorPanel.h"
 
-#include <spdlog/spdlog.h>
-
 #include "../../scene/Components.h"
 
 namespace application
@@ -22,7 +20,7 @@ namespace application
 
     void InspectorPanel::drawComponents(const engine::Entity &entity)
     {
-        //Display Tag
+        // Entity Tag
         if (entity.hasComponent<engine::TagComponent>())
         {
             auto &tag = entity.getComponent<engine::TagComponent>().tag;
@@ -34,7 +32,7 @@ namespace application
             if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
                 tag = std::string(buffer);
 
-            //Add components button
+            // Add components button
             ImGui::SameLine();
             drawAddComponentsPopup(entity);
 
@@ -42,7 +40,7 @@ namespace application
         }
 
 
-        //Transform
+        // Transform
         static bool linkedTransformScale = true;
         drawComponent<TransformComponent>(entity, "Transform", [](TransformComponent &transform) {
             Drag3f("Position", transform.position, 0.01f, 0, 0, "%.2f");
@@ -50,7 +48,7 @@ namespace application
             DragLinked3f("Scale", transform.scale, linkedTransformScale, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f");
         });
 
-        //Raytraced Material
+        // Raytraced Material
         drawComponent<RaytracedMaterialComponent>(entity, "Raytraced Material", [](RaytracedMaterialComponent &material) {
             Color3f("Color", material.color);
             Color3f("Emission Color", material.emissionColor);
@@ -58,13 +56,13 @@ namespace application
             Drag1f("Smoothness", material.smoothness, 0.01f, 0, 1, "%.2f");
         });
 
-        //Raytraced Sphere
+        // Raytraced Sphere
         drawEmptyComponent<RaytracedSphereComponent>(entity, "Raytraced Sphere");
 
-        //Raytraced Box
+        // Raytraced Box
         drawEmptyComponent<RaytracedBoxComponent>(entity, "Raytraced Box");
 
-        //Raytraced Mesh
+        // Raytraced Mesh
         drawComponent<RaytracedMeshComponent>(entity, "Raytraced Mesh", [](RaytracedMeshComponent &mesh) {
             InputText("Mesh Name", mesh.name);
         });
@@ -80,20 +78,26 @@ namespace application
 
         const bool opened = ImGui::TreeNodeEx((void*) typeid(T).hash_code(), DEFAULT_COMPONENTS_FLAGS, name.c_str());
 
+        bool removed = false;
         if (removable)
         {
             ImGui::PushID(typeid(T).name());
 
             ImGui::SameLine(ImGui::GetWindowWidth() - 62);
             if (ImGui::Button("Remove"))
+            {
                 entity.removeComponent<T>();
+                removed = true;
+            }
 
             ImGui::PopID();
         }
 
         if (opened)
         {
-            drawFunc(entity.getComponent<T>());
+            if (!removed)
+                drawFunc(entity.getComponent<T>());
+
             ImGui::TreePop();
         }
 
@@ -138,19 +142,19 @@ namespace application
         if (!ImGui::BeginPopup("AddComponents"))
             return;
 
-        //Transform
+        // Transform
         drawAddComponent<TransformComponent>(entity, "Transform");
 
-        //Raytraced Material
+        // Raytraced Material
         drawAddComponent<RaytracedMaterialComponent>(entity, "Raytraced Material");
 
-        //Raytraced Sphere
+        // Raytraced Sphere
         drawAddComponent<RaytracedSphereComponent>(entity, "Raytraced Sphere");
 
-        //Raytraced Box
+        // Raytraced Box
         drawAddComponent<RaytracedBoxComponent>(entity, "Raytraced Box");
 
-        //Raytraced Mesh
+        // Raytraced Mesh
         drawAddComponent<RaytracedMeshComponent>(entity, "Raytraced Mesh");
 
         ImGui::EndPopup();

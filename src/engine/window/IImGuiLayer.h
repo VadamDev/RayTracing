@@ -2,11 +2,11 @@
 
 namespace engine
 {
-    class IImGuiWindow
+    class IImGuiLayer
     {
 
     public:
-        virtual ~IImGuiWindow() = default;
+        virtual ~IImGuiLayer() = default;
 
         virtual void draw() = 0;
     };

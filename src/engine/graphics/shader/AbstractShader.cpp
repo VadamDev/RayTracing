@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 
 #include "uniforms/UniformAccess.h"
-#include "exceptions/ShaderException.h"
+#include "ShaderException.hpp"
 
 namespace engine
 {

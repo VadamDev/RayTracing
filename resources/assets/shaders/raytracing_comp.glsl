@@ -75,6 +75,7 @@ uniform vec3 viewParams; // planeWidth, planeHeight, focalLength;
 uniform vec3 cameraPos;
 
 uniform mat4 localToWorld;
+
 uniform bool accumulate;
 uniform int maxBounces;
 uniform int raysPerPixel;
@@ -127,6 +128,14 @@ vec3 randomDir(inout uint rngState)
     float y = randNormalDistribution(rngState);
     float z = randNormalDistribution(rngState);
     return normalize(vec3(x, y, z));
+}
+
+vec2 randomPointInCircle(inout uint rngState)
+{
+    float theta = TAU * rand(rngState);
+    vec2 point = vec2(cos(theta), sin(theta));
+
+    return point * sqrt(rand(rngState));
 }
 
 /*
@@ -355,10 +364,10 @@ void main()
     ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
     ivec2 screenSize = imageSize(resultImage);
 
-    //Generate Random Seed
+    // Generate Random Seed
     uint rngState = uint(pixelCoords.y * screenSize.x + pixelCoords.x + (frameIndex * 719393 * uint(accumulate)));
 
-    //Create ray
+    // Create ray
     vec3 viewPointLocal = vec3(vec2(pixelCoords) / screenSize - 0.5, 1) * viewParams;
     vec3 viewPoint = vec4(localToWorld * vec4(viewPointLocal, 1)).xyz;
 
@@ -367,12 +376,12 @@ void main()
     ray.dir = normalize(viewPoint - ray.origin);
     ray.invDir = 1.0 / ray.dir;
 
-    //Shoot ray and average color
+    // Shoot ray and average color
     vec3 totalLight = vec3(0);
     for(int i = 0; i < raysPerPixel; i++)
         totalLight += traceRay(ray, rngState);
 
-    //Accumulate
+    // Accumulate
     vec3 finalColor = totalLight / raysPerPixel;
     if(accumulate)
     {

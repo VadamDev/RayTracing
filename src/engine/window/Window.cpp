@@ -19,12 +19,12 @@ namespace engine
             glfwDestroyWindow(window);
         }
 
-        glfwTerminate(); //Have no effect when GLFW is not initialized so no need to add a check, I think... Maybe? Eh...
+        glfwTerminate(); // Have no effect when GLFW is not initialized so no need to add a check, I think... Maybe? Eh...
     }
 
     void Window::create()
     {
-        //Initializing GLFW
+        // Initializing GLFW
         glfwSetErrorCallback([](int error, const char* description) {
             spdlog::error("Caught a GLFW error [{}]: \n{}", error, description);
         });
@@ -32,7 +32,7 @@ namespace engine
         if (!glfwInit())
             throw std::runtime_error("Failed to initialize GLFW");
 
-        //Creating the window
+        // Creating the window
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
@@ -47,17 +47,17 @@ namespace engine
         if (!window)
             throw std::runtime_error("Failed to create a GLFW window");
 
-        //Black magic pointer shit that I DO NOT understand
+        // Black magic pointer shit that I DO NOT understand
         glfwSetWindowUserPointer(window, this);
 
-        //Setup callbacks
+        // Setup callbacks
         setupCallbacks();
 
-        //Centering the window
+        // Centering the window
         const GLFWvidmode *vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         glfwSetWindowPos(window, (vidMode->width - width) / 2, (vidMode->height - height) / 2);
 
-        //Set context current
+        // Set context current
         glfwMakeContextCurrent(window);
         glfwSwapInterval(0);
 
@@ -65,13 +65,13 @@ namespace engine
         if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
             throw std::runtime_error("Failed to initialize OpenGL context");
 
-        //Show OpenGL version
+        // Show OpenGL version
         spdlog::info("OpenGL version {}", std::string_view(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
 
         //Show the window
         glfwShowWindow(window);
 
-        //Setup Imgui
+        // Setup Imgui
         IMGUI_CHECKVERSION();
 
         ImGui::CreateContext();
@@ -147,8 +147,8 @@ namespace engine
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        //ImGui is currently rendered before world rendering. We're always rendering to a framebuffer so it'll never cause issues
-        for (auto &imguiWindow : imguiWindows)
+        // ImGui is currently rendered before world rendering. We're always rendering to a framebuffer so it'll never cause issues
+        for (const auto &imguiWindow : imguiWindows)
             imguiWindow->draw();
     }
 
@@ -167,7 +167,7 @@ namespace engine
     }
 
     /*
-       Getters
+     * Getters
      */
 
     bool Window::shouldClose() const
@@ -176,7 +176,7 @@ namespace engine
     }
 
     /*
-       Setters
+     * Setters
      */
 
     void Window::setTitle(std::string title)

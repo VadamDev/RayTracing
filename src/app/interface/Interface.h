@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../engine/window/IImGuiWindow.h"
+#include "../../engine/window/IImGuiLayer.h"
 #include "../rendering/Renderer.h"
 #include "panels/UIPanel.h"
 
@@ -9,7 +9,7 @@ namespace application
     class CameraController;
     class RaytracingApplication;
 
-    class Interface : public engine::IImGuiWindow
+    class Interface : public engine::IImGuiLayer
     {
 
     public:

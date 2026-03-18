@@ -12,7 +12,7 @@ namespace engine
             : window(window) {}
 
         /*
-           Start / Stop
+         * Start / Stop
          */
         
         void start(AbstractClock *clock) noexcept
@@ -33,7 +33,7 @@ namespace engine
         }
 
         /*
-           Getters
+         * Getters
          */
 
         Window& getWindow() const { return window; }

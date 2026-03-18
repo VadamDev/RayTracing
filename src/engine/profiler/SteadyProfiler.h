@@ -62,21 +62,21 @@ namespace engine {
 
         std::string& getName() { return name; }
 
-        //Start / End time of the profiler
+        // Start / End time of the profiler
         time_point<steady_clock> getStartTime() const { return startTime; }
         time_point<steady_clock> getEndTime() const { return endTime; }
 
-        //Total accumulated time since profiler started
+        // Total accumulated time since profiler started
         nanoseconds getAccumulatedTime() const { return accumulatedTime; }
 
-        //Last spent time
+        // Last spent time
         nanoseconds getLastSpentTime() const { return lastSpentTime; }
         float getLastSpentTimeMs() const { return getLastSpentTime().count() / 1e6f; }
 
-        //Amount of time the profiler has run
+        // Amount of time the profiler has run
         uint64_t getNumCalls() const { return numCalls; }
 
-        //Average time spent
+        // Average time spent
         nanoseconds calculateSpentTimeAvg() const;
         float calculateSpentTimeAvgMs() const { return calculateSpentTimeAvg().count() / 1e6f; }
 

@@ -7,7 +7,7 @@
 
 #include "../event/EventDispatcher.h"
 #include "WindowResizeEvent.h"
-#include "IImGuiWindow.h"
+#include "IImGuiLayer.h"
 #include "input/InputsManager.h"
 
 namespace engine
@@ -30,7 +30,7 @@ namespace engine
         void popFrame() const noexcept;
 
         void whenResized(const std::function<void(WindowResizeEvent&)> &callback);
-        void registerImGuiWindow(const std::shared_ptr<IImGuiWindow> &imguiWindow) { imguiWindows.push_back(imguiWindow); }
+        void registerImGuiWindow(const std::shared_ptr<IImGuiLayer> &imguiWindow) { imguiWindows.push_back(imguiWindow); }
 
         /*
          * Getters
@@ -73,7 +73,7 @@ namespace engine
         std::shared_ptr<InputsManager> inputManager;
         EventDispatcher<WindowResizeEvent> resizeDispatcher;
 
-        std::vector<std::shared_ptr<IImGuiWindow>> imguiWindows;
+        std::vector<std::shared_ptr<IImGuiLayer>> imguiWindows;
 
         bool resized = true, grabbed = false;
         double dFrameTime = 0, fFrameTime = 0;

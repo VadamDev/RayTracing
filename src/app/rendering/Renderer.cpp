@@ -32,7 +32,7 @@ namespace application
 
     void Renderer::render()
     {
-        //TODO: hack, until i add an event for accumulation reset
+        // TODO: hack, until i add an event for accumulation reset
         if(accumulatedBefore != accumulate)
             frameIndex = 1;
         accumulatedBefore = accumulate;

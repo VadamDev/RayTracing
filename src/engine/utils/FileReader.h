@@ -4,7 +4,7 @@
 #include <spdlog/spdlog.h>
 
 namespace engine::utils {
-    static std::string readFile(const std::string &filePath)
+    inline std::string readFile(const std::string &filePath)
     {
         std::ifstream in;
         in.open(filePath);

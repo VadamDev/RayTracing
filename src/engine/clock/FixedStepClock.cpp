@@ -1,10 +1,6 @@
 #include "FixedStepClock.h"
 
-#include <chrono>
 #include <spdlog/spdlog.h>
-#include "../window/Window.h"
-
-using namespace std::chrono;
 
 namespace engine
 {

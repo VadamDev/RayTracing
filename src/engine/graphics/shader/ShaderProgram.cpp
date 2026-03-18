@@ -1,7 +1,7 @@
 #include "ShaderProgram.h"
 
 #include "../../utils/FileReader.h"
-#include "exceptions/ShaderException.h"
+#include "ShaderException.hpp"
 
 namespace engine {
     void ShaderProgram::create()

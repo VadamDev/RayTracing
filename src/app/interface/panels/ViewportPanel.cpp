@@ -16,7 +16,7 @@ namespace application
 
         const glm::ivec2 accurateDims = calculateViewportSize(windowWidth, windowHeight);
 
-        //Terrible! way of detecting resizes
+        // Terrible! way of detecting resizes
         if(accurateDims.x != canvas->getWidth() || accurateDims.y != canvas->getHeight())
             renderer->dispatchCanvasResize(engine::WindowResizeEvent(accurateDims.x, accurateDims.y));
 

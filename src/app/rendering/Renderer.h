@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../engine/graphics/mesh/VertexArrayObject.h"
 #include "Camera.h"
 #include "Canvas.h"
 #include "RaytracingShader.h"
+#include "../../engine/graphics/IRenderable.h"
 #include "../../engine/window/Window.h"
 
 namespace engine
@@ -35,7 +35,7 @@ namespace application
         bool environmentLight = true;
     private:
         unsigned int frameIndex = 1;
-        bool accumulatedBefore = true; //TODO: hack, until i add an event for accumulation reset
+        bool accumulatedBefore = true; // TODO: hack, until i add an event for accumulation reset
 
         engine::Window *window = nullptr;
         RaytracingApplication *application = nullptr;

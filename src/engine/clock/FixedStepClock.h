@@ -10,20 +10,21 @@ namespace engine
 
     static constexpr auto UPDATE_PROFILER = "Update", RENDER_PROFILER = "Render";
 
-    class FixedStepClock : public AbstractClock {
+    class FixedStepClock : public AbstractClock
+    {
 
     public:
         using AbstractClock::AbstractClock;
 
         /*
-           Start / Stop
+         * Start / Stop
          */
 
         void start() override;
         void stop() override;
 
         /*
-           Getters
+         * Getters
          */
 
         int getUPS() const { return ups; }
@@ -34,7 +35,7 @@ namespace engine
         ProfilerEntry* getRenderProfiler() const { return renderProfiler; }
 
         /*
-           Setters
+         * Setters
          */
 
         void setTargetUPS(const int targetUps)

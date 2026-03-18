@@ -6,7 +6,7 @@
 namespace engine::exceptions
 {
     /*
-       Utils
+     * Utils
      */
 
     inline std::string formatShaderType(const unsigned int type)
@@ -25,7 +25,7 @@ namespace engine::exceptions
     }
 
     /*
-       Shader
+     * Shader
      */
 
     class ShaderException : public std::runtime_error
@@ -53,7 +53,7 @@ namespace engine::exceptions
     };
 
     /*
-       Program
+     * Program
      */
 
     class ProgramException : public std::runtime_error

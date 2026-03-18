@@ -2,7 +2,7 @@
 
 #include "Camera.h"
 #include "../../engine/graphics/shader/ComputeShader.h"
-#include "../../engine/graphics/shader/ShaderStorageBuffer.h"
+#include "../../engine/graphics/shader/ShaderStorageBuffer.hpp"
 #include "../model/ModelManager.h"
 #include "../scene/Components.h"
 
@@ -36,7 +36,7 @@ namespace application
         engine::ShaderStorageBuffer<Triangle> trianglesBuffer;
         engine::ShaderStorageBuffer<TriangleMeshData> meshesBuffer;
 
-        UniformAccess screenParams, viewParams, cameraPos; //planeWidth, planeHeight, focalLength
+        UniformAccess screenParams, viewParams, cameraPos; // planeWidth, planeHeight, focalLength
         UniformAccess localToWorldMatrix;
     };
 }

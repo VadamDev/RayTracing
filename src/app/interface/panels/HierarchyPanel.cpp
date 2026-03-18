@@ -10,18 +10,18 @@ namespace application
 
         engine::Scene &scene = application->getActiveScene();
 
-        //Draw all scene entities in the panel
+        // Unselect entity if clicked on nothing
+        if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(0))
+            selectedEntity = {};
+
+        // Draw all scene entities in the panel
         for (auto &entityHandle : scene.registry.view<entt::entity>())
         {
             const engine::Entity entity(entityHandle, &scene);
             drawEntity(scene, entityHandle, entity);
         }
 
-        //Unselect entity if clicked on nothing
-        if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(0))
-            selectedEntity = {};
-
-        //Right click hierarchy popup
+        // Right click hierarchy popup
         if (ImGui::BeginPopupContextWindow(nullptr, ImGuiPopupFlags_MouseButtonRight | ImGuiPopupFlags_NoOpenOverItems))
         {
             drawHierarchyPopup(scene);
@@ -33,13 +33,44 @@ namespace application
 
     void HierarchyPanel::drawHierarchyPopup(engine::Scene &scene)
     {
-        if (ImGui::MenuItem("New Entity"))
-            scene.newEntity("Entity");
+        // Empty Entity
+        if (ImGui::MenuItem("New [Empty Entity]"))
+            scene.newEntity("Empty Entity");
+
+        // Raytraced Sphere
+        if (ImGui::MenuItem("New [Raytraced Sphere]"))
+        {
+            const engine::Entity sphere = scene.newEntity("Raytraced Sphere");
+
+            sphere.addComponent<TransformComponent>();
+            sphere.addComponent<RaytracedMaterialComponent>();
+            sphere.addComponent<RaytracedSphereComponent>();
+        }
+
+        // Raytraced Box
+        if (ImGui::MenuItem("New [Raytraced Box]"))
+        {
+            const engine::Entity box = scene.newEntity("Raytraced Box");
+
+            box.addComponent<TransformComponent>();
+            box.addComponent<RaytracedMaterialComponent>();
+            box.addComponent<RaytracedBoxComponent>();
+        }
+
+        // Raytraced Mesh
+        if (ImGui::MenuItem("New [Raytraced Mesh]"))
+        {
+            const engine::Entity mesh = scene.newEntity("Raytraced Mesh");
+
+            mesh.addComponent<TransformComponent>();
+            mesh.addComponent<RaytracedMaterialComponent>();
+            mesh.addComponent<RaytracedMeshComponent>();
+        }
     }
 
     void HierarchyPanel::drawEntity(engine::Scene &scene, const entt::entity &handle, const engine::Entity &entity)
     {
-        //Just in case
+        // Just in case
         auto tag = std::string("UNKNOWN");
         if (entity.hasComponent<engine::TagComponent>())
             tag = entity.getComponent<engine::TagComponent>().tag;
@@ -47,11 +78,11 @@ namespace application
         const ImGuiTreeNodeFlags FLAGS = (selectedEntity == entity ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Bullet;
         const bool opened = ImGui::TreeNodeEx((void*) (uint64_t) (uint32_t) handle, FLAGS, tag.c_str());
 
-        //Select the clicked entity
+        // Select the clicked entity
         if (ImGui::IsItemClicked())
             selectedEntity = entity;
 
-        //Create right click context menu
+        // Create right click context menu
         if (ImGui::BeginPopupContextItem())
         {
             drawEntityPopup(scene, entity);
@@ -64,7 +95,7 @@ namespace application
 
     void HierarchyPanel::drawEntityPopup(engine::Scene &scene, const engine::Entity &entity)
     {
-        //Copy Entity
+        // Copy Entity
         if (ImGui::MenuItem("Duplicate"))
         {
             std::string tag = "UNKNOWN";
@@ -76,15 +107,13 @@ namespace application
             return;
         }
 
-        //Destroy entity
+        // Destroy entity
         if (ImGui::MenuItem("Delete"))
         {
-            scene.destroyEntity(entity);
-
             if (selectedEntity == entity)
                 selectedEntity = {};
 
-            return;
+            scene.destroyEntity(entity);
         }
     }
 }

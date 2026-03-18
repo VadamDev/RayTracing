@@ -29,20 +29,20 @@ namespace application
         Renderer *renderer;
         CameraController *controller;
 
-        //Input Data
+        // Input Data
         const char* ASPECT_RATIO_LABELS[4] { "16/9", "32/9", "4/3", "9/16" };
         const float ASPECT_RATIOS[4] { 16.0f / 9.0f, 32.0f / 9.0f, 4.0f / 3.0f, 9.0f / 16.0f };
         int selectedAspectRatio = 0;
 
-        //Displayed Data
+        // Displayed Data
         float updateCooldown = 0;
-        float lastRenderTimeMs = 0, renderTimeAvgMs = 0;
+        float lastRenderTimeMs = 0;
 
         void updateData();
 
-        //Why is there no correct number formating in c++20...
+        // Why is there no correct number formating in c++20...
         template<typename T>
-        std::string formatNumber(T number, const char separator = ' ')
+        static std::string formatNumber(T number, const char separator = ' ')
         {
             const std::string input = std::to_string(number);
             const size_t length = input.length() - 1;

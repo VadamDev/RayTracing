@@ -1,6 +1,6 @@
 #include "ComputeShader.h"
 
-#include "exceptions/ShaderException.h"
+#include "ShaderException.hpp"
 #include "../../utils/FileReader.h"
 
 namespace engine

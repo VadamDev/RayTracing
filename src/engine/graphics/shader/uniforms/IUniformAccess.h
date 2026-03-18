@@ -13,7 +13,7 @@ namespace engine
         virtual ~IUniformAccess() = default;
 
         /*
-           Float
+         * Float
          */
 
         virtual void set1f(float value) const = 0;
@@ -27,7 +27,7 @@ namespace engine
         virtual void setMatrix4f(const glm::mat4 &matrix) const = 0;
 
         /*
-           Int
+         * Int
          */
 
         virtual void set1i(int value) const = 0;
@@ -40,14 +40,14 @@ namespace engine
         virtual void set3i(const glm::ivec3 &vector) const = 0;
 
         /*
-           Boolean
+         * Boolean
          */
 
         virtual void setBool(bool b) const = 0;
     };
 
-    //Since GLSL compiler scrap every unused variable, we just use a no operation placeholder.
-    //It might be smarter to only return this class on test builds.
+    // Since GLSL compiler scrap every unused variable, we just use a no operation placeholder.
+    // It might be smarter to only return this class on test builds.
     class NoOpUniformAccess : public IUniformAccess
     {
 

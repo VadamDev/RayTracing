@@ -11,7 +11,7 @@ namespace engine {
             : location(location) {}
 
         /*
-           Float
+         * Float
          */
 
         void set1f(float value) const override;
@@ -25,7 +25,7 @@ namespace engine {
         void setMatrix4f(const glm::mat4 &matrix) const override;
 
         /*
-           Int
+         * Int
          */
 
         void set1i(int value) const override;
@@ -38,7 +38,7 @@ namespace engine {
         void set3i(const glm::ivec3 &vector) const override;
 
         /*
-           Boolean
+         * Boolean
          */
 
         void setBool(bool b) const override;

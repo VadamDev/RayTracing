@@ -29,11 +29,11 @@ namespace application
 
         const auto inputsManager = window.getInputsManager();
 
-        //Ungrab Viewport
+        // Ungrab Viewport
         if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_ESCAPE))
             window.setGrabbed(false);
 
-        //Camera controls
+        // Camera controls
         controller->processInputs(deltaTime);
     }
 

@@ -8,14 +8,14 @@
 
 namespace application
 {
-    static constexpr float UPDATE_COOLDOWN_SECONDS = 0.5f;
+    static constexpr float UPDATE_COOLDOWN_SECONDS = 0.25f;
 
     SettingsPanel::SettingsPanel(const RaytracingApplication *application, Renderer *renderer, CameraController *controller)
         : UIPanel("Settings"), clock(dynamic_cast<engine::FixedStepClock*>(application->getClock())), renderer(renderer), controller(controller) {}
 
     void SettingsPanel::draw()
     {
-        //Prevent data from being updated every render, making the output readable
+        // Prevent data from being updated every render, making the output readable
         if ((updateCooldown += clock->getDeltaTime()) > UPDATE_COOLDOWN_SECONDS)
         {
             updateData();
@@ -24,19 +24,21 @@ namespace application
 
         ImGui::Begin(name.c_str());
 
+        // Stats
         if (ImGui::CollapsingHeader("Stats", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            ImGui::Text(std::format("FPS: {}", clock->getFPS()).c_str());
-            ImGui::Text(std::format("{:.3f}ms (avg: {:.3f}ms)", lastRenderTimeMs, renderTimeAvgMs).c_str());
+            ImGui::Text(std::format("FPS: {} | {:.3f}ms", clock->getFPS(), lastRenderTimeMs).c_str());
+            ImGui::Checkbox("Ignore FPS Cap", &clock->bIgnoreFpsCap);
 
             ImGui::NewLine();
         }
 
+        // Viewport
         if (ImGui::CollapsingHeader("Viewport", ImGuiTreeNodeFlags_DefaultOpen))
         {
             const Canvas *canvas = renderer->getCanvas();
-            int viewportWidth = canvas->getWidth();
-            int viewportHeight = canvas->getHeight();
+            const int viewportWidth = canvas->getWidth();
+            const int viewportHeight = canvas->getHeight();
 
             const auto camera = renderer->getCamera();
 
@@ -45,14 +47,19 @@ namespace application
                 camera->targetAspectRatio = ASPECT_RATIOS[selectedAspectRatio];
 
             ImGui::NewLine();
-            Drag1f("Fov", camera->fov, 1, 75, 130, "%.0f", 150);
+            Drag1f("Fov", camera->fov, 1, 45, 130, "%.0f", 150);
             Drag1f("Sensitivity", controller->sensitivity, 0.01f, 0.01f, 1, "%.2f", 150);
             Drag1f("Camera Speed", controller->cameraSpeed, 0.05f, 1, 8, "%.1f", 150);
 
             ImGui::NewLine();
+        }
+
+        // Raytracer
+        if (ImGui::CollapsingHeader("Raytracer", ImGuiTreeNodeFlags_DefaultOpen))
+        {
             Checkbox("Accumulate", renderer->accumulate, 150);
-            Drag1i("Max Bounces", renderer->maxBounces, 1, 1, 16, 150);
-            Drag1i("Rays Per Pixel", renderer->raysPerPixel, 1, 1, 512, 150);
+            Drag1i("Max Bounces", renderer->maxBounces, 1, 1, std::numeric_limits<int>::infinity(), 150);
+            Drag1i("Rays Per Pixel", renderer->raysPerPixel, 1, 1, 128, 150);
             Checkbox("Environment Light", renderer->environmentLight, 150);
         }
 
@@ -62,6 +69,5 @@ namespace application
     void SettingsPanel::updateData()
     {
         lastRenderTimeMs = clock->getRenderProfiler()->getLastSpentTimeMs();
-        renderTimeAvgMs = clock->getRenderProfiler()->calculateSpentTimeAvgMs();
     }
 }
