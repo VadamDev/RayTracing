@@ -46,6 +46,8 @@ namespace application
         shader->maxBounces->set1i(maxBounces);
         shader->raysPerPixel->set1i(raysPerPixel);
         shader->environmentLight->setBool(environmentLight);
+        shader->divergeStrength->set1f(divergeStrength);
+        shader->defocusStrength->set1f(defocusStrength);
         shader->sendViewParams(camera.get());
 
         shader->dispatchCompute(ceil(canvas->getWidth() / 8), ceil(canvas->getHeight() / 8), 1, GL_TEXTURE_FETCH_BARRIER_BIT);

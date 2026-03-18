@@ -33,6 +33,8 @@ namespace application
         int maxBounces = 8;
         int raysPerPixel = 1;
         bool environmentLight = true;
+        float divergeStrength = 0.5f;
+        float defocusStrength = 0;
     private:
         unsigned int frameIndex = 1;
         bool accumulatedBefore = true; // TODO: hack, until i add an event for accumulation reset

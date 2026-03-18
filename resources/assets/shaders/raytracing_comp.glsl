@@ -72,14 +72,14 @@ struct HitInfo
 
 uniform uint frameIndex;
 uniform vec3 viewParams; // planeWidth, planeHeight, focalLength;
-uniform vec3 cameraPos;
-
 uniform mat4 localToWorld;
 
 uniform bool accumulate;
 uniform int maxBounces;
 uniform int raysPerPixel;
 uniform bool environmentLight;
+uniform float divergeStrength;
+uniform float defocusStrength;
 
 layout(std430, binding = 0) buffer SphereBuffer {
     Sphere spheres[];
@@ -367,19 +367,36 @@ void main()
     // Generate Random Seed
     uint rngState = uint(pixelCoords.y * screenSize.x + pixelCoords.x + (frameIndex * 719393 * uint(accumulate)));
 
-    // Create ray
+    // Calculate viewpoint
     vec3 viewPointLocal = vec3(vec2(pixelCoords) / screenSize - 0.5, 1) * viewParams;
     vec3 viewPoint = vec4(localToWorld * vec4(viewPointLocal, 1)).xyz;
 
-    Ray ray;
-    ray.origin = cameraPos;
-    ray.dir = normalize(viewPoint - ray.origin);
-    ray.invDir = 1.0 / ray.dir;
+    // Camera Vectors
+    vec3 camRight = localToWorld[0].xyz;
+    vec3 camUp = localToWorld[1].xyz;
+    vec3 camPos = localToWorld[3].xyz;
 
     // Shoot ray and average color
     vec3 totalLight = vec3(0);
     for(int i = 0; i < raysPerPixel; i++)
+    {
+        // Defocus Jitter (used for DOF)
+        vec2 defocusJitter = randomPointInCircle(rngState) * defocusStrength / screenSize.x;
+        vec3 jitteredOrigin = camPos + defocusJitter.x * camRight + defocusJitter.y * camUp;
+
+        // Diverge Jitter (used for AA or whole scene blur)
+        vec2 divergeJitter = randomPointInCircle(rngState) * divergeStrength / screenSize.x;
+        vec3 jitteredViewPoint = viewPoint + divergeJitter.x * camRight + divergeJitter.y * camUp;
+
+        // Create Ray
+        Ray ray;
+        ray.origin = jitteredOrigin;
+        ray.dir = normalize(jitteredViewPoint - ray.origin);
+        ray.invDir = 1.0 / ray.dir;
+
+        // Shoot Ray
         totalLight += traceRay(ray, rngState);
+    }
 
     // Accumulate
     vec3 finalColor = totalLight / raysPerPixel;

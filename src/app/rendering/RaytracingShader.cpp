@@ -20,8 +20,6 @@ namespace application
         const float planeWidth = planeHeight * camera->getAspectRatio();
 
         viewParams->set3f(planeWidth, planeHeight, camera->nearClipPlane);
-        cameraPos->set3f(camera->position);
-
         localToWorldMatrix->setMatrix4f(camera->getLocalToWorldMatrix());
     }
 
@@ -29,7 +27,6 @@ namespace application
     {
         frameIndex = accessUniform("frameIndex");
         viewParams = accessUniform("viewParams");
-        cameraPos = accessUniform("cameraPos");
 
         localToWorldMatrix = accessUniform("localToWorld");
 
@@ -37,6 +34,8 @@ namespace application
         maxBounces = accessUniform("maxBounces");
         raysPerPixel = accessUniform("raysPerPixel");
         environmentLight = accessUniform("environmentLight");
+        divergeStrength = accessUniform("divergeStrength");
+        defocusStrength = accessUniform("defocusStrength");
     }
 
     void RaytracingShader::updateSpheresBuffer(const std::vector<RaytracedSphereComponent> &spheres)

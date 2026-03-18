@@ -30,13 +30,15 @@ namespace application
         UniformAccess accumulate;
         UniformAccess maxBounces, raysPerPixel;
         UniformAccess environmentLight;
+        UniformAccess divergeStrength;
+        UniformAccess defocusStrength;
     private:
         engine::ShaderStorageBuffer<RaytracedSphereComponent> spheresBuffer;
         engine::ShaderStorageBuffer<RaytracedBoxComponent> boxesBuffer;
         engine::ShaderStorageBuffer<Triangle> trianglesBuffer;
         engine::ShaderStorageBuffer<TriangleMeshData> meshesBuffer;
 
-        UniformAccess screenParams, viewParams, cameraPos; // planeWidth, planeHeight, focalLength
+        UniformAccess screenParams, viewParams; // planeWidth, planeHeight, focalLength
         UniformAccess localToWorldMatrix;
     };
 }
