@@ -11,10 +11,13 @@ layout(rgba32f, binding = 0) uniform image2D resultImage;
 // Raytraced Objects
 struct Material
 {
-    vec3 color, emissionColor;
+    vec3 color;
+    float smoothness;
+
+    vec3 emissionColor;
     float emissionStrenght;
 
-    float smoothness;
+    int type;
 };
 
 struct Sphere
@@ -281,6 +284,14 @@ HitInfo intersectScene(Ray ray)
 
         result = intersection;
         result.material = box.material;
+
+        //Checkerboard Material
+        if(result.material.type == 1)
+        {
+            vec2 checkerboard = mod(floor(intersection.hitPos.xz), 2);
+            if(checkerboard.x == checkerboard.y)
+                result.material.color = result.material.emissionColor;
+        }
     }
 
     //Meshes

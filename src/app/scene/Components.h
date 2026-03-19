@@ -14,10 +14,13 @@ namespace application
 
     struct alignas(16) RaytracedMaterialComponent
     {
-        glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f); float pad0 = 0;
+        glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+        float smoothness = 0;
+
         glm::vec3 emissionColor = glm::vec3(0, 0, 0);
         float emissionStrength = 0;
-        float smoothness = 0;
+
+        int type = 0;
     };
 
     struct alignas(16) RaytracedSphereComponent

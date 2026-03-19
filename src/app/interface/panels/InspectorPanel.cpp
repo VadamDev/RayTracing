@@ -51,9 +51,16 @@ namespace application
         // Raytraced Material
         drawComponent<RaytracedMaterialComponent>(entity, "Raytraced Material", [](RaytracedMaterialComponent &material) {
             Color3f("Color", material.color);
+            Drag1f("Smoothness", material.smoothness, 0.01f, 0, 1, "%.2f");
+
+            ImGui::NewLine();
+
             Color3f("Emission Color", material.emissionColor);
             Drag1f("Emission Strength", material.emissionStrength, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f");
-            Drag1f("Smoothness", material.smoothness, 0.01f, 0, 1, "%.2f");
+
+            ImGui::NewLine();
+
+            Drag1i("Material Type", material.type, 1, 0, 1);
         });
 
         // Raytraced Sphere

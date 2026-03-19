@@ -6,11 +6,6 @@
 #include "../../engine/graphics/IRenderable.h"
 #include "../../engine/window/Window.h"
 
-namespace engine
-{
-    class ProfilerEntry;
-}
-
 namespace application
 {
     class RaytracingApplication;
