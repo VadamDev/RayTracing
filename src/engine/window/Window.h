@@ -4,16 +4,27 @@
 #include <GLFW/glfw3.h>
 #include <string>
 #include <memory>
+#include <vector>
 
-#include "../event/EventDispatcher.h"
-#include "WindowResizeEvent.h"
 #include "IImGuiLayer.h"
 #include "input/InputsManager.h"
 
 namespace engine
 {
+    class Messenger;
+
+    struct WindowResizeEvent
+    {
+        explicit WindowResizeEvent(const int newWidth, const int newHeight)
+            : newWidth(newWidth), newHeight(newHeight), newAspectRatio(static_cast<float>(newWidth) / static_cast<float>(newHeight)) {}
+
+        int newWidth, newHeight;
+        float newAspectRatio;
+    };
+
     class Window
     {
+        friend class Application;
 
     public:
         explicit Window(const int width, const int height, std::string title)
@@ -29,7 +40,6 @@ namespace engine
         void pushFrame() noexcept;
         void popFrame() const noexcept;
 
-        void whenResized(const std::function<void(WindowResizeEvent&)> &callback);
         void registerImGuiWindow(const std::shared_ptr<IImGuiLayer> &imguiWindow) { imguiWindows.push_back(imguiWindow); }
 
         /*
@@ -71,9 +81,9 @@ namespace engine
         GLFWwindow *window = nullptr;
 
         std::shared_ptr<InputsManager> inputManager;
-        EventDispatcher<WindowResizeEvent> resizeDispatcher;
-
         std::vector<std::shared_ptr<IImGuiLayer>> imguiWindows;
+
+        Messenger *messenger = nullptr;
 
         bool resized = true, grabbed = false;
         double dFrameTime = 0, fFrameTime = 0;

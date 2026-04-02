@@ -1,6 +1,7 @@
 #pragma once
 
 #include "clock/AbstractClock.h"
+#include "messenger/Messenger.hpp"
 
 namespace engine
 {
@@ -9,7 +10,10 @@ namespace engine
 
     public:
         explicit Application(Window &window)
-            : window(window) {}
+            : window(window)
+        {
+            window.messenger = &globalMessenger;
+        }
 
         /*
          * Start / Stop
@@ -38,9 +42,12 @@ namespace engine
 
         Window& getWindow() const { return window; }
         AbstractClock* getClock() const { return clock; }
+        Messenger* getGlobalMessenger() { return &globalMessenger; }
 
     protected:
         Window &window;
         AbstractClock *clock = nullptr;
+
+        Messenger globalMessenger;
     };
 }

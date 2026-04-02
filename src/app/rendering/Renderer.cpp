@@ -3,7 +3,6 @@
 #include <spdlog/spdlog.h>
 
 #include "../RaytracingApplication.h"
-#include "../../engine/clock/FixedStepClock.h"
 #include "../../engine/scene/Entity.h"
 #include "../scene/Components.h"
 
@@ -14,29 +13,39 @@ namespace application
         this->window = window;
         this->application = application;
 
+        engine::Messenger *globalMessenger = application->getGlobalMessenger();
+
         //Canvas
         canvas = std::make_unique<Canvas>();
         canvas->create();
 
         //Camera
-        camera = std::make_unique<Camera>(90, 1, this);
+        camera = std::make_unique<Camera>(90, 1, globalMessenger);
 
         //Shader
         shader = std::make_unique<RaytracingShader>();
         shader->create();
 
-        camera->onCameraMove([this](CameraMovedEvent &_) {
+        //Messenger
+        globalMessenger->subscribe<CameraMovedEvent>([globalMessenger](const CameraMovedEvent *) {
+            AccumulationResetEvent e;
+            globalMessenger->dispatch(e);
+        });
+
+        globalMessenger->subscribe<CanvasResizeEvent>([this, globalMessenger](const CanvasResizeEvent *event) {
+            canvas->resize(event->newWidth, event->newHeight);
+
+            AccumulationResetEvent e;
+            globalMessenger->dispatch(e);
+        });
+
+        globalMessenger->subscribe<AccumulationResetEvent>([this](const AccumulationResetEvent *) {
             frameIndex = 1;
         });
     }
 
     void Renderer::render()
     {
-        // TODO: hack, until i add an event for accumulation reset
-        if(accumulatedBefore != accumulate)
-            frameIndex = 1;
-        accumulatedBefore = accumulate;
-
         updateBuffers();
 
         shader->bind();
@@ -53,19 +62,6 @@ namespace application
         shader->dispatchCompute(ceil(canvas->getWidth() / 8), ceil(canvas->getHeight() / 8), 1, GL_TEXTURE_FETCH_BARRIER_BIT);
 
         shader->unbind();
-    }
-
-    void Renderer::onCanvasResize(const std::function<void(engine::WindowResizeEvent &)> &callback)
-    {
-        viewportResizeDispatcher.subscribe(callback);
-    }
-
-    void Renderer::dispatchCanvasResize(engine::WindowResizeEvent event)
-    {
-        canvas->resize(event.getNewWidth(), event.getNewHeight());
-        frameIndex = 1;
-
-        viewportResizeDispatcher.dispatch(event);
     }
 
     void Renderer::updateBuffers() const
@@ -183,5 +179,10 @@ namespace application
         }
 
         shader->updateMeshesBuffer(allMeshes);
+    }
+
+    engine::Messenger* Renderer::getGlobalMessenger() const
+    {
+        return application->getGlobalMessenger();
     }
 }

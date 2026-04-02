@@ -33,6 +33,8 @@ namespace application
             ImGui::NewLine();
         }
 
+        bool rstAcc = false; //reset frame accumulation flag
+
         // Viewport
         if (ImGui::CollapsingHeader("Viewport", ImGuiTreeNodeFlags_DefaultOpen))
         {
@@ -47,8 +49,8 @@ namespace application
                 camera->targetAspectRatio = ASPECT_RATIOS[selectedAspectRatio];
 
             ImGui::NewLine();
-            Drag1f("Fov", camera->fov, 1, 45, 130, "%.0f", 150);
-            Drag1f("Focal Plane", camera->nearClipPlane, 0.01f, 1, std::numeric_limits<float>::infinity(), "%.2f", 150);
+            rstAcc |= Drag1f("Fov", camera->fov, 1, 45, 130, "%.0f", 150);
+            rstAcc |= Drag1f("Focal Plane", camera->nearClipPlane, 0.01f, 1, std::numeric_limits<float>::infinity(), "%.2f", 150);
             Drag1f("Sensitivity", controller->sensitivity, 0.01f, 0.01f, 1, "%.2f", 150);
             Drag1f("Camera Speed", controller->cameraSpeed, 0.05f, 1, 8, "%.1f", 150);
 
@@ -58,12 +60,19 @@ namespace application
         // Raytracer
         if (ImGui::CollapsingHeader("Raytracer", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            Checkbox("Accumulate", renderer->accumulate, 150);
-            Drag1i("Max Bounces", renderer->maxBounces, 1, 1, std::numeric_limits<int>::infinity(), 150);
-            Drag1i("Rays Per Pixel", renderer->raysPerPixel, 1, 1, 128, 150);
-            Checkbox("Environment Light", renderer->environmentLight, 150);
-            Drag1f("Diverge Strength", renderer->divergeStrength, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f", 150);
-            Drag1f("Defocus Strength", renderer->defocusStrength, 0.01, 0, std::numeric_limits<float>::infinity(), "%.2f", 150);
+            rstAcc |= Checkbox("Accumulate", renderer->accumulate, 150);
+
+            rstAcc |= Drag1i("Max Bounces", renderer->maxBounces, 1, 1, std::numeric_limits<int>::infinity(), 150);
+            rstAcc |= Drag1i("Rays Per Pixel", renderer->raysPerPixel, 1, 1, 128, 150);
+            rstAcc |= Checkbox("Environment Light", renderer->environmentLight, 150);
+            rstAcc |= Drag1f("Diverge Strength", renderer->divergeStrength, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f", 150);
+            rstAcc |= Drag1f("Defocus Strength", renderer->defocusStrength, 0.01, 0, std::numeric_limits<float>::infinity(), "%.2f", 150);
+        }
+
+        if (rstAcc)
+        {
+            AccumulationResetEvent event;
+            renderer->getGlobalMessenger()->dispatch(event);
         }
 
         ImGui::End();

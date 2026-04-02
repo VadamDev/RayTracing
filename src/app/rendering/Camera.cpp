@@ -1,20 +1,21 @@
 #include "Camera.h"
 
 #include "Renderer.h"
+#include "../../engine/messenger/Messenger.hpp"
 
 namespace application
 {
-    static constexpr glm::vec3 UP(0, 1, 0);
     static constexpr glm::vec3 RIGHT(1, 0, 0);
+    static constexpr glm::vec3 UP   (0, 1, 0);
 
-    Camera::Camera(const float fov, const float nearClipPlane, Renderer *renderer)
-        : fov(fov), nearClipPlane(nearClipPlane)
+    Camera::Camera(const float fov, const float nearClipPlane, engine::Messenger *messenger)
+        : fov(fov), nearClipPlane(nearClipPlane), messenger(messenger)
     {
-        renderer->onCanvasResize([this](const engine::WindowResizeEvent &event) {
-            this->windowWidth = event.getNewWidth();
-            this->windowHeight = event.getNewHeight();
+        messenger->subscribe<engine::WindowResizeEvent>([this](const engine::WindowResizeEvent *event) {
+            this->windowWidth = event->newWidth;
+            this->windowHeight = event->newHeight;
 
-            this->aspectRatio = event.getNewAspectRatio();
+            this->aspectRatio = event->newAspectRatio;
         });
     }
 
@@ -26,6 +27,6 @@ namespace application
         localToWorldMatrix = glm::rotate(localToWorldMatrix, glm::radians(rotation.x), RIGHT);
 
         CameraMovedEvent event;
-        moveDispatcher.dispatch(event);
+        messenger->dispatch(event);
     }
 }

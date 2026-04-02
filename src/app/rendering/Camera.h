@@ -4,23 +4,25 @@
 #include "glm/vec3.hpp"
 #include <glm/ext/matrix_transform.hpp>
 
-#include "../../engine/event/EventDispatcher.h"
+namespace engine
+{
+    class Messenger;
+}
 
 namespace application
 {
     static constexpr float DEFAULT_ASPECT_RATIO = 16.0f / 9.0f;
 
-    class Renderer;
-    class CameraMovedEvent : public engine::IEvent {};
+    struct CameraMovedEvent
+    {};
 
     class Camera
     {
 
     public:
-        explicit Camera(float fov, float nearClipPlane, Renderer *renderer);
+        explicit Camera(float fov, float nearClipPlane, engine::Messenger *messenger);
 
         void updateLocalToWorldMatrix();
-        void onCameraMove(const std::function<void(CameraMovedEvent&)> &callback) { moveDispatcher.subscribe(callback); }
 
         int getWindowWidth() const { return windowWidth; }
         int getWindowHeight() const { return windowHeight; }
@@ -38,8 +40,8 @@ namespace application
         int windowWidth = 0, windowHeight = 0;
         float aspectRatio = DEFAULT_ASPECT_RATIO;
 
-        glm::mat4 localToWorldMatrix = glm::identity<glm::mat4>();
+        engine::Messenger *messenger;
 
-        engine::EventDispatcher<CameraMovedEvent> moveDispatcher;
+        glm::mat4 localToWorldMatrix = glm::identity<glm::mat4>();
     };
 }

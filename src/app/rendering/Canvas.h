@@ -1,9 +1,14 @@
 #pragma once
 
-#include <cstdint>
+#include "../../engine/window/Window.h"
 
 namespace application
 {
+    struct CanvasResizeEvent : engine::WindowResizeEvent
+    {
+        using WindowResizeEvent::WindowResizeEvent;
+    };
+
     class Canvas
     {
 

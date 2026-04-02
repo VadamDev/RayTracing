@@ -2,6 +2,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include "../../../engine/messenger/Messenger.hpp"
+
 namespace application
 {
     static constexpr ImVec4 BLANK4(0, 0, 0, 0);
@@ -18,7 +20,10 @@ namespace application
 
         // Terrible! way of detecting resizes
         if(accurateDims.x != canvas->getWidth() || accurateDims.y != canvas->getHeight())
-            renderer->dispatchCanvasResize(engine::WindowResizeEvent(accurateDims.x, accurateDims.y));
+        {
+            CanvasResizeEvent event(accurateDims.x, accurateDims.y);
+            renderer->getGlobalMessenger()->dispatch(event);
+        }
 
         ImGui::PushStyleColor(ImGuiCol_Button, BLANK4);
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, BLANK4);

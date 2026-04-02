@@ -3,6 +3,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "../messenger/Messenger.hpp"
 
 #include "spdlog/spdlog.h"
 
@@ -135,7 +136,7 @@ namespace engine
             resized = false;
 
             WindowResizeEvent event(width, height);
-            resizeDispatcher.dispatch(event);
+            messenger->dispatch<WindowResizeEvent>(event);
         }
 
         dFrameTime = glfwGetTime();
@@ -159,11 +160,6 @@ namespace engine
 
         glfwPollEvents();
         glfwSwapBuffers(window);
-    }
-
-    void Window::whenResized(const std::function<void(WindowResizeEvent&)> &callback)
-    {
-        resizeDispatcher.subscribe(callback);
     }
 
     /*
