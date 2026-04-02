@@ -84,19 +84,19 @@ uniform bool environmentLight;
 uniform float divergeStrength;
 uniform float defocusStrength;
 
-layout(std430, binding = 0) buffer SphereBuffer {
+layout(std430, binding = 0) readonly buffer SphereBuffer {
     Sphere spheres[];
 };
 
-layout(std430, binding = 1) buffer BoxBuffer {
+layout(std430, binding = 1) readonly buffer BoxBuffer {
     Box boxes[];
 };
 
-layout(std430, binding = 2) buffer TriangleBuffer {
+layout(std430, binding = 2) readonly buffer TriangleBuffer {
     Triangle triangles[];
 };
 
-layout(std430, binding = 3) buffer MeshesBuffer {
+layout(std430, binding = 3) readonly buffer MeshesBuffer {
     TriangleMesh meshes[];
 };
 
