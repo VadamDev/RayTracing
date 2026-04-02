@@ -12,10 +12,10 @@ namespace application
         explicit CameraController(Camera *camera, const std::shared_ptr<engine::InputsManager> &inputsManager)
             : camera(camera), inputsManager(inputsManager) {}
 
-        void processInputs(float deltaTime);
+        void processInputs(float deltaTime) const;
 
         float sensitivity = 0.2f;
-        float cameraSpeed = 4;
+        float cameraSpeed = 5;
 
     private:
         Camera *camera;
@@ -24,6 +24,6 @@ namespace application
         bool processMouseMovements() const;
         bool processKeyboardMovements(float deltaTime) const;
 
-        void move(float xOffset, float yOffset, float zOffset) const;
+        void move(glm::vec3 offset) const;
     };
 }

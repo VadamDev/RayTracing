@@ -2,9 +2,10 @@
 
 namespace application
 {
+    static constexpr glm::vec3 ZERO(0, 0, 0);
     static constexpr glm::vec3 WORLD_UP(0, 1, 0);
 
-    void CameraController::processInputs(const float deltaTime)
+    void CameraController::processInputs(const float deltaTime) const
     {
         const bool processedMouse = processMouseMovements(), processedKeyboard = processKeyboardMovements(deltaTime);
 
@@ -49,36 +50,38 @@ namespace application
 
     bool CameraController::processKeyboardMovements(const float deltaTime) const
     {
-        float xOffset = 0, yOffset = 0, zOffset = 0;
+        glm::vec3 offset(0, 0, 0);
 
         if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_W))
-            zOffset += cameraSpeed;
+            offset.z += 1;
 
         if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_A))
-            xOffset -= cameraSpeed;
+            offset.x -= 1;
 
         if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_S))
-            zOffset -= cameraSpeed;
+            offset.z -= 1;
 
         if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_D))
-            xOffset += cameraSpeed;
+            offset.x += 1;
 
         if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_SPACE))
-            yOffset += cameraSpeed;
+            offset.y += 1;
 
         if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_LEFT_CONTROL))
-            yOffset -= cameraSpeed;
+            offset.y -= 1;
 
-        if (xOffset != 0 || yOffset != 0 || zOffset != 0)
+        if (offset != ZERO)
         {
-            move(xOffset * deltaTime, yOffset * deltaTime, zOffset * deltaTime);
+            offset = glm::normalize(offset) * cameraSpeed * deltaTime;
+            move(offset);
+
             return true;
         }
 
         return false;
     }
 
-    void CameraController::move(const float xOffset, const float yOffset, const float zOffset) const
+    void CameraController::move(const glm::vec3 offset) const
     {
         const float yawRad = glm::radians(camera->rotation.y);
 
@@ -86,8 +89,8 @@ namespace application
         const glm::vec3 right = glm::cross(WORLD_UP, forward);
 
         glm::vec3 &pos = camera->position;
-        pos += forward * zOffset;
-        pos += right * xOffset;
-        pos += WORLD_UP * yOffset;
+        pos += offset.x * right;
+        pos += offset.y * WORLD_UP;
+        pos += offset.z * forward;
     }
 }
