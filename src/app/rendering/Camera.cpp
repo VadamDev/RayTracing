@@ -11,7 +11,7 @@ namespace application
     Camera::Camera(const float fov, const float nearClipPlane, engine::Messenger *messenger)
         : fov(fov), nearClipPlane(nearClipPlane), messenger(messenger)
     {
-        messenger->subscribe<engine::WindowResizeEvent>([this](const engine::WindowResizeEvent *event) {
+        messenger->subscribe<CanvasResizeEvent>([this](const CanvasResizeEvent *event) {
             this->windowWidth = event->newWidth;
             this->windowHeight = event->newHeight;
 
