@@ -5,6 +5,8 @@ namespace application
     static constexpr glm::vec3 ZERO(0, 0, 0);
     static constexpr glm::vec3 WORLD_UP(0, 1, 0);
 
+    static constexpr float SPRINT_MULTIPLIER = 2.5f;
+
     void CameraController::processInputs(const float deltaTime) const
     {
         const bool processedMouse = processMouseMovements(), processedKeyboard = processKeyboardMovements(deltaTime);
@@ -51,6 +53,7 @@ namespace application
     bool CameraController::processKeyboardMovements(const float deltaTime) const
     {
         glm::vec3 offset(0, 0, 0);
+        bool sprinting = false;
 
         if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_W))
             offset.z += 1;
@@ -70,9 +73,12 @@ namespace application
         if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_LEFT_CONTROL))
             offset.y -= 1;
 
+        if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_LEFT_SHIFT))
+            sprinting = true;
+
         if (offset != ZERO)
         {
-            offset = glm::normalize(offset) * cameraSpeed * deltaTime;
+            offset = glm::normalize(offset) * cameraSpeed * (sprinting ? SPRINT_MULTIPLIER : 1) * deltaTime;
             move(offset);
 
             return true;
