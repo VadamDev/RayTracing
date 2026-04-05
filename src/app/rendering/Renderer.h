@@ -16,7 +16,9 @@ namespace application
     class RaytracingApplication;
 
     struct AccumulationResetEvent
-    {};
+    {
+        unsigned int newFrameIndex = 1;
+    };
 
     class Renderer : public engine::IRenderable
     {

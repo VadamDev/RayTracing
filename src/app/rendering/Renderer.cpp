@@ -39,8 +39,8 @@ namespace application
             globalMessenger->dispatch(e);
         });
 
-        globalMessenger->subscribe<AccumulationResetEvent>([this](const AccumulationResetEvent *) {
-            frameIndex = 1;
+        globalMessenger->subscribe<AccumulationResetEvent>([this](const AccumulationResetEvent *event) {
+            frameIndex = event->newFrameIndex;
         });
     }
 
@@ -59,7 +59,7 @@ namespace application
         shader->defocusStrength->set1f(defocusStrength);
         shader->sendViewParams(camera.get());
 
-        shader->dispatchCompute(ceil(canvas->getWidth() / 8), ceil(canvas->getHeight() / 8), 1, GL_TEXTURE_FETCH_BARRIER_BIT);
+        RaytracingShader::dispatchCompute(ceil(canvas->getWidth() / 8), ceil(canvas->getHeight() / 8), 1, GL_TEXTURE_FETCH_BARRIER_BIT);
 
         shader->unbind();
     }

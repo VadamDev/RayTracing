@@ -52,7 +52,7 @@ namespace application
             rstAcc |= Drag1f("Fov", camera->fov, 1, 45, 130, "%.0f", 150);
             rstAcc |= Drag1f("Focal Plane", camera->nearClipPlane, 0.01f, 1, std::numeric_limits<float>::infinity(), "%.2f", 150);
             Drag1f("Sensitivity", controller->sensitivity, 0.01f, 0.01f, 1, "%.2f", 150);
-            Drag1f("Camera Speed", controller->cameraSpeed, 0.05f, 1, 8, "%.1f", 150);
+            Drag1f("Camera Speed", controller->cameraSpeed, 0.05f, 1, std::numeric_limits<float>::infinity(), "%.1f", 150);
 
             ImGui::NewLine();
         }
