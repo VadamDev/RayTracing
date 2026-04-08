@@ -1,6 +1,7 @@
 #include "RaytracingApplication.h"
 
-#include "DefaultScene.h"
+#include "../engine/scene/Entity.h"
+#include "scene/Components.h"
 
 namespace application
 {
@@ -14,7 +15,13 @@ namespace application
         interface = std::make_shared<Interface>(&window, &renderer, this, controller.get());
         window.registerImGuiWindow(interface);
 
-        setupDefaultScene(scene);
+        sceneSerializer.addSerializableComponent<engine::TagComponent>();
+
+        sceneSerializer.addSerializableComponent<TransformComponent>();
+        sceneSerializer.addSerializableComponent<RaytracedMaterialComponent>();
+        sceneSerializer.addSerializableComponent<RaytracedSphereComponent>();
+        sceneSerializer.addSerializableComponent<RaytracedBoxComponent>();
+        sceneSerializer.addSerializableComponent<RaytracedMeshComponent>();
     }
 
     void RaytracingApplication::update()

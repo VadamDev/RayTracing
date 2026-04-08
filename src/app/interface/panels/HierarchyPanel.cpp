@@ -1,6 +1,7 @@
 #include "HierarchyPanel.h"
 
 #include "../../RaytracingApplication.h"
+#include "../../scene/Components.h"
 
 namespace application
 {

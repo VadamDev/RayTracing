@@ -1,60 +1,90 @@
 #pragma once
 
-#include <glm/vec3.hpp>
 #include <string>
+
+#include "../../engine/scene/SerializableComponent.h"
+#include "RaytracedObjects.h"
 
 namespace application
 {
-    struct TransformComponent
+    struct TransformComponent : engine::SerializableComponent
     {
         glm::vec3 position = glm::vec3(0, 0, 0);
         glm::vec3 rotation = glm::vec3(0, 0, 0);
         glm::vec3 scale = glm::vec3(1);
+
+        void serialize(nlohmann::json &componentJson) const override
+        {
+            componentJson["position"] = { position.x, position.y, position.z };
+            componentJson["rotation"] = { rotation.x, rotation.y, rotation.z };
+            componentJson["scale"] = { scale.x, scale.y, scale.z };
+        }
+
+        void deserialize(const nlohmann::json &componentJson) override
+        {
+            position = { componentJson["position"][0], componentJson["position"][1], componentJson["position"][2] };
+            rotation = { componentJson["rotation"][0], componentJson["rotation"][1], componentJson["rotation"][2] };
+            scale = { componentJson["scale"][0], componentJson["scale"][1], componentJson["scale"][2] };
+        }
     };
 
-    struct alignas(16) RaytracedMaterialComponent
+
+
+    struct RaytracedMaterialComponent : engine::SerializableComponent
     {
-        glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
-        float smoothness = 0;
+        RaytracedMaterial material;
 
-        glm::vec3 emissionColor = glm::vec3(0, 0, 0);
-        float emissionStrength = 0;
+        void serialize(nlohmann::json &componentJson) const override
+        {
+            componentJson["color"] = { material.color.x, material.color.y, material.color.z };
+            componentJson["smoothness"] = material.smoothness;
 
-        int type = 0;
+            componentJson["emissionColor"] = { material.emissionColor.x, material.emissionColor.y, material.emissionColor.z };
+            componentJson["emissionStrength"] = material.emissionStrength;
+
+            componentJson["type"] = material.type;
+        }
+
+        void deserialize(const nlohmann::json &componentJson) override
+        {
+            material.color = { componentJson["color"][0], componentJson["color"][1], componentJson["color"][2] };
+            material.smoothness = componentJson["smoothness"];
+
+            material.emissionColor = { componentJson["emissionColor"][0], componentJson["emissionColor"][1], componentJson["emissionColor"][2] };
+            material.emissionStrength = componentJson["emissionStrength"];
+
+            material.type = componentJson["type"];
+        }
     };
 
-    struct alignas(16) RaytracedSphereComponent
+    struct alignas(16) RaytracedSphereComponent : engine::SerializableComponent
     {
-        glm::vec3 position = glm::vec3(0, 0, 0);
-        float radius = 0;
-        RaytracedMaterialComponent material{};
+        RaytracedSphere sphere;
+
+        void serialize(nlohmann::json &componentJson) const override {}
+        void deserialize(const nlohmann::json &componentJson) override {}
     };
 
-    struct alignas(16) RaytracedBoxComponent
+    struct alignas(16) RaytracedBoxComponent : engine::SerializableComponent
     {
-        glm::vec3 boxMin = glm::vec3(0, 0, 0); float pad0 = 0;
-        glm::vec3 boxMax = glm::vec3(0, 0, 0); float pad1 = 0;
-        RaytracedMaterialComponent material{};
+        RaytracedBox box;
+
+        void serialize(nlohmann::json &componentJson) const override {}
+        void deserialize(const nlohmann::json &componentJson) override {}
     };
 
-    struct RaytracedMeshComponent
+    struct RaytracedMeshComponent : engine::SerializableComponent
     {
         std::string name;
-    };
 
-    struct alignas(16) TriangleMeshData
-    {
-        unsigned int triIndex;
-        unsigned int triCount;
+        void serialize(nlohmann::json &componentJson) const override
+        {
+            componentJson["name"] = name;
+        }
 
-        float pad0 = 0, pad1 = 0;
-
-        glm::vec3 boxMin; float pad2 = 0;
-        glm::vec3 boxMax; float pad3 = 0;
-
-        glm::mat4 localToWorld;
-        glm::mat4 worldToLocal;
-
-        RaytracedMaterialComponent material{};
+        void deserialize(const nlohmann::json &componentJson) override
+        {
+            name = componentJson["name"];
+        }
     };
 }

@@ -60,7 +60,7 @@ namespace application
 
         auto &attribs = reader.GetAttrib();
 
-        std::vector<Triangle> triangles;
+        std::vector<RaytracedTriangle> triangles;
         for (const shape_t &shape : reader.GetShapes())
         {
             const auto &indices = shape.mesh.indices;
@@ -85,7 +85,7 @@ namespace application
         allMeshes[name] = tri;
     }
 
-    Triangle ModelManager::parseTriangle(const size_t &indiceIndex, const std::vector<index_t> &indices, const std::vector<real_t> &vertices, const std::vector<real_t> &normals)
+    RaytracedTriangle ModelManager::parseTriangle(const size_t &indiceIndex, const std::vector<index_t> &indices, const std::vector<real_t> &vertices, const std::vector<real_t> &normals)
     {
         glm::vec3 triPositions[3];
         glm::vec3 triNormals[3];
@@ -117,7 +117,7 @@ namespace application
             }
         }
 
-        const Triangle tri {
+        const RaytracedTriangle tri {
             .posA = triPositions[0],
             .posB = triPositions[1],
             .posC = triPositions[2],
@@ -130,7 +130,7 @@ namespace application
         return tri;
     }
 
-    AABB ModelManager::calculateMeshAABB(const std::vector<Triangle> &triangles)
+    AABB ModelManager::calculateMeshAABB(const std::vector<RaytracedTriangle> &triangles)
     {
         AABB aabb {
             .min = glm::vec3(std::numeric_limits<float>::infinity()),

@@ -4,6 +4,7 @@
 #include "panels/HierarchyPanel.h"
 #include "panels/InspectorPanel.h"
 #include "panels/SettingsPanel.h"
+#include "panels/ToolbarPanel.h"
 #include "panels/ViewportPanel.h"
 
 namespace application
@@ -16,10 +17,12 @@ namespace application
          * Create Panels
          */
 
-        const auto settingsPanel = registerPanel<SettingsPanel>(application, renderer, controller);
-        const auto viewportPanel = registerPanel<ViewportPanel>(window, renderer);
+        registerPanel<ToolbarPanel>(application);
+        registerPanel<SettingsPanel>(application, renderer, controller);
+        registerPanel<ViewportPanel>(window, renderer);
+
         const auto hierarchyPanel = registerPanel<HierarchyPanel>(application);
-        const auto inspectorPanel = registerPanel<InspectorPanel>(hierarchyPanel.get());
+        registerPanel<InspectorPanel>(hierarchyPanel.get());
     }
 
     void Interface::draw()

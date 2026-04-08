@@ -3,15 +3,29 @@
 #include <utility>
 
 #include "Scene.h"
+#include "SerializableComponent.h"
 
 namespace engine
 {
-    struct TagComponent
+    struct TagComponent : SerializableComponent
     {
         std::string tag;
 
         explicit TagComponent(std::string tag)
             : tag(std::move(tag)) {}
+
+        explicit TagComponent()
+            : tag("Empty Entity") {}
+
+        void serialize(nlohmann::json &componentJson) const override
+        {
+            componentJson["tag"] = tag;
+        }
+
+        void deserialize(const nlohmann::json &componentJson) override
+        {
+            tag = componentJson["tag"].get<std::string>();
+        }
     };
 
     class Entity

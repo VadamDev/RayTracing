@@ -49,7 +49,9 @@ namespace application
         });
 
         // Raytraced Material
-        drawComponent<RaytracedMaterialComponent>(entity, "Raytraced Material", [](RaytracedMaterialComponent &material) {
+        drawComponent<RaytracedMaterialComponent>(entity, "Raytraced Material", [](RaytracedMaterialComponent &component) {
+            RaytracedMaterial &material = component.material;
+            
             Color3f("Color", material.color);
             Drag1f("Smoothness", material.smoothness, 0.01f, 0, 1, "%.2f");
 

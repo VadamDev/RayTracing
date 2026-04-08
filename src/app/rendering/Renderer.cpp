@@ -81,14 +81,14 @@ namespace application
     {
         //TODO: if any changes are detected here, we need to reset the frame index to 1
 
-        std::vector<RaytracedSphereComponent> allSpheres;
+        std::vector<RaytracedSphere> allSpheres;
 
         engine::Scene &currentScene = application->getActiveScene();
         for (auto &entityHandle : currentScene.registry.view<RaytracedMaterialComponent, RaytracedSphereComponent>())
         {
             const engine::Entity entity = { entityHandle, &currentScene };
 
-            auto &sphere = entity.getComponent<RaytracedSphereComponent>();
+            auto &sphere = entity.getComponent<RaytracedSphereComponent>().sphere;
             if (entity.hasComponent<TransformComponent>())
             {
                 const auto &transform = entity.getComponent<TransformComponent>();
@@ -96,7 +96,7 @@ namespace application
                 sphere.radius = (transform.scale.x + transform.scale.y + transform.scale.z) / 3;
             }
 
-            sphere.material = entity.getComponent<RaytracedMaterialComponent>();
+            sphere.material = entity.getComponent<RaytracedMaterialComponent>().material;
             allSpheres.push_back(sphere);
         }
 
@@ -105,14 +105,14 @@ namespace application
 
     void Renderer::updateBoxes() const
     {
-        std::vector<RaytracedBoxComponent> allBoxes;
+        std::vector<RaytracedBox> allBoxes;
 
         engine::Scene &currentScene = application->getActiveScene();
         for (auto &entityHandle : currentScene.registry.view<RaytracedMaterialComponent, RaytracedBoxComponent>())
         {
             const engine::Entity entity = { entityHandle, &currentScene };
 
-            auto &box = entity.getComponent<RaytracedBoxComponent>();
+            auto &box = entity.getComponent<RaytracedBoxComponent>().box;
             if (entity.hasComponent<TransformComponent>())
             {
                 const auto &transform = entity.getComponent<TransformComponent>();
@@ -122,7 +122,7 @@ namespace application
                 box.boxMax = transform.position + halfScale;
             }
 
-            box.material = entity.getComponent<RaytracedMaterialComponent>();
+            box.material = entity.getComponent<RaytracedMaterialComponent>().material;
             allBoxes.push_back(box);
         }
 
@@ -172,7 +172,7 @@ namespace application
                 .localToWorld = transformMatrix,
                 .worldToLocal = glm::inverse(transformMatrix),
 
-                .material = entity.getComponent<RaytracedMaterialComponent>()
+                .material = entity.getComponent<RaytracedMaterialComponent>().material
             };
 
             allMeshes.push_back(data);

@@ -38,17 +38,17 @@ namespace application
         defocusStrength = accessUniform("defocusStrength");
     }
 
-    void RaytracingShader::updateSpheresBuffer(const std::vector<RaytracedSphereComponent> &spheres)
+    void RaytracingShader::updateSpheresBuffer(const std::vector<RaytracedSphere> &spheres)
     {
         spheresBuffer.update(spheres, 0, GL_DYNAMIC_DRAW);
     }
 
-    void RaytracingShader::updateBoxesBuffer(const std::vector<RaytracedBoxComponent> &boxes)
+    void RaytracingShader::updateBoxesBuffer(const std::vector<RaytracedBox> &boxes)
     {
         boxesBuffer.update(boxes, 1, GL_DYNAMIC_DRAW);
     }
 
-    void RaytracingShader::updateTrianglesBuffer(const std::vector<Triangle> &triangles)
+    void RaytracingShader::updateTrianglesBuffer(const std::vector<RaytracedTriangle> &triangles)
     {
         trianglesBuffer.update(triangles, 2, GL_DYNAMIC_DRAW);
     }

@@ -7,19 +7,10 @@
 #include <vector>
 #include <glm/vec3.hpp>
 
+#include "../scene/RaytracedObjects.h"
+
 namespace application
 {
-    struct alignas(16) Triangle
-    {
-        glm::vec3 posA; float pad0 = 0;
-        glm::vec3 posB; float pad1 = 0;
-        glm::vec3 posC; float pad2 = 0;
-
-        glm::vec3 normalA; float pad3 = 0;
-        glm::vec3 normalB; float pad4 = 0;
-        glm::vec3 normalC;
-    };
-
     struct TriangleMesh
     {
         unsigned int triIndex;
@@ -37,13 +28,13 @@ namespace application
         void loadAll();
         void load(const std::filesystem::path &path);
 
-        std::vector<Triangle> getAllTriangles() const { return allTriangles; }
+        std::vector<RaytracedTriangle> getAllTriangles() const { return allTriangles; }
         std::unordered_map<std::string, TriangleMesh> getAllMeshes() const { return allMeshes; }
     private:
-        static Triangle parseTriangle(const size_t &indiceIndex, const std::vector<tinyobj::index_t> &indices, const std::vector<tinyobj::real_t> &vertices, const std::vector<tinyobj::real_t> &normals);
-        static AABB calculateMeshAABB(const std::vector<Triangle> &triangles);
+        static RaytracedTriangle parseTriangle(const size_t &indiceIndex, const std::vector<tinyobj::index_t> &indices, const std::vector<tinyobj::real_t> &vertices, const std::vector<tinyobj::real_t> &normals);
+        static AABB calculateMeshAABB(const std::vector<RaytracedTriangle> &triangles);
 
-        std::vector<Triangle> allTriangles;
+        std::vector<RaytracedTriangle> allTriangles;
         std::unordered_map<std::string, TriangleMesh> allMeshes;
     };
 }

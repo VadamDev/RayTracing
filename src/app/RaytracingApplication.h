@@ -2,6 +2,7 @@
 
 #include "../engine/Application.h"
 #include "../engine/scene/Scene.h"
+#include "../engine/scene/SceneSerializer.h"
 #include "controller/CameraController.h"
 #include "interface/Interface.h"
 #include "model/ModelManager.h"
@@ -23,12 +24,16 @@ namespace application
 
         void destroy() noexcept override;
 
-        engine::Scene& getActiveScene() { return scene; }
         ModelManager& getModelManager() { return modelManager; }
+
+        engine::SceneSerializer& getSceneSerializer() { return sceneSerializer; }
+        engine::Scene& getActiveScene() { return scene; }
+        void setActiveScene(engine::Scene &scene) { this->scene = std::move(scene); }
 
     private:
         ModelManager modelManager;
 
+        engine::SceneSerializer sceneSerializer;
         engine::Scene scene;
 
         Renderer renderer;
