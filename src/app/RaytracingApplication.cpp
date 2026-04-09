@@ -54,4 +54,12 @@ namespace application
     {
 
     }
+
+    void RaytracingApplication::loadScene(engine::Scene &scene)
+    {
+        this->scene = std::move(scene);
+
+        AccumulationResetEvent event;
+        globalMessenger.dispatch(event);
+    }
 }

@@ -28,7 +28,7 @@ namespace application
 
         engine::SceneSerializer& getSceneSerializer() { return sceneSerializer; }
         engine::Scene& getActiveScene() { return scene; }
-        void setActiveScene(engine::Scene &scene) { this->scene = std::move(scene); }
+        void loadScene(engine::Scene &scene);
 
     private:
         ModelManager modelManager;

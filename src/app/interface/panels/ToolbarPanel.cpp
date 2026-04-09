@@ -5,6 +5,7 @@
     #undef interface
 #endif
 #include <spdlog/spdlog.h>
+#include <nlohmann/json.hpp>
 
 #include "../../RaytracingApplication.h"
 
@@ -41,13 +42,15 @@ namespace application {
                     try
                     {
                         engine::Scene scene = application->getSceneSerializer().deserializeScene(paths[0]);
-                        application->setActiveScene(scene);
+                        application->loadScene(scene);
                     }
-                    catch (const std::exception &e) //TODO: better exception with dialog notification
+                    catch (const nlohmann::detail::exception &e)
                     {
-                        spdlog::error("Failed to parse scene", e.what());
-                    }
+                        spdlog::error("Failed to parse scene json: {}", e.what());
 
+                        pfd::message message("An error occured", e.what(), pfd::choice::ok, pfd::icon::error);
+                        message.result();
+                    }
                 }
             }
 
