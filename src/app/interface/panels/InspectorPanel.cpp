@@ -63,6 +63,9 @@ namespace application
             updBuffs |= Color3f("Color", material.color);
             updBuffs |= Drag1f("Smoothness", material.smoothness, 0.01f, 0, 1, "%.2f");
 
+            updBuffs |= Color3f("Specular Color", material.specularColor);
+            updBuffs |= Drag1f("Specular Probability", material.specularProbability, 0.01f, 0, 1, "%.2f");
+
             ImGui::NewLine();
 
             updBuffs |= Color3f("Emission Color", material.emissionColor);

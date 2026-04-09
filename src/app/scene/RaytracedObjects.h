@@ -10,6 +10,9 @@ namespace application {
         glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
         float smoothness = 0;
 
+        glm::vec3 specularColor = glm::vec3(1, 1, 1);
+        float specularProbability = 0;
+
         glm::vec3 emissionColor = glm::vec3(0, 0, 0);
         float emissionStrength = 0;
 

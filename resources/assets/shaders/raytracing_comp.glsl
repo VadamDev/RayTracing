@@ -14,6 +14,9 @@ struct Material
     vec3 color;
     float smoothness;
 
+    vec3 specularColor;
+    float specularProbability;
+
     vec3 emissionColor;
     float emissionStrenght;
 
@@ -355,15 +358,18 @@ vec3 traceRay(Ray ray, inout uint rngState)
         Material material = hitResult.material;
         vec3 emittedLight = material.emissionColor * material.emissionStrenght;
 
+        bool isSpecularBounce = bool(rand(rngState) <= material.specularProbability);
+
         outColor += emittedLight * rayColor;
-        rayColor *= material.color;
+        rayColor *= mix(material.color, material.specularColor, isSpecularBounce);
 
         //Bounce ray
         ray.origin = hitResult.hitPos + hitResult.normal * EPSILON;
 
         vec3 diffuseDir = normalize(hitResult.normal + randomDir(rngState));
         vec3 specularDir = reflect(ray.dir, hitResult.normal);
-        ray.dir = mix(diffuseDir, specularDir, material.smoothness);
+
+        ray.dir = mix(diffuseDir, specularDir, isSpecularBounce ? material.smoothness : 0);
         ray.invDir = 1.0 / ray.dir;
     }
 

@@ -37,6 +37,9 @@ namespace application
             componentJson["color"] = { material.color.x, material.color.y, material.color.z };
             componentJson["smoothness"] = material.smoothness;
 
+            componentJson["specularColor"] = { material.specularColor.x, material.specularColor.y, material.specularColor.z };
+            componentJson["specularProbability"] = material.specularProbability;
+
             componentJson["emissionColor"] = { material.emissionColor.x, material.emissionColor.y, material.emissionColor.z };
             componentJson["emissionStrength"] = material.emissionStrength;
 
@@ -47,6 +50,9 @@ namespace application
         {
             material.color = { componentJson["color"][0], componentJson["color"][1], componentJson["color"][2] };
             material.smoothness = componentJson["smoothness"];
+
+            material.specularColor = { componentJson["specularColor"][0], componentJson["specularColor"][1], componentJson["specularColor"][2] };
+            material.specularProbability = componentJson["specularProbability"];
 
             material.emissionColor = { componentJson["emissionColor"][0], componentJson["emissionColor"][1], componentJson["emissionColor"][2] };
             material.emissionStrength = componentJson["emissionStrength"];
