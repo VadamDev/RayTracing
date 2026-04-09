@@ -24,7 +24,7 @@ namespace engine
 
         void deserialize(const nlohmann::json &componentJson) override
         {
-            tag = componentJson["tag"].get<std::string>();
+            tag = componentJson.value("tag", "MISSING TAG");
         }
     };
 

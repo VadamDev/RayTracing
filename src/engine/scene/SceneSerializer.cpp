@@ -50,9 +50,7 @@ namespace engine {
 
         std::ifstream file(path);
         if (!file.is_open())
-        {
-            //TODO: error
-        }
+            throw std::runtime_error("Failed to open scene file at: " + path);
 
         const json sceneJson = json::parse(file);
         file.close();
@@ -63,11 +61,17 @@ namespace engine {
         {
             const entt::entity entityHandle = scene->registry.create();
 
-            const json &componentsJson = entityJson["components"];
+            const json &componentsJson = entityJson.value("components", json::array());
             for (size_t i = 0; i < componentsJson.size(); i++)
             {
                 const json &componentJson = componentsJson[i];
-                const entt::id_type &componentTypeId = componentJson["hs"];
+                const entt::id_type &componentTypeId = componentJson.value("hs", -1);
+
+                if (componentTypeId == -1)
+                {
+                    spdlog::warn("Json does not contain a type id! Skipping...");
+                    continue;
+                }
 
                 const auto &pair = componentSerializers.find(componentTypeId);
                 if (pair == componentSerializers.end())

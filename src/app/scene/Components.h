@@ -22,9 +22,9 @@ namespace application
 
         void deserialize(const nlohmann::json &componentJson) override
         {
-            position = { componentJson["position"][0], componentJson["position"][1], componentJson["position"][2] };
-            rotation = { componentJson["rotation"][0], componentJson["rotation"][1], componentJson["rotation"][2] };
-            scale = { componentJson["scale"][0], componentJson["scale"][1], componentJson["scale"][2] };
+            position = engine::valueVec3(componentJson, "position", position);
+            rotation = engine::valueVec3(componentJson, "rotation", rotation);
+            scale = engine::valueVec3(componentJson, "scale", scale);
         }
     };
 
@@ -48,16 +48,16 @@ namespace application
 
         void deserialize(const nlohmann::json &componentJson) override
         {
-            material.color = { componentJson["color"][0], componentJson["color"][1], componentJson["color"][2] };
-            material.smoothness = componentJson["smoothness"];
+            material.color = engine::valueVec3(componentJson, "color", material.color);
+            material.smoothness = componentJson.value("smoothness", material.smoothness);
 
-            material.specularColor = { componentJson["specularColor"][0], componentJson["specularColor"][1], componentJson["specularColor"][2] };
-            material.specularProbability = componentJson["specularProbability"];
+            material.specularColor = engine::valueVec3(componentJson, "specularColor", material.specularColor);
+            material.specularProbability = componentJson.value("specularProbability", material.specularProbability);
 
-            material.emissionColor = { componentJson["emissionColor"][0], componentJson["emissionColor"][1], componentJson["emissionColor"][2] };
-            material.emissionStrength = componentJson["emissionStrength"];
+            material.emissionColor = engine::valueVec3(componentJson, "emissionColor", material.emissionColor);
+            material.emissionStrength = componentJson.value("emissionStrength", material.emissionStrength);
 
-            material.type = componentJson["type"];
+            material.type = componentJson.value("type", material.type);
         }
     };
 
@@ -88,7 +88,7 @@ namespace application
 
         void deserialize(const nlohmann::json &componentJson) override
         {
-            name = componentJson["name"];
+            name = componentJson.value("name", name);
         }
     };
 }

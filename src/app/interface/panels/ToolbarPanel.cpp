@@ -48,7 +48,14 @@ namespace application {
                     {
                         spdlog::error("Failed to parse scene json: {}", e.what());
 
-                        pfd::message message("An error occured", e.what(), pfd::choice::ok, pfd::icon::error);
+                        pfd::message message("An error occurred", e.what(), pfd::choice::ok, pfd::icon::error);
+                        message.result();
+                    }
+                    catch (const std::runtime_error &e)
+                    {
+                        spdlog::error("Failed to read scene json: {}", e.what());
+
+                        pfd::message message("An error occurred", e.what(), pfd::choice::ok, pfd::icon::error);
                         message.result();
                     }
                 }
