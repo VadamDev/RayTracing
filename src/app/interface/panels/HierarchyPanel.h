@@ -20,9 +20,11 @@ namespace application
     private:
         RaytracingApplication *application;
 
-        void drawHierarchyPopup(engine::Scene &scene);
+        void drawHierarchyPopup(engine::Scene *scene);
 
-        void drawEntity(engine::Scene &scene, const entt::entity &handle, const engine::Entity &entity);
-        void drawEntityPopup(engine::Scene &scene, const engine::Entity &entity);
+        void drawEntity(engine::Scene *scene, const entt::entity &handle, const engine::Entity &entity);
+        void drawEntityPopup(engine::Scene *scene, const engine::Entity &entity);
+
+        void resetAccumulation() const;
     };
 }

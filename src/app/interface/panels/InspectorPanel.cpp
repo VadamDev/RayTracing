@@ -1,5 +1,6 @@
 #include "InspectorPanel.h"
 
+#include "../../RaytracingApplication.h"
 #include "../../scene/Components.h"
 
 namespace application
@@ -42,27 +43,37 @@ namespace application
 
         // Transform
         static bool linkedTransformScale = true;
-        drawComponent<TransformComponent>(entity, "Transform", [](TransformComponent &transform) {
-            Drag3f("Position", transform.position, 0.01f, 0, 0, "%.2f");
-            Drag3f("Rotation", transform.rotation, 0.1f, 0, 0, "%.1f");
-            DragLinked3f("Scale", transform.scale, linkedTransformScale, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f");
+        drawComponent<TransformComponent>(entity, "Transform", [this](TransformComponent &transform) {
+            bool updBuffs = false;
+
+            updBuffs |= Drag3f("Position", transform.position, 0.01f, 0, 0, "%.2f");
+            updBuffs |= Drag3f("Rotation", transform.rotation, 0.1f, 0, 0, "%.1f");
+            updBuffs |= DragLinked3f("Scale", transform.scale, linkedTransformScale, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f");
+
+            if (updBuffs)
+                updateBuffers();
         });
 
         // Raytraced Material
-        drawComponent<RaytracedMaterialComponent>(entity, "Raytraced Material", [](RaytracedMaterialComponent &component) {
+        drawComponent<RaytracedMaterialComponent>(entity, "Raytraced Material", [this](RaytracedMaterialComponent &component) {
             RaytracedMaterial &material = component.material;
-            
-            Color3f("Color", material.color);
-            Drag1f("Smoothness", material.smoothness, 0.01f, 0, 1, "%.2f");
+
+            bool updBuffs = false;
+
+            updBuffs |= Color3f("Color", material.color);
+            updBuffs |= Drag1f("Smoothness", material.smoothness, 0.01f, 0, 1, "%.2f");
 
             ImGui::NewLine();
 
-            Color3f("Emission Color", material.emissionColor);
-            Drag1f("Emission Strength", material.emissionStrength, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f");
+            updBuffs |= Color3f("Emission Color", material.emissionColor);
+            updBuffs |= Drag1f("Emission Strength", material.emissionStrength, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f");
 
             ImGui::NewLine();
 
-            Drag1i("Material Type", material.type, 1, 0, 1);
+            updBuffs |= Drag1i("Material Type", material.type, 1, 0, 1);
+
+            if (updBuffs)
+                updateBuffers();
         });
 
         // Raytraced Sphere
@@ -72,8 +83,11 @@ namespace application
         drawEmptyComponent<RaytracedBoxComponent>(entity, "Raytraced Box");
 
         // Raytraced Mesh
-        drawComponent<RaytracedMeshComponent>(entity, "Raytraced Mesh", [](RaytracedMeshComponent &mesh) {
-            InputText("Mesh Name", mesh.name);
+        drawComponent<RaytracedMeshComponent>(entity, "Raytraced Mesh", [this](RaytracedMeshComponent &mesh) {
+            bool updBuffs = InputText("Mesh Name", mesh.name);
+
+            if (updBuffs)
+                updateBuffers();
         });
     }
 
@@ -184,5 +198,11 @@ namespace application
 
         if (isDisabled)
             ImGui::EndDisabled();
+    }
+
+    void InspectorPanel::updateBuffers() const
+    {
+        UpdateShaderBuffersEvent event;
+        application->getGlobalMessenger()->dispatch(event);
     }
 }

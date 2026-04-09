@@ -41,7 +41,7 @@ namespace application {
                 {
                     try
                     {
-                        engine::Scene scene = application->getSceneSerializer().deserializeScene(paths[0]);
+                        engine::Scene *scene = application->getSceneSerializer().deserializeScene(paths[0], application->getGlobalMessenger());
                         application->loadScene(scene);
                     }
                     catch (const nlohmann::detail::exception &e)

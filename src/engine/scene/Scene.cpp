@@ -1,5 +1,6 @@
 #include "Scene.h"
 
+#include "../messenger/Messenger.hpp"
 #include "Entity.h"
 
 namespace engine
@@ -8,6 +9,9 @@ namespace engine
     {
         const Entity entity(registry.create(), this);
         entity.addComponent<TagComponent>(name);
+
+        AddEntityToSceneEvent event(&entity);
+        globalMessenger->dispatch(event);
 
         return entity;
     }
@@ -34,5 +38,8 @@ namespace engine
     void Scene::destroyEntity(const Entity &entity)
     {
         registry.destroy(entity);
+
+        RemoveEntityFromSceneEvent event(&entity);
+        globalMessenger->dispatch(event);
     }
 }

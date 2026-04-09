@@ -2,19 +2,20 @@
 
 #include <spdlog/spdlog.h>
 #include <fstream>
+#include "../messenger/Messenger.hpp"
 
 namespace engine {
     using nlohmann::json;
 
-    void SceneSerializer::serializeScene(const Scene &scene, const std::string &name)
+    void SceneSerializer::serializeScene(const Scene *scene, const std::string &name)
     {
         json sceneJson = json::array();
-        for (const auto &entityHandle : scene.registry.view<entt::entity>())
+        for (const auto &entityHandle : scene->registry.view<entt::entity>())
         {
             json entityJson;
 
             json componentsList = json::array();
-            for (const auto&& [id, storage] : scene.registry.storage())
+            for (const auto&& [id, storage] : scene->registry.storage())
             {
                 if (!storage.contains(entityHandle))
                     continue;
@@ -44,7 +45,7 @@ namespace engine {
         file.close();
     }
 
-    Scene SceneSerializer::deserializeScene(const std::string &path)
+    Scene* SceneSerializer::deserializeScene(const std::string &path, Messenger *messenger)
     {
 
         std::ifstream file(path);
@@ -56,11 +57,11 @@ namespace engine {
         const json sceneJson = json::parse(file);
         file.close();
 
-        Scene scene;
+        auto *scene = new Scene(messenger);
 
         for(const auto& [_, entityJson] : sceneJson.items())
         {
-            const entt::entity entityHandle = scene.registry.create();
+            const entt::entity entityHandle = scene->registry.create();
 
             const json &componentsJson = entityJson["components"];
             for (size_t i = 0; i < componentsJson.size(); i++)
@@ -76,7 +77,7 @@ namespace engine {
                 }
 
                 const ComponentSerializerProxy &proxy = pair->second;
-                proxy.deserializeFunc(scene.registry, entityHandle, componentJson);
+                proxy.deserializeFunc(scene->registry, entityHandle, componentJson);
             }
         }
 

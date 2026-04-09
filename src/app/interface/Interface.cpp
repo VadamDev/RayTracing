@@ -22,7 +22,7 @@ namespace application
         registerPanel<ViewportPanel>(window, renderer);
 
         const auto hierarchyPanel = registerPanel<HierarchyPanel>(application);
-        registerPanel<InspectorPanel>(hierarchyPanel.get());
+        registerPanel<InspectorPanel>(hierarchyPanel.get(), application);
     }
 
     void Interface::draw()

@@ -27,14 +27,14 @@ namespace application
         ModelManager& getModelManager() { return modelManager; }
 
         engine::SceneSerializer& getSceneSerializer() { return sceneSerializer; }
-        engine::Scene& getActiveScene() { return scene; }
-        void loadScene(engine::Scene &scene);
+        engine::Scene* getActiveScene() const { return scene; }
+        void loadScene(engine::Scene *scene);
 
     private:
         ModelManager modelManager;
 
         engine::SceneSerializer sceneSerializer;
-        engine::Scene scene;
+        engine::Scene *scene = nullptr, *nextScene = nullptr;
 
         Renderer renderer;
         std::unique_ptr<CameraController> controller;

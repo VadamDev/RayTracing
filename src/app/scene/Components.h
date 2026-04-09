@@ -28,8 +28,6 @@ namespace application
         }
     };
 
-
-
     struct RaytracedMaterialComponent : engine::SerializableComponent
     {
         RaytracedMaterial material;

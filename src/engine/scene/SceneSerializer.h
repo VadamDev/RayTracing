@@ -6,6 +6,8 @@
 #include "SerializableComponent.h"
 
 namespace engine {
+    class Messenger;
+
     struct ComponentSerializerProxy
     {
         std::function<void(nlohmann::json&, const void*)> serializeFunc;
@@ -15,8 +17,8 @@ namespace engine {
     class SceneSerializer {
 
     public:
-        void serializeScene(const Scene &scene, const std::string &name);
-        Scene deserializeScene(const std::string &path);
+        void serializeScene(const Scene *scene, const std::string &name);
+        Scene* deserializeScene(const std::string &path, Messenger *messenger);
 
         template<typename T>
         void addSerializableComponent()

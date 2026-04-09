@@ -9,19 +9,20 @@ namespace application
     {
 
     public:
-        explicit InspectorPanel(HierarchyPanel *hierarchyPanel)
-            : UIPanel("Inspector"), hierarchyPanel(hierarchyPanel) {}
+        explicit InspectorPanel(HierarchyPanel *hierarchyPanel, RaytracingApplication *application)
+            : UIPanel("Inspector"), hierarchyPanel(hierarchyPanel), application(application) {}
 
         void draw() override;
 
     private:
         HierarchyPanel *hierarchyPanel;
+        RaytracingApplication *application;
 
         /*
          * Inspect components
          */
 
-        static void drawComponents(const engine::Entity &entity);
+        void drawComponents(const engine::Entity &entity);
 
         template<typename T>
         static void drawComponent(const engine::Entity &entity, const std::string &name, std::function<void(T&)> drawFunc, bool removable = true);
@@ -37,5 +38,7 @@ namespace application
 
         template<typename T, typename... Args>
         static void drawAddComponent(const engine::Entity &entity, const std::string &name, Args&&... args);
+
+        void updateBuffers() const;
     };
 }

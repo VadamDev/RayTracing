@@ -9,7 +9,7 @@ namespace application
     {
         ImGui::Begin(name.c_str());
 
-        engine::Scene &scene = application->getActiveScene();
+        engine::Scene *scene = application->getActiveScene();
 
         // Unselect entity if clicked on nothing
         if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(0))
@@ -19,14 +19,14 @@ namespace application
         const auto &inputsManager= application->getWindow().getInputsManager();
         if (selectedEntity && inputsManager->isKeyDown(engine::KeyboardKeys::KEY_DELETE))
         {
-            scene.destroyEntity(selectedEntity);
+            scene->destroyEntity(selectedEntity);
             selectedEntity = {};
         }
 
         // Draw all scene entities in the panel
-        for (auto &entityHandle : scene.registry.view<entt::entity>())
+        for (auto &entityHandle : scene->registry.view<entt::entity>())
         {
-            const engine::Entity entity(entityHandle, &scene);
+            const engine::Entity entity(entityHandle, scene);
             drawEntity(scene, entityHandle, entity);
         }
 
@@ -40,44 +40,53 @@ namespace application
         ImGui::End();
     }
 
-    void HierarchyPanel::drawHierarchyPopup(engine::Scene &scene)
+    void HierarchyPanel::drawHierarchyPopup(engine::Scene *scene)
     {
         // Empty Entity
         if (ImGui::MenuItem("New [Empty Entity]"))
-            scene.newEntity("Empty Entity");
+            scene->newEntity("Empty Entity");
 
         // Raytraced Sphere
         if (ImGui::MenuItem("New [Raytraced Sphere]"))
         {
-            const engine::Entity sphere = scene.newEntity("Raytraced Sphere");
+            const engine::Entity sphere = scene->newEntity("Raytraced Sphere");
 
             sphere.addComponent<TransformComponent>();
             sphere.addComponent<RaytracedMaterialComponent>();
             sphere.addComponent<RaytracedSphereComponent>();
+
+            selectedEntity = sphere;
+            resetAccumulation();
         }
 
         // Raytraced Box
         if (ImGui::MenuItem("New [Raytraced Box]"))
         {
-            const engine::Entity box = scene.newEntity("Raytraced Box");
+            const engine::Entity box = scene->newEntity("Raytraced Box");
 
             box.addComponent<TransformComponent>();
             box.addComponent<RaytracedMaterialComponent>();
             box.addComponent<RaytracedBoxComponent>();
+
+            selectedEntity = box;
+            resetAccumulation();
         }
 
         // Raytraced Mesh
         if (ImGui::MenuItem("New [Raytraced Mesh]"))
         {
-            const engine::Entity mesh = scene.newEntity("Raytraced Mesh");
+            const engine::Entity mesh = scene->newEntity("Raytraced Mesh");
 
             mesh.addComponent<TransformComponent>();
             mesh.addComponent<RaytracedMaterialComponent>();
             mesh.addComponent<RaytracedMeshComponent>();
+            
+            selectedEntity = mesh;
+            resetAccumulation();
         }
     }
 
-    void HierarchyPanel::drawEntity(engine::Scene &scene, const entt::entity &handle, const engine::Entity &entity)
+    void HierarchyPanel::drawEntity(engine::Scene *scene, const entt::entity &handle, const engine::Entity &entity)
     {
         // Just in case
         auto tag = std::string("UNKNOWN");
@@ -102,7 +111,7 @@ namespace application
             ImGui::TreePop();
     }
 
-    void HierarchyPanel::drawEntityPopup(engine::Scene &scene, const engine::Entity &entity)
+    void HierarchyPanel::drawEntityPopup(engine::Scene *scene, const engine::Entity &entity)
     {
         // Copy Entity
         if (ImGui::MenuItem("Duplicate"))
@@ -111,7 +120,7 @@ namespace application
             if(entity.hasComponent<engine::TagComponent>())
                 tag = std::string(entity.getComponent<engine::TagComponent>().tag);
 
-            selectedEntity = scene.copyEntity(entity, tag);
+            selectedEntity = scene->copyEntity(entity, tag);
 
             return;
         }
@@ -122,7 +131,13 @@ namespace application
             if (selectedEntity == entity)
                 selectedEntity = {};
 
-            scene.destroyEntity(entity);
+            scene->destroyEntity(entity);
         }
+    }
+
+    void HierarchyPanel::resetAccumulation() const
+    {
+        AccumulationResetEvent event;
+        application->getGlobalMessenger()->dispatch(event);
     }
 }

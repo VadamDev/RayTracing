@@ -2,6 +2,7 @@
 
 #include "../engine/scene/Entity.h"
 #include "scene/Components.h"
+#include "../engine/scene/Scene.h"
 
 namespace application
 {
@@ -22,6 +23,8 @@ namespace application
         sceneSerializer.addSerializableComponent<RaytracedSphereComponent>();
         sceneSerializer.addSerializableComponent<RaytracedBoxComponent>();
         sceneSerializer.addSerializableComponent<RaytracedMeshComponent>();
+
+        scene = new engine::Scene(&globalMessenger);
     }
 
     void RaytracingApplication::update()
@@ -34,7 +37,7 @@ namespace application
         if (!window.isGrabbed())
             return;
 
-        const auto inputsManager = window.getInputsManager();
+        const auto &inputsManager = window.getInputsManager();
 
         // Ungrab Viewport
         if (inputsManager->isKeyDown(engine::KeyboardKeys::KEY_ESCAPE))
@@ -47,19 +50,28 @@ namespace application
     void RaytracingApplication::render(const float deltaTime)
     {
         glClear(GL_COLOR_BUFFER_BIT);
+
+        // We're delaying scene change to next frame because UI might still use the old scene pointer. TODO: use ref?
+        if (nextScene != nullptr)
+        {
+            delete scene;
+            scene = nextScene;
+            nextScene = nullptr;
+
+            UpdateShaderBuffersEvent event;
+            globalMessenger.dispatch(event);
+        }
+
         renderer.render();
     }
 
     void RaytracingApplication::destroy() noexcept
     {
-
+        delete scene;
     }
 
-    void RaytracingApplication::loadScene(engine::Scene &scene)
+    void RaytracingApplication::loadScene(engine::Scene *scene)
     {
-        this->scene = std::move(scene);
-
-        AccumulationResetEvent event;
-        globalMessenger.dispatch(event);
+        nextScene = scene;
     }
 }

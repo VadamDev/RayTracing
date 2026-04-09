@@ -15,38 +15,64 @@ namespace application
 
         engine::Messenger *globalMessenger = application->getGlobalMessenger();
 
-        //Canvas
+        // Canvas
         canvas = std::make_unique<Canvas>();
         canvas->create();
 
-        //Camera
+        // Camera
         camera = std::make_unique<Camera>(90, 1, globalMessenger);
 
-        //Shader
+        // Shader
         shader = std::make_unique<RaytracingShader>();
         shader->create();
 
-        //Messenger
-        globalMessenger->subscribe<CameraMovedEvent>([globalMessenger](const CameraMovedEvent *) {
-            AccumulationResetEvent e;
-            globalMessenger->dispatch(e);
+        // Reset frame accumulation on camera move
+        globalMessenger->subscribe<CameraMovedEvent>([this](const CameraMovedEvent *) {
+            resetAccumulation();
         });
 
-        globalMessenger->subscribe<CanvasResizeEvent>([this, globalMessenger](const CanvasResizeEvent *event) {
+        // Resize render canvas on viewport resize + reset accumulation
+        globalMessenger->subscribe<CanvasResizeEvent>([this](const CanvasResizeEvent *event) {
             canvas->resize(event->newWidth, event->newHeight);
-
-            AccumulationResetEvent e;
-            globalMessenger->dispatch(e);
+            resetAccumulation();
         });
 
+        // Reset Frame Accumulation
         globalMessenger->subscribe<AccumulationResetEvent>([this](const AccumulationResetEvent *event) {
             frameIndex = event->newFrameIndex;
+        });
+
+        // Update buffer storage and reset accumulation on entity add/remove
+        globalMessenger->subscribe<engine::AddEntityToSceneEvent>([globalMessenger](const engine::AddEntityToSceneEvent *) {
+            UpdateShaderBuffersEvent event;
+            globalMessenger->dispatch(event);
+        });
+
+        globalMessenger->subscribe<engine::RemoveEntityFromSceneEvent>([globalMessenger](const engine::RemoveEntityFromSceneEvent *) {
+            UpdateShaderBuffersEvent event;
+            globalMessenger->dispatch(event);
+        });
+
+        // Only update buffer storage if necessary, whole scene is sent to the GPU when this event is fired
+        globalMessenger->subscribe<UpdateShaderBuffersEvent>([this](const UpdateShaderBuffersEvent *event) {
+            if (event->resetAccumulation)
+                resetAccumulation();
+
+            shouldUpdateBuffers = true;
         });
     }
 
     void Renderer::render()
     {
-        updateBuffers();
+        if (shouldUpdateBuffers)
+        {
+            updateSpheres();
+            updateBoxes();
+            shader->updateTrianglesBuffer(application->getModelManager().getAllTriangles());
+            updateTriangleMeshes();
+
+            shouldUpdateBuffers = false;
+        }
 
         shader->bind();
 
@@ -64,29 +90,14 @@ namespace application
         shader->unbind();
     }
 
-    void Renderer::updateBuffers() const
-    {
-        updateSpheres();
-        updateBoxes();
-        updateTriangles();
-        updateTriangleMeshes();
-    }
-
-    /*
-     * TODO: this is heavily temporary, we do not need update every frame, just check for changes (with imgui?), and update the buffer if necessary
-     * this requires some serious rework, so just leave it as it is for now
-     * also this approach might seems a bit stupid, since data is duplicated between components. Only RaytracedSphereComponent is actually sent to the renderer
-     */
     void Renderer::updateSpheres() const
     {
-        //TODO: if any changes are detected here, we need to reset the frame index to 1
-
         std::vector<RaytracedSphere> allSpheres;
 
-        engine::Scene &currentScene = application->getActiveScene();
-        for (auto &entityHandle : currentScene.registry.view<RaytracedMaterialComponent, RaytracedSphereComponent>())
+        engine::Scene *currentScene = application->getActiveScene();
+        for (auto &entityHandle : currentScene->registry.view<RaytracedMaterialComponent, RaytracedSphereComponent>())
         {
-            const engine::Entity entity = { entityHandle, &currentScene };
+            const engine::Entity entity = { entityHandle, currentScene };
 
             auto &sphere = entity.getComponent<RaytracedSphereComponent>().sphere;
             if (entity.hasComponent<TransformComponent>())
@@ -107,10 +118,10 @@ namespace application
     {
         std::vector<RaytracedBox> allBoxes;
 
-        engine::Scene &currentScene = application->getActiveScene();
-        for (auto &entityHandle : currentScene.registry.view<RaytracedMaterialComponent, RaytracedBoxComponent>())
+        engine::Scene *currentScene = application->getActiveScene();
+        for (auto &entityHandle : currentScene->registry.view<RaytracedMaterialComponent, RaytracedBoxComponent>())
         {
-            const engine::Entity entity = { entityHandle, &currentScene };
+            const engine::Entity entity = { entityHandle, currentScene };
 
             auto &box = entity.getComponent<RaytracedBoxComponent>().box;
             if (entity.hasComponent<TransformComponent>())
@@ -129,21 +140,16 @@ namespace application
         shader->updateBoxesBuffer(allBoxes);
     }
 
-    void Renderer::updateTriangles() const
-    {
-        shader->updateTrianglesBuffer(application->getModelManager().getAllTriangles());
-    }
-
     void Renderer::updateTriangleMeshes() const
     {
         const auto &meshesMap = application->getModelManager().getAllMeshes();
 
         std::vector<TriangleMeshData> allMeshes;
 
-        engine::Scene &currentScene = application->getActiveScene();
-        for (auto &entityHandle : currentScene.registry.view<RaytracedMaterialComponent, RaytracedMeshComponent>())
+        engine::Scene *currentScene = application->getActiveScene();
+        for (auto &entityHandle : currentScene->registry.view<RaytracedMaterialComponent, RaytracedMeshComponent>())
         {
-            const engine::Entity entity = { entityHandle, &currentScene };
+            const engine::Entity entity = { entityHandle, currentScene };
 
             const std::string &meshName = entity.getComponent<RaytracedMeshComponent>().name;
             if (!meshesMap.contains(meshName))
@@ -184,5 +190,11 @@ namespace application
     engine::Messenger* Renderer::getGlobalMessenger() const
     {
         return application->getGlobalMessenger();
+    }
+
+    void Renderer::resetAccumulation() const
+    {
+        AccumulationResetEvent e;
+        application->getGlobalMessenger()->dispatch(e);
     }
 }

@@ -20,6 +20,11 @@ namespace application
         unsigned int newFrameIndex = 1;
     };
 
+    struct UpdateShaderBuffersEvent
+    {
+        bool resetAccumulation = true;
+    };
+
     class Renderer : public engine::IRenderable
     {
 
@@ -48,11 +53,12 @@ namespace application
         std::unique_ptr<Camera> camera;
         std::unique_ptr<RaytracingShader> shader;
 
-        void updateBuffers() const;
+        bool shouldUpdateBuffers = true;
 
         void updateSpheres() const;
         void updateBoxes() const;
-        void updateTriangles() const;
         void updateTriangleMeshes() const;
+
+        void resetAccumulation() const;
     };
 }
