@@ -15,6 +15,14 @@ namespace application
         if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(0))
             selectedEntity = {};
 
+        // Quick remove entity
+        const auto &inputsManager= application->getWindow().getInputsManager();
+        if (selectedEntity && inputsManager->isKeyDown(engine::KeyboardKeys::KEY_DELETE))
+        {
+            scene.destroyEntity(selectedEntity);
+            selectedEntity = {};
+        }
+
         // Draw all scene entities in the panel
         for (auto &entityHandle : scene.registry.view<entt::entity>())
         {
