@@ -128,7 +128,10 @@ namespace application
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.7f, 0.15f, 0.15f, 1 });
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered));
             if (ImGui::Button("X", buttonSize))
+            {
                 values.x = defaultValue;
+                changed = true;
+            }
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
@@ -142,7 +145,10 @@ namespace application
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.15f, 0.7f, 0.15f, 1 });
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered));
             if (ImGui::Button("Y", buttonSize))
+            {
                 values.y = defaultValue;
+                changed = true;
+            }
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
@@ -156,7 +162,10 @@ namespace application
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.15f, 0.15f, 0.7f, 1 });
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered));
             if (ImGui::Button("Z", buttonSize))
+            {
                 values.z = defaultValue;
+                changed = true;
+            }
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
@@ -211,13 +220,17 @@ namespace application
                     values = glm::vec3(defaultValue);
                 else
                     values.x = defaultValue;
+
+                changed = true;
             }
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
-            if (ImGui::DragFloat("##X", &values.x, speed, min, max, format) && linked)
+            if (ImGui::DragFloat("##X", &values.x, speed, min, max, format))
             {
-                values.y = values.z = values.x;
+                if (linked)
+                    values.y = values.z = values.x;
+
                 changed = true;
             }
             ImGui::PopItemWidth();
@@ -233,13 +246,17 @@ namespace application
                     values = glm::vec3(defaultValue);
                 else
                     values.y = defaultValue;
+
+                changed = true;
             }
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
-            if (ImGui::DragFloat("##Y", &values.y, speed, min, max, format) && linked)
+            if (ImGui::DragFloat("##Y", &values.y, speed, min, max, format))
             {
-                values.x = values.z = values.y;
+                if (linked)
+                    values.x = values.z = values.y;
+
                 changed = true;
             }
             ImGui::PopItemWidth();
@@ -255,13 +272,17 @@ namespace application
                     values = glm::vec3(defaultValue);
                 else
                     values.z = defaultValue;
+
+                changed = true;
             }
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
-            if (ImGui::DragFloat("##Z", &values.z, speed, min, max, format) && linked)
+            if (ImGui::DragFloat("##Z", &values.z, speed, min, max, format))
             {
-                values.x = values.y = values.z;
+                if (linked)
+                    values.x = values.y = values.z;
+
                 changed = true;
             }
             ImGui::PopItemWidth();
