@@ -17,7 +17,7 @@ namespace application
 
         // Quick remove entity
         const auto &inputsManager= application->getWindow().getInputsManager();
-        if (selectedEntity && inputsManager->isKeyDown(engine::KeyboardKeys::KEY_DELETE))
+        if (selectedEntity && inputsManager->isKeyDown(engine::KeyboardKeys::KEY_DELETE) && !ImGui::GetIO().WantCaptureKeyboard)
         {
             scene->destroyEntity(selectedEntity);
             selectedEntity = {};
