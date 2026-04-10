@@ -1,5 +1,7 @@
 #include "RaytracingApplication.h"
 
+#include <spdlog/spdlog.h>
+
 #include "../engine/scene/Entity.h"
 #include "scene/Components.h"
 #include "../engine/scene/Scene.h"
@@ -24,7 +26,15 @@ namespace application
         sceneSerializer.addSerializableComponent<RaytracedBoxComponent>();
         sceneSerializer.addSerializableComponent<RaytracedMeshComponent>();
 
-        scene = new engine::Scene(&globalMessenger);
+        try
+        {
+            scene = sceneSerializer.deserializeScene("resources/assets/scenes/default_scene.json", &globalMessenger);
+        }
+        catch (std::exception &e)
+        {
+            spdlog::warn("Failed to load default scene: {}", e.what());
+            scene = new engine::Scene(&globalMessenger);
+        }
     }
 
     void RaytracingApplication::update()

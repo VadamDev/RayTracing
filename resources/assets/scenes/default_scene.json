@@ -1,0 +1,359 @@
+[
+  {
+    "components": [
+      {
+        "hs": 2281046661,
+        "tag": "Raytraced Sphere"
+      },
+      {
+        "hs": 2581203321,
+        "position": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      {
+        "color": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "emissionColor": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "emissionStrength": 0.0,
+        "hs": 2520299631,
+        "smoothness": 1.0,
+        "specularColor": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "specularProbability": 1.0,
+        "type": 0
+      },
+      {
+        "hs": 3172698599
+      }
+    ]
+  },
+  {
+    "components": [
+      {
+        "hs": 2281046661,
+        "tag": "Ceiling Light"
+      },
+      {
+        "hs": 2581203321,
+        "position": [
+          0.0,
+          7.949999809265137,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          3.5,
+          0.10000000149011612,
+          3.5
+        ]
+      },
+      {
+        "color": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "emissionColor": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "emissionStrength": 8.0,
+        "hs": 2520299631,
+        "smoothness": 0.0,
+        "specularColor": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "specularProbability": 0.0,
+        "type": 0
+      },
+      {
+        "hs": 1344150385
+      }
+    ]
+  },
+  {
+    "components": [
+      {
+        "hs": 2281046661,
+        "tag": "Ceiling"
+      },
+      {
+        "hs": 2581203321,
+        "position": [
+          0.0,
+          8.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          8.010000228881836,
+          0.009999999776482582,
+          8.0
+        ]
+      },
+      {
+        "color": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "emissionColor": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "emissionStrength": 0.0,
+        "hs": 2520299631,
+        "smoothness": 0.0,
+        "specularColor": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "specularProbability": 0.0,
+        "type": 0
+      },
+      {
+        "hs": 1344150385
+      }
+    ]
+  },
+  {
+    "components": [
+      {
+        "hs": 2281046661,
+        "tag": "NORTH Wall"
+      },
+      {
+        "hs": 2581203321,
+        "position": [
+          0.0,
+          4.0,
+          4.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          8.010000228881836,
+          8.010000228881836,
+          0.009999999776482582
+        ]
+      },
+      {
+        "color": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "emissionColor": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "emissionStrength": 0.0,
+        "hs": 2520299631,
+        "smoothness": 0.0,
+        "specularColor": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "specularProbability": 0.0,
+        "type": 0
+      },
+      {
+        "hs": 1344150385
+      }
+    ]
+  },
+  {
+    "components": [
+      {
+        "hs": 2281046661,
+        "tag": "WEST Wall"
+      },
+      {
+        "hs": 2581203321,
+        "position": [
+          -4.0,
+          4.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          8.0,
+          8.0
+        ]
+      },
+      {
+        "color": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "emissionColor": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "emissionStrength": 0.0,
+        "hs": 2520299631,
+        "smoothness": 0.0,
+        "specularColor": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "specularProbability": 0.0,
+        "type": 0
+      },
+      {
+        "hs": 1344150385
+      }
+    ]
+  },
+  {
+    "components": [
+      {
+        "hs": 2281046661,
+        "tag": "EAST Wall"
+      },
+      {
+        "hs": 2581203321,
+        "position": [
+          4.0,
+          4.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          8.0,
+          8.0
+        ]
+      },
+      {
+        "color": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "emissionColor": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "emissionStrength": 0.0,
+        "hs": 2520299631,
+        "smoothness": 0.0,
+        "specularColor": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "specularProbability": 0.0,
+        "type": 0
+      },
+      {
+        "hs": 1344150385
+      }
+    ]
+  },
+  {
+    "components": [
+      {
+        "hs": 2281046661,
+        "tag": "Floor"
+      },
+      {
+        "hs": 2581203321,
+        "position": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          8.0,
+          0.009999999776482582,
+          8.0
+        ]
+      },
+      {
+        "color": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "emissionColor": [
+          0.09652507305145264,
+          0.09652507305145264,
+          0.09652507305145264
+        ],
+        "emissionStrength": 0.0,
+        "hs": 2520299631,
+        "smoothness": 0.0,
+        "specularColor": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "specularProbability": 0.0,
+        "type": 1
+      },
+      {
+        "hs": 1344150385
+      }
+    ]
+  }
+]
