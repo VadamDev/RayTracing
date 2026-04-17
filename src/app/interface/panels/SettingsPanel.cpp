@@ -33,8 +33,6 @@ namespace application
             ImGui::NewLine();
         }
 
-        bool rstAcc = false; //reset frame accumulation flag
-
         // Viewport
         if (ImGui::CollapsingHeader("Viewport", ImGuiTreeNodeFlags_DefaultOpen))
         {
@@ -49,8 +47,25 @@ namespace application
                 camera->targetAspectRatio = ASPECT_RATIOS[selectedAspectRatio];
 
             ImGui::NewLine();
+        }
+
+        bool rstAcc = false; //reset frame accumulation flag
+
+        // Camera
+        if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            Camera *camera = renderer->getCamera();
+
+            ImGui::Text(std::format("XYZ: {:.3f}, {:.3f}, {:.3f}", camera->position.x, camera->position.y, camera->position.z).c_str());
+            ImGui::Text(std::format("Yaw / Pitch: {:.1f}, {:.1f}", camera->rotation.x, camera->rotation.y).c_str());
+
+            ImGui::NewLine();
+
             rstAcc |= Drag1f("Fov", camera->fov, 1, 45, 130, "%.0f", 150);
             rstAcc |= Drag1f("Focal Plane", camera->nearClipPlane, 0.01f, 1, std::numeric_limits<float>::infinity(), "%.2f", 150);
+
+            ImGui::NewLine();
+
             Drag1f("Sensitivity", controller->sensitivity, 0.01f, 0.01f, 1, "%.2f", 150);
             Drag1f("Camera Speed", controller->cameraSpeed, 0.05f, 1, std::numeric_limits<float>::infinity(), "%.1f", 150);
 
@@ -66,7 +81,7 @@ namespace application
             rstAcc |= Drag1i("Rays Per Pixel", renderer->raysPerPixel, 1, 1, 128, 150);
             rstAcc |= Checkbox("Environment Light", renderer->environmentLight, 150);
             rstAcc |= Drag1f("Diverge Strength", renderer->divergeStrength, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f", 150);
-            rstAcc |= Drag1f("Defocus Strength", renderer->defocusStrength, 0.01, 0, std::numeric_limits<float>::infinity(), "%.2f", 150);
+            rstAcc |= Drag1f("Defocus Strength", renderer->defocusStrength, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f", 150);
         }
 
         if (rstAcc)

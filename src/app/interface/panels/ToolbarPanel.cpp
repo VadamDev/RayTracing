@@ -4,6 +4,7 @@
 #if defined(interface) // Go fuck yourself Microsoft. ARE YOU SERIOUS??
     #undef interface
 #endif
+
 #include <spdlog/spdlog.h>
 #include <nlohmann/json.hpp>
 
