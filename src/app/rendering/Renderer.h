@@ -37,6 +37,8 @@ namespace application
         Camera* getCamera() const { return camera.get(); }
         engine::Messenger* getGlobalMessenger() const;
 
+        int drawDebugMode = 0;
+        glm::vec2 statsThresholds = glm::vec2(1);
         bool accumulate = true;
         int maxBounces = 8;
         int raysPerPixel = 1;
@@ -57,6 +59,7 @@ namespace application
 
         void updateSpheres() const;
         void updateBoxes() const;
+        void updateMeshDataBuffers() const;
         void updateTriangleMeshes() const;
 
         void resetAccumulation() const;

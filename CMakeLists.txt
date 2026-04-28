@@ -3,6 +3,10 @@ project(Raytracing)
 
 set(CMAKE_CXX_STANDARD 20)
 
+if(MSVC)
+    add_compile_definitions(NOMINMAX)
+endif()
+
 # Dependencies
 find_package(spdlog REQUIRED)
 find_package(glad CONFIG REQUIRED)

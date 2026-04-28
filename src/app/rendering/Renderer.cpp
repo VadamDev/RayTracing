@@ -64,11 +64,12 @@ namespace application
 
     void Renderer::render()
     {
+
         if (shouldUpdateBuffers)
         {
             updateSpheres();
             updateBoxes();
-            shader->updateTrianglesBuffer(application->getModelManager().getAllTriangles());
+            updateMeshDataBuffers();
             updateTriangleMeshes();
 
             shouldUpdateBuffers = false;
@@ -77,6 +78,8 @@ namespace application
         shader->bind();
 
         shader->frameIndex->set1ui(frameIndex++);
+        shader->drawDebugMode->set1i(drawDebugMode);
+        shader->statsThresholds->set2f(statsThresholds);
         shader->accumulate->setBool(accumulate);
         shader->maxBounces->set1i(maxBounces);
         shader->raysPerPixel->set1i(raysPerPixel);
@@ -87,6 +90,7 @@ namespace application
 
         RaytracingShader::dispatchCompute(ceil(canvas->getWidth() / 8), ceil(canvas->getHeight() / 8), 1, GL_TEXTURE_FETCH_BARRIER_BIT);
 
+        shader->unbindBuffers();
         shader->unbind();
     }
 
@@ -140,6 +144,12 @@ namespace application
         shader->updateBoxesBuffer(allBoxes);
     }
 
+    void Renderer::updateMeshDataBuffers() const
+    {
+        const ModelManager &modelManager = application->getModelManager();
+        shader->updateMeshDataBuffers(modelManager.getAllTriangles(), modelManager.getAllBVHNodes());
+    }
+
     void Renderer::updateTriangleMeshes() const
     {
         const auto &meshesMap = application->getModelManager().getAllMeshes();
@@ -169,11 +179,7 @@ namespace application
 
             const TriangleMesh &mesh = meshesMap.at(meshName);
             const TriangleMeshData data {
-                .triIndex = mesh.triIndex,
-                .triCount = mesh.numTri,
-
-                .boxMin = mesh.boxMin,
-                .boxMax = mesh.boxMax,
+                .rootBVHNodeIndex = mesh.rootBVHNodeIndex,
 
                 .localToWorld = transformMatrix,
                 .worldToLocal = glm::inverse(transformMatrix),

@@ -5,21 +5,15 @@
 #include <tiny_obj_loader.h>
 #include <unordered_map>
 #include <vector>
-#include <glm/vec3.hpp>
 
-#include "../scene/RaytracedObjects.h"
+#include "../bvh/BVHTriangle.h"
 
 namespace application
 {
     struct TriangleMesh
     {
-        unsigned int triIndex;
-        unsigned int numTri;
-
-        glm::vec3 boxMin, boxMax;
+        int rootBVHNodeIndex;
     };
-
-    struct AABB;
 
     class ModelManager
     {
@@ -29,12 +23,15 @@ namespace application
         void load(const std::filesystem::path &path);
 
         std::vector<RaytracedTriangle> getAllTriangles() const { return allTriangles; }
+        std::vector<RaytracedBVHNode> getAllBVHNodes() const { return allNodes; }
+
         std::unordered_map<std::string, TriangleMesh> getAllMeshes() const { return allMeshes; }
     private:
-        static RaytracedTriangle parseTriangle(const size_t &indiceIndex, const std::vector<tinyobj::index_t> &indices, const std::vector<tinyobj::real_t> &vertices, const std::vector<tinyobj::real_t> &normals);
-        static AABB calculateMeshAABB(const std::vector<RaytracedTriangle> &triangles);
+        static BVHTriangle parseTriangle(const size_t &indiceIndex, const std::vector<tinyobj::index_t> &indices, const std::vector<tinyobj::real_t> &vertices, const std::vector<tinyobj::real_t> &normals);
 
         std::vector<RaytracedTriangle> allTriangles;
+        std::vector<RaytracedBVHNode> allNodes;
+
         std::unordered_map<std::string, TriangleMesh> allMeshes;
     };
 }

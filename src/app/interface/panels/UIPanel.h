@@ -86,7 +86,6 @@ namespace application
             const bool changed = ImGui::Checkbox("##value", &value);
 
             EndColumnAlignedControl(disabledStyles);
-
             return changed;
         }
 
@@ -98,7 +97,6 @@ namespace application
             const bool changed = ImGui::DragInt("##value", &value, speed, min, max);
 
             EndColumnAlignedControl(disabledStyles);
-
             return changed;
         }
 
@@ -110,7 +108,6 @@ namespace application
             const bool changed = ImGui::DragFloat("##value", &value, speed, min, max, format);
 
             EndColumnAlignedControl(disabledStyles);
-
             return changed;
         }
 
@@ -174,7 +171,6 @@ namespace application
             ImGui::PopItemWidth();
 
             EndColumnAlignedControl(disabledStyles);
-
             return changed;
         }
 
@@ -287,9 +283,7 @@ namespace application
             }
             ImGui::PopItemWidth();
 
-            //Original EndColumnAlignedControl
             EndColumnAlignedControl(disabledStyles);
-
             return changed;
         }
 
@@ -301,7 +295,6 @@ namespace application
             const bool changed = ImGui::ColorEdit3("##color", glm::value_ptr(value), ImGuiColorEditFlags_NoLabel);
 
             EndColumnAlignedControl(disabledStyles);
-
             return changed;
         }
 
@@ -314,18 +307,22 @@ namespace application
             char buffer[128] = {};
             strcpy_s(buffer, value.c_str());
 
-            bool changed = false;
-
-            ImGui::PushID(label.c_str());
-            if (ImGui::InputText("##text", buffer, sizeof(buffer)))
-            {
+            const bool changed = ImGui::InputText("##text", buffer, sizeof(buffer));
+            if (changed)
                 value = std::string(buffer);
-                changed = true;
-            }
-            ImGui::PopID();
 
             EndColumnAlignedControl(disabledStyles);
+            return changed;
+        }
 
+        static bool Combo(const std::string &label, int *currentItem, const std::vector<const char*> &items, const float columnWidth = 96.0f)
+        {
+            const int disabledStyles = BeginColumnAlignedControl(label, columnWidth);
+
+            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+            const bool changed = ImGui::Combo("##combo", currentItem, items.data(), items.size());
+
+            EndColumnAlignedControl(disabledStyles);
             return changed;
         }
     };

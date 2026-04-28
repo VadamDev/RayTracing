@@ -1,14 +1,14 @@
 #include "ModelManager.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
-#include <glm/common.hpp>
-
-#include "tiny_obj_loader.h"
-
+#include <tiny_obj_loader.h>
 #include <spdlog/spdlog.h>
+
+#include "../bvh/BoundingVolumeHierarchy.h"
 
 namespace application
 {
+    static constexpr int BVH_TARGET_DEPTH = 32;
     static const std::string MESHES_DIR = "resources/assets/meshes";
 
     using namespace std::filesystem;
@@ -16,6 +16,8 @@ namespace application
 
     void ModelManager::loadAll()
     {
+        spdlog::info("Target BVH depth is {}", BVH_TARGET_DEPTH);
+
         for (const auto &entry : directory_iterator(MESHES_DIR))
         {
             if (!entry.is_regular_file())
@@ -28,19 +30,15 @@ namespace application
             try { load(path); }
             catch (std::exception &e) //TODO: custom exceptions
             {
-                spdlog::error("", e.what());
+                spdlog::error("Failed to load model at path {}: {}", path.string(), e.what());
             }
         }
     }
 
-    struct AABB
-    {
-        glm::vec3 min, max;
-    };
-
     void ModelManager::load(const path &path)
     {
         const std::string name = path.stem().string();
+        spdlog::info("Loading model {}...", path.filename().string());
 
         ObjReaderConfig readerConfig;
         readerConfig.triangulate = true;
@@ -54,13 +52,13 @@ namespace application
             if (!reader.Error().empty())
                 error = reader.Error();
 
-            spdlog::error(error); //TODO: custom exceptions
+            spdlog::error(error);
             return;
         }
 
         auto &attribs = reader.GetAttrib();
 
-        std::vector<RaytracedTriangle> triangles;
+        std::vector<BVHTriangle> triangles;
         for (const shape_t &shape : reader.GetShapes())
         {
             const auto &indices = shape.mesh.indices;
@@ -70,22 +68,24 @@ namespace application
                 triangles.push_back(parseTriangle(indiceIndex, indices, attribs.vertices, attribs.normals));
         }
 
-        auto [boxMin, boxMax] = calculateMeshAABB(triangles);
-        TriangleMesh tri {
-            .triIndex = (unsigned int) allTriangles.size(),
-            .numTri = (unsigned int) triangles.size(),
+        // Build bvh, also silently sort the provided triangle vector
+        spdlog::info("-> Building BVH for {} triangles...", triangles.size());
+        BoundingVolumeHierarchy bvh(BVH_TARGET_DEPTH);
+        bvh.build(triangles);
 
-            .boxMin = boxMin,
-            .boxMax = boxMax
+        const int rootBVHNodeIndex = allNodes.size();
+        bvh.emplace(triangles, allTriangles, allNodes);
+
+        const BVHStats &bvhStats = bvh.getStats();
+        spdlog::info("-> BVH built in {:.3f}ms, {} nodes ({} leaf)", bvhStats.buildTimeMs, bvhStats.nodeCount, bvhStats.leafNodeCount);
+        spdlog::info("-> Loaded {}", path.filename().string());
+
+        allMeshes[name] = {
+            .rootBVHNodeIndex = rootBVHNodeIndex
         };
-
-        allTriangles.reserve(allTriangles.size() + triangles.size());
-        allTriangles.insert(allTriangles.end(), triangles.begin(), triangles.end());
-
-        allMeshes[name] = tri;
     }
 
-    RaytracedTriangle ModelManager::parseTriangle(const size_t &indiceIndex, const std::vector<index_t> &indices, const std::vector<real_t> &vertices, const std::vector<real_t> &normals)
+    BVHTriangle ModelManager::parseTriangle(const size_t &indiceIndex, const std::vector<index_t> &indices, const std::vector<real_t> &vertices, const std::vector<real_t> &normals)
     {
         glm::vec3 triPositions[3];
         glm::vec3 triNormals[3];
@@ -117,37 +117,16 @@ namespace application
             }
         }
 
-        const RaytracedTriangle tri {
-            .posA = triPositions[0],
-            .posB = triPositions[1],
-            .posC = triPositions[2],
+        const BVHTriangle tri(
+            triPositions[0],
+            triPositions[1],
+            triPositions[2],
 
-            .normalA = triNormals[0],
-            .normalB = triNormals[1],
-            .normalC = triNormals[2]
-        };
+            triNormals[0],
+            triNormals[1],
+            triNormals[2]
+        );
 
         return tri;
-    }
-
-    AABB ModelManager::calculateMeshAABB(const std::vector<RaytracedTriangle> &triangles)
-    {
-        AABB aabb {
-            .min = glm::vec3(std::numeric_limits<float>::infinity()),
-            .max = glm::vec3(-std::numeric_limits<float>::infinity())
-        };
-
-        for (auto &tri : triangles)
-        {
-            aabb.min = glm::min(aabb.min, glm::vec3(tri.posA));
-            aabb.min = glm::min(aabb.min, glm::vec3(tri.posB));
-            aabb.min = glm::min(aabb.min, glm::vec3(tri.posC));
-
-            aabb.max = glm::max(aabb.max, glm::vec3(tri.posA));
-            aabb.max = glm::max(aabb.max, glm::vec3(tri.posB));
-            aabb.max = glm::max(aabb.max, glm::vec3(tri.posC));
-        }
-
-        return aabb;
     }
 }

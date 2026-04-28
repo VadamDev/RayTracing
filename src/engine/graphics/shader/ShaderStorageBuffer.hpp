@@ -44,8 +44,6 @@ namespace engine
 
             glNamedBufferData(ssbo, sizeof(T) * currentSize, data.data(), usage);
             glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, ssbo);
-
-            unbind();
         }
 
         bool isBound() const { return bBound; }

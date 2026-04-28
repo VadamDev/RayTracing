@@ -26,8 +26,8 @@ namespace engine
 
     void ComputeShader::dispatchCompute(const unsigned int numGroupsX, const unsigned int numGroupsY, const unsigned int numGroupsZ, const unsigned int memoryBarrier)
     {
-        glDispatchCompute(numGroupsX, numGroupsY, numGroupsZ);
         glMemoryBarrier(memoryBarrier);
+        glDispatchCompute(numGroupsX, numGroupsY, numGroupsZ);
     }
 
     void ComputeShader::waitCompletion()

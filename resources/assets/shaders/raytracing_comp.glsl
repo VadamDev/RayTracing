@@ -1,14 +1,13 @@
 #version 460
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
-
 layout(rgba32f, binding = 0) uniform image2D resultImage;
 
 /*
   Structs
 */
 
-// Raytraced Objects
+// Primitives
 struct Material
 {
     vec3 color;
@@ -44,19 +43,24 @@ struct Triangle
     vec3 normalA, normalB, normalC;
 };
 
-struct TriangleMesh
+// BVH
+struct BVHNode
 {
-    uint triIndex;
-    uint numTri;
-
     vec3 boxMin, boxMax;
 
+    int leftChildIdx;
+    int triIndex, triCount;
+};
+
+struct TriangleMesh
+{
+    int rootBVHNodeIndex;
     mat4 localToWorld, worldToLocal;
 
     Material material;
 };
 
-// Rays management
+// Rays
 struct Ray
 {
     vec3 origin;
@@ -76,16 +80,18 @@ struct HitInfo
   IO
 */
 
-uniform uint frameIndex;
+uniform uint frameIndex; // Index of the frame currently being rendered
 uniform vec3 viewParams; // planeWidth, planeHeight, focalLength;
-uniform mat4 localToWorld;
+uniform mat4 localToWorld; // Camera localToWorld matrix
+uniform int drawDebugMode;
+uniform vec2 statsThresholds;
 
-uniform bool accumulate;
-uniform int maxBounces;
-uniform int raysPerPixel;
-uniform bool environmentLight;
-uniform float divergeStrength;
-uniform float defocusStrength;
+uniform bool accumulate; // Should accumulate the result with the previous frame?
+uniform int maxBounces; // Max number of bounces for a given ray
+uniform int raysPerPixel; // Number of rays to shoot per pixel, makes the editor less noisy TODO: Multiple Importance Sampling
+uniform bool environmentLight; // Should the ray gather light from the environment (=fake skybox) if it doesn't hit anything?
+uniform float divergeStrength; // Blur used for a rudimentary AA, or whole scene blurring
+uniform float defocusStrength; // Blur used for DOF. change the focal length parameter to focus on different parts of the scene
 
 layout(std430, binding = 0) readonly buffer SphereBuffer {
     Sphere spheres[];
@@ -99,7 +105,11 @@ layout(std430, binding = 2) readonly buffer TriangleBuffer {
     Triangle triangles[];
 };
 
-layout(std430, binding = 3) readonly buffer MeshesBuffer {
+layout(std430, binding = 3) readonly buffer BVHNodeBuffer {
+    BVHNode nodes[];
+};
+
+layout(std430, binding = 4) readonly buffer MeshesBuffer {
     TriangleMesh meshes[];
 };
 
@@ -149,16 +159,16 @@ vec2 randomPointInCircle(inout uint rngState)
 */
 
 // Thanks to: https://raytracing.github.io/books/RayTracingInOneWeekend.html#surfacenormalsandmultipleobjects/simplifyingtheray-sphereintersectioncode
-HitInfo intersectSphere(Ray ray, Sphere sphere)
+HitInfo intersectSphere(Ray ray, vec3 pos, float radius)
 {
     HitInfo result;
     result.didHit = false;
 
-    vec3 oc = sphere.pos - ray.origin;
+    vec3 oc = pos - ray.origin;
 
     float a = dot(ray.dir, ray.dir);
     float h = dot(ray.dir, oc);
-    float c = dot(oc, oc) - sphere.radius * sphere.radius;
+    float c = dot(oc, oc) - radius * radius;
 
     float discreminant = h * h - a * c;
 
@@ -171,7 +181,7 @@ HitInfo intersectSphere(Ray ray, Sphere sphere)
             result.didHit = true;
             result.dst = dst;
             result.hitPos = ray.origin + ray.dir * dst;
-            result.normal = normalize(result.hitPos - sphere.pos);
+            result.normal = normalize(result.hitPos - pos);
         }
     }
 
@@ -188,10 +198,10 @@ HitInfo intersectTriangle(Ray ray, Triangle tri)
     vec3 edgeAC = tri.posC - tri.posA;
     vec3 normal = cross(edgeAB, edgeAC);
 
-    float discreminant = -dot(ray.dir, normal);
-    if(discreminant >= EPSILON)
+    float det = -dot(ray.dir, normal);
+    if(det >= EPSILON)
     {
-        float invDiscreminant = 1.0 / discreminant;
+        float invDiscreminant = 1.0 / det;
 
         vec3 ao = ray.origin - tri.posA;
         vec3 dao = cross(ao, ray.dir);
@@ -213,33 +223,8 @@ HitInfo intersectTriangle(Ray ray, Triangle tri)
     return result;
 }
 
-// AABB intersection based of https://gist.github.com/DomNomNom/46bb1ce47f68d255fd5d
-HitInfo intersectAABB(Ray ray, Box box)
-{
-    HitInfo result;
-    result.didHit = false;
-
-    vec3 tMin = (box.boxMin - ray.origin) * ray.invDir;
-    vec3 tMax = (box.boxMax - ray.origin) * ray.invDir;
-
-    vec3 t1 = min(tMin, tMax);
-    vec3 t2 = max(tMin, tMax);
-
-    float tNear = max(max(t1.x, t1.y), t1.z);
-    float tFar = min(min(t2.x, t2.y), t2.z);
-
-    if(tNear <= tFar && tFar >= 0.0)
-    {
-        result.didHit = true;
-        result.dst = tNear;
-        result.hitPos = ray.origin + ray.dir * tNear;
-        result.normal = -sign(ray.dir) * step(vec3(tNear - EPSILON), t1);
-    }
-
-    return result;
-}
-
-bool intersectAABB(Ray ray, vec3 boxMin, vec3 boxMax)
+// Slab Method AABB intersection. Thanks to: https://tavianator.com/2022/ray_box_boundary.html
+float intersectAABB(Ray ray, vec3 boxMin, vec3 boxMax)
 {
     vec3 tMin = (boxMin - ray.origin) * ray.invDir;
     vec3 tMax = (boxMax - ray.origin) * ray.invDir;
@@ -250,14 +235,14 @@ bool intersectAABB(Ray ray, vec3 boxMin, vec3 boxMax)
     float tNear = max(max(t1.x, t1.y), t1.z);
     float tFar = min(min(t2.x, t2.y), t2.z);
 
-    return tNear <= tFar && tFar > 0.0;
+    return tNear <= tFar && tFar > 0 ? tNear : INFINITY;
 }
 
 /*
   Shader
 */
 
-HitInfo intersectScene(Ray ray)
+HitInfo intersectScene(Ray ray, inout vec2 stats)
 {
     HitInfo result;
     result.didHit = false;
@@ -268,7 +253,7 @@ HitInfo intersectScene(Ray ray)
     {
         Sphere sphere = spheres[i];
 
-        HitInfo intersection = intersectSphere(ray, sphere);
+        HitInfo intersection = intersectSphere(ray, sphere.pos, sphere.radius);
         if(!intersection.didHit || intersection.dst > result.dst)
             continue;
 
@@ -281,23 +266,26 @@ HitInfo intersectScene(Ray ray)
     {
         Box box = boxes[i];
 
-        HitInfo intersection = intersectAABB(ray, box);
-        if(!intersection.didHit || intersection.dst > result.dst)
+        float dst = intersectAABB(ray, box.boxMin, box.boxMax);
+        if(dst <= 0 || dst >= result.dst)
             continue;
 
-        result = intersection;
+        result.didHit = true;
+        result.dst = dst;
+        result.hitPos = ray.origin + ray.dir * dst;
+        result.normal = -sign(ray.dir) * step(vec3(dst), min((box.boxMin - ray.origin) * ray.invDir, (box.boxMax - ray.origin) * ray.invDir));
         result.material = box.material;
 
-        //Checkerboard Material
+        // Checkerboard Material
         if(result.material.type == 1)
         {
-            vec2 checkerboard = mod(floor(intersection.hitPos.xz), 2);
+            vec2 checkerboard = mod(floor(result.hitPos.xz), 2);
             if(checkerboard.x == checkerboard.y)
                 result.material.color = result.material.emissionColor;
         }
     }
 
-    //Meshes
+    // Meshes
     for(int i = 0; i < meshes.length(); i++)
     {
         TriangleMesh mesh = meshes[i];
@@ -307,26 +295,54 @@ HitInfo intersectScene(Ray ray)
         localRay.dir = (mesh.worldToLocal * vec4(ray.dir, 0)).xyz;
         localRay.invDir = 1.0 / localRay.dir;
 
-        if(!intersectAABB(localRay, mesh.boxMin, mesh.boxMax))
-            continue;
+        int stack[32];
+        int stackPtr = 0;
+        stack[stackPtr++] = mesh.rootBVHNodeIndex;
 
-        for(uint j = mesh.triIndex; j <= (mesh.triIndex + mesh.numTri); j++)
+        while(stackPtr > 0)
         {
-            HitInfo intersection = intersectTriangle(localRay, triangles[j]);
-            if(!intersection.didHit || intersection.dst > result.dst)
-                continue;
+            BVHNode node = nodes[stack[--stackPtr]];
 
-            result = intersection;
+            if(node.triCount > 0)
+            {
+                stats.y += node.triCount;
 
-            result.hitPos = (mesh.localToWorld * vec4(result.hitPos, 1)).xyz;
-            result.normal = (mesh.localToWorld * vec4(result.normal, 0)).xyz;
-            result.material = mesh.material;
+                for(int i = node.triIndex; i < node.triIndex + node.triCount; i++)
+                {
+                    HitInfo intersection = intersectTriangle(localRay, triangles[i]);
+                    if(!intersection.didHit || intersection.dst > result.dst)
+                        continue;
+
+                    result = intersection;
+                    result.hitPos = (mesh.localToWorld * vec4(result.hitPos, 1)).xyz;
+                    result.normal = (mesh.localToWorld * vec4(result.normal, 0)).xyz;
+                    result.material = mesh.material;
+                }
+            }
+            else
+            {
+                int leftChildIdx = node.leftChildIdx;
+                int rightChildIdx = node.leftChildIdx + 1;
+                BVHNode leftChild = nodes[leftChildIdx];
+                BVHNode rightChild = nodes[rightChildIdx];
+
+                float dstLeft = intersectAABB(localRay, leftChild.boxMin, leftChild.boxMax);
+                float dstRight = intersectAABB(localRay, rightChild.boxMin, rightChild.boxMax);
+                stats.x += 2;
+
+                if(max(dstLeft, dstRight) < result.dst)
+                    stack[stackPtr++] = dstLeft < dstRight ? rightChildIdx : leftChildIdx;
+
+                if(min(dstLeft, dstRight) < result.dst)
+                    stack[stackPtr++] = dstLeft < dstRight ? leftChildIdx : rightChildIdx;
+            }
         }
     }
 
     return result;
 }
 
+// Simple fake sky box TODO: add sun dir
 vec3 calculateEnvironmentLight(Ray ray)
 {
     if(!environmentLight)
@@ -341,14 +357,15 @@ vec3 calculateEnvironmentLight(Ray ray)
     return skyColor * vec3(1.0, 0.9, 0.7);
 }
 
-vec3 traceRay(Ray ray, inout uint rngState)
+// Main raytracing function, shoot the ray and gather the color it brings back
+vec3 traceRay(Ray ray, inout uint rngState, inout vec2 stats)
 {
     vec3 outColor = vec3(0);
     vec3 rayColor = vec3(1);
 
     for(int i = 0; i <= maxBounces; i++)
     {
-        HitInfo hitResult = intersectScene(ray);
+        HitInfo hitResult = intersectScene(ray, stats);
         if(!hitResult.didHit) {
             outColor += calculateEnvironmentLight(ray) * rayColor;
             break;
@@ -376,25 +393,52 @@ vec3 traceRay(Ray ray, inout uint rngState)
     return outColor;
 }
 
+vec3 colorizeStats(vec2 stats)
+{
+    stats /= statsThresholds;
+
+    switch(drawDebugMode)
+    {
+        case 1: // Box Tests Count
+            if(stats.x >= 1)
+                return vec3(1, 0, 0);
+
+            return vec3(stats.x);
+        case 2: // Tri Tests Count
+            if(stats.y >= 1)
+                return vec3(1, 0, 0);
+
+            return vec3(stats.y);
+        case 3: // Box+Tri Tests Count
+            if(max(stats.x, stats.y) >= 1)
+                return vec3(1);
+
+            return vec3(stats.x, 0, stats.y);
+        default:
+            return vec3(0);
+    }
+}
+
 void main()
 {
     ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
     ivec2 screenSize = imageSize(resultImage);
 
     // Generate Random Seed
-    uint rngState = uint(pixelCoords.y * screenSize.x + pixelCoords.x + (frameIndex * 719393 * uint(accumulate)));
+    uint rngState = uint(pixelCoords.y * screenSize.x + pixelCoords.x + (frameIndex * 719393 * uint(accumulate))); // 719393 is a prime number used to to recreate the seed between frames
 
     // Calculate viewpoint
     vec3 viewPointLocal = vec3(vec2(pixelCoords) / screenSize - 0.5, 1) * viewParams;
     vec3 viewPoint = vec4(localToWorld * vec4(viewPointLocal, 1)).xyz;
 
-    // Camera Vectors
     vec3 camRight = localToWorld[0].xyz;
     vec3 camUp = localToWorld[1].xyz;
     vec3 camPos = localToWorld[3].xyz;
 
     // Shoot ray and average color
     vec3 totalLight = vec3(0);
+    vec2 stats = vec2(0);
+
     for(int i = 0; i < raysPerPixel; i++)
     {
         // Defocus Jitter (used for DOF)
@@ -412,16 +456,15 @@ void main()
         ray.invDir = 1.0 / ray.dir;
 
         // Shoot Ray
-        totalLight += traceRay(ray, rngState);
+        totalLight += traceRay(ray, rngState, stats);
     }
 
     // Accumulate
-    vec3 finalColor = totalLight / raysPerPixel;
+    vec3 finalColor = totalLight / raysPerPixel + colorizeStats(stats);
     if(accumulate)
     {
-        float weight = 1.0 / frameIndex;
         vec3 accumulatedColor = imageLoad(resultImage, pixelCoords).rgb;
-        finalColor = mix(accumulatedColor, finalColor, weight);
+        finalColor = mix(accumulatedColor, finalColor, 1.0 / frameIndex);
     }
 
     imageStore(resultImage, pixelCoords, vec4(finalColor, 1));

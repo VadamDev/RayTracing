@@ -1,6 +1,7 @@
 #include "RaytracingShader.h"
 
 #include <glad/glad.h>
+#include <spdlog/spdlog.h>
 
 namespace application
 {
@@ -11,6 +12,7 @@ namespace application
         spheresBuffer.create();
         boxesBuffer.create();
         trianglesBuffer.create();
+        bvhNodesBuffer.create();
         meshesBuffer.create();
     }
 
@@ -27,8 +29,9 @@ namespace application
     {
         frameIndex = accessUniform("frameIndex");
         viewParams = accessUniform("viewParams");
-
         localToWorldMatrix = accessUniform("localToWorld");
+        drawDebugMode = accessUniform("drawDebugMode");
+        statsThresholds = accessUniform("statsThresholds");
 
         accumulate = accessUniform("accumulate");
         maxBounces = accessUniform("maxBounces");
@@ -48,13 +51,23 @@ namespace application
         boxesBuffer.update(boxes, 1, GL_DYNAMIC_DRAW);
     }
 
-    void RaytracingShader::updateTrianglesBuffer(const std::vector<RaytracedTriangle> &triangles)
+    void RaytracingShader::updateMeshDataBuffers(const std::vector<RaytracedTriangle> &triangles, const std::vector<RaytracedBVHNode> &bvhNodes)
     {
         trianglesBuffer.update(triangles, 2, GL_DYNAMIC_DRAW);
+        bvhNodesBuffer.update(bvhNodes, 3, GL_DYNAMIC_DRAW);
     }
 
     void RaytracingShader::updateMeshesBuffer(const std::vector<TriangleMeshData> &meshes)
     {
-        meshesBuffer.update(meshes, 3, GL_DYNAMIC_DRAW);
+        meshesBuffer.update(meshes, 4, GL_DYNAMIC_DRAW);
+    }
+
+    void RaytracingShader::unbindBuffers()
+    {
+        spheresBuffer.unbind();
+        boxesBuffer.unbind();
+        trianglesBuffer.unbind();
+        bvhNodesBuffer.unbind();
+        meshesBuffer.unbind();
     }
 }
