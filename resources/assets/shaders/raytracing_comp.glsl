@@ -114,9 +114,11 @@ layout(std430, binding = 4) readonly buffer MeshesBuffer {
 };
 
 const float INFINITY = 1.0 / 0.0;
-const float EPSILON = 0.00001;
+const float EPSILON = 0.0000001;
 const float PI = 3.1415926;
 const float TAU = PI * 2;
+
+#define BVH_TARGET_DEPTH 32
 
 /*
   Random Generation
@@ -138,7 +140,7 @@ float randNormalDistribution(inout uint rngState)
     return sqrt(-2 * log(rand(rngState))) * cos(theta);
 }
 
-vec3 randomDir(inout uint rngState)
+vec3 randDir(inout uint rngState)
 {
     float x = randNormalDistribution(rngState);
     float y = randNormalDistribution(rngState);
@@ -146,7 +148,7 @@ vec3 randomDir(inout uint rngState)
     return normalize(vec3(x, y, z));
 }
 
-vec2 randomPointInCircle(inout uint rngState)
+vec2 randPointInCircle(inout uint rngState)
 {
     float theta = TAU * rand(rngState);
     vec2 point = vec2(cos(theta), sin(theta));
@@ -188,37 +190,41 @@ HitInfo intersectSphere(Ray ray, vec3 pos, float radius)
     return result;
 }
 
-// Möller–Trumbore intersection algorithm, thanks to https://youtu.be/Qz0KTGYJtUk
+// Möller–Trumbore intersection algorithm, thanks to https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
 HitInfo intersectTriangle(Ray ray, Triangle tri)
 {
     HitInfo result;
     result.didHit = false;
 
-    vec3 edgeAB = tri.posB - tri.posA;
-    vec3 edgeAC = tri.posC - tri.posA;
-    vec3 normal = cross(edgeAB, edgeAC);
+    vec3 edge1 = tri.posB - tri.posA;
+    vec3 edge2 = tri.posC - tri.posA;
+    vec3 pvec = cross(ray.dir, edge2);
 
-    float det = -dot(ray.dir, normal);
-    if(det >= EPSILON)
-    {
-        float invDiscreminant = 1.0 / det;
+    float det = dot(edge1, pvec);
+    if(det < EPSILON)
+        return result;
 
-        vec3 ao = ray.origin - tri.posA;
-        vec3 dao = cross(ao, ray.dir);
+    vec3 tvec = ray.origin - tri.posA;
+    float u = dot(tvec, pvec);
+    if(u < 0 || u > det)
+        return result;
 
-        float dst = dot(ao, normal) * invDiscreminant;
-        float u = dot(edgeAC, dao) * invDiscreminant;
-        float v = -dot(edgeAB, dao) * invDiscreminant;
-        float w = 1 - u - v;
+    vec3 qvec = cross(tvec, edge1);
+    float v = dot(ray.dir, qvec);
+    if(v < 0 || u + v > det)
+        return result;
 
-        if(dst >= 0 && u >= 0 && v >= 0 && w >= 0)
-        {
-            result.didHit = true;
-            result.dst = dst;
-            result.hitPos = ray.origin + ray.dir * dst;
-            result.normal = normalize(tri.normalA * w + tri.normalB * u + tri.normalC * v);
-        }
-    }
+    float invDet = 1.0 / det;
+    float t = dot(edge2, qvec) * invDet;
+
+    u *= invDet;
+    v *= invDet;
+    float w = 1 - u - v;
+
+    result.didHit = true;
+    result.dst = t;
+    result.hitPos = ray.origin + ray.dir * t;
+    result.normal = normalize(tri.normalA * w + tri.normalB * u + tri.normalC * v);
 
     return result;
 }
@@ -292,10 +298,10 @@ HitInfo intersectScene(Ray ray, inout vec2 stats)
 
         Ray localRay;
         localRay.origin = (mesh.worldToLocal * vec4(ray.origin, 1)).xyz;
-        localRay.dir = (mesh.worldToLocal * vec4(ray.dir, 0)).xyz;
+        localRay.dir = normalize((mesh.worldToLocal * vec4(ray.dir, 0)).xyz);
         localRay.invDir = 1.0 / localRay.dir;
 
-        int stack[32];
+        int stack[BVH_TARGET_DEPTH];
         int stackPtr = 0;
         stack[stackPtr++] = mesh.rootBVHNodeIndex;
 
@@ -310,13 +316,16 @@ HitInfo intersectScene(Ray ray, inout vec2 stats)
                 for(int i = node.triIndex; i < node.triIndex + node.triCount; i++)
                 {
                     HitInfo intersection = intersectTriangle(localRay, triangles[i]);
-                    if(!intersection.didHit || intersection.dst > result.dst)
+                    if(!intersection.didHit || intersection.dst >= result.dst)
                         continue;
 
-                    result = intersection;
-                    result.hitPos = (mesh.localToWorld * vec4(result.hitPos, 1)).xyz;
-                    result.normal = (mesh.localToWorld * vec4(result.normal, 0)).xyz;
+                    result.didHit = true;
+                    result.dst = intersection.dst;
+                    result.hitPos = ray.origin + ray.dir * intersection.dst;
+                    result.normal = normalize((mesh.localToWorld * vec4(intersection.normal, 0)).xyz);
                     result.material = mesh.material;
+
+                    break; // TODO: i'm not sure if this is correct, if 2+ triangles are overlappinng in the same bvh box it will only render one of them
                 }
             }
             else
@@ -365,14 +374,20 @@ vec3 traceRay(Ray ray, inout uint rngState, inout vec2 stats)
 
     for(int i = 0; i <= maxBounces; i++)
     {
-        HitInfo hitResult = intersectScene(ray, stats);
-        if(!hitResult.didHit) {
+        HitInfo intersection = intersectScene(ray, stats);
+        if(!intersection.didHit) {
             outColor += calculateEnvironmentLight(ray) * rayColor;
             break;
         }
 
+        if(drawDebugMode == 4)
+        {
+            outColor = intersection.normal * 0.5 + 0.5;
+            break;
+        }
+
         //Calculate lighting
-        Material material = hitResult.material;
+        Material material = intersection.material;
         vec3 emittedLight = material.emissionColor * material.emissionStrenght;
 
         bool isSpecularBounce = bool(rand(rngState) <= material.specularProbability);
@@ -381,10 +396,10 @@ vec3 traceRay(Ray ray, inout uint rngState, inout vec2 stats)
         rayColor *= mix(material.color, material.specularColor, isSpecularBounce);
 
         //Bounce ray
-        ray.origin = hitResult.hitPos + hitResult.normal * EPSILON;
+        ray.origin = intersection.hitPos + intersection.normal * EPSILON;
 
-        vec3 diffuseDir = normalize(hitResult.normal + randomDir(rngState));
-        vec3 specularDir = reflect(ray.dir, hitResult.normal);
+        vec3 diffuseDir = normalize(intersection.normal + randDir(rngState));
+        vec3 specularDir = reflect(ray.dir, intersection.normal);
 
         ray.dir = mix(diffuseDir, specularDir, isSpecularBounce ? material.smoothness : 0);
         ray.invDir = 1.0 / ray.dir;
@@ -442,11 +457,11 @@ void main()
     for(int i = 0; i < raysPerPixel; i++)
     {
         // Defocus Jitter (used for DOF)
-        vec2 defocusJitter = randomPointInCircle(rngState) * defocusStrength / screenSize.x;
+        vec2 defocusJitter = randPointInCircle(rngState) * defocusStrength / screenSize.x;
         vec3 jitteredOrigin = camPos + defocusJitter.x * camRight + defocusJitter.y * camUp;
 
         // Diverge Jitter (used for AA or whole scene blur)
-        vec2 divergeJitter = randomPointInCircle(rngState) * divergeStrength / screenSize.x;
+        vec2 divergeJitter = randPointInCircle(rngState) * divergeStrength / screenSize.x;
         vec3 jitteredViewPoint = viewPoint + divergeJitter.x * camRight + divergeJitter.y * camUp;
 
         // Create Ray

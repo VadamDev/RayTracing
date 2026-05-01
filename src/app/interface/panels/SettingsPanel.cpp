@@ -85,7 +85,7 @@ namespace application
 
             ImGui::NewLine();
 
-            static const std::vector modes = { "Off", "Box Tests", "Tri Tests", "Box + Tri Tests"};
+            static const std::vector modes = { "Off", "Box Tests", "Tri Tests", "Box + Tri Tests", "Normal Vectors" };
             rstAcc |= Combo("Draw Debug Mode", &renderer->drawDebugMode, modes, COLUMN_WIDTH);
             rstAcc |= Drag1f("Box Threshold", renderer->statsThresholds.x, 1, 1, 1e9f, "%.0f", COLUMN_WIDTH);
             rstAcc |= Drag1f("Tri Threshold", renderer->statsThresholds.y, 1, 1, 1e9f, "%.0f", COLUMN_WIDTH);
