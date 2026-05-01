@@ -178,7 +178,7 @@ HitInfo intersectSphere(Ray ray, vec3 pos, float radius)
     {
         float dst = (h - sqrt(discreminant)) / a;
 
-        if(dst >= 0)
+        if(dst >= EPSILON)
         {
             result.didHit = true;
             result.dst = dst;
