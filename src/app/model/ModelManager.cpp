@@ -77,7 +77,7 @@ namespace application
         bvh.emplace(triangles, allTriangles, allNodes);
 
         const BVHStats &bvhStats = bvh.getStats();
-        spdlog::info("-> BVH built in {:.3f}ms, {} nodes ({} leaf)", bvhStats.buildTimeMs, bvhStats.nodeCount, bvhStats.leafNodeCount);
+        spdlog::info("-> BVH built in {:.3f}ms, {} nodes ({} leaf | Tri min/max: {}, {}) (Depth min/max {}, {})", bvhStats.buildTimeMs, bvhStats.nodeCount, bvhStats.leafNodeCount, bvhStats.minTriCount, bvhStats.maxTriCount, bvhStats.minDepth, bvhStats.maxDepth);
         spdlog::info("-> Loaded {}", path.filename().string());
 
         allMeshes[name] = {

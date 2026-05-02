@@ -40,8 +40,8 @@ namespace application {
         int triCount = 0;
         int nodeCount = 0, leafNodeCount = 0;
 
-        /*int minDepth = 0, maxDepth = 0;
-        int minTriCount = 0, maxTriCount = 0;*/
+        int minDepth = 0, maxDepth = 0;
+        int minTriCount = 0, maxTriCount = 0;
     };
 
     class BoundingVolumeHierarchy {
@@ -66,5 +66,6 @@ namespace application {
         void splitNode(std::vector<BVHTriangle> &triangles, int parentNodeIdx, int currentDepth);
 
         void collectStats();
+        void findMinMaxDepth(int parentNodeIdx, int currentDepth, int &minDepth, int &maxDepth);
     };
 }

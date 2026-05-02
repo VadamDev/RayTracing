@@ -92,14 +92,53 @@ namespace application {
 
     void BoundingVolumeHierarchy::collectStats()
     {
+        int minTriCount = std::numeric_limits<int>::max();
+        int maxTriCount = std::numeric_limits<int>::min();
+
+        int minDepth = std::numeric_limits<int>::max();
+        int maxDepth = std::numeric_limits<int>::min();
+
         stats.nodeCount = nodes.size();
 
         for (const auto &node : nodes)
         {
-            stats.triCount += node.triCount;
+            const int triCount = node.triCount;
+            if (triCount <= 0)
+                continue;
 
-            if (node.triCount > 0)
-                stats.leafNodeCount++;
+            stats.triCount += triCount;
+            stats.leafNodeCount++;
+
+            if (minTriCount > triCount)
+                minTriCount = triCount;
+
+            if (maxTriCount < triCount)
+                maxTriCount = triCount;
         }
+
+        stats.minTriCount = minTriCount;
+        stats.maxTriCount = maxTriCount;
+
+        findMinMaxDepth(0, 0, minDepth, maxDepth);
+        stats.minDepth = minDepth;
+        stats.maxDepth = maxDepth;
+    }
+
+    void BoundingVolumeHierarchy::findMinMaxDepth(const int parentNodeIdx, const int currentDepth, int &minDepth, int &maxDepth)
+    {
+        const BVHNode &node = nodes[parentNodeIdx];
+        if (node.triCount > 0)
+        {
+            if (currentDepth < minDepth)
+                minDepth = currentDepth;
+
+            if (currentDepth > maxDepth)
+                maxDepth = currentDepth;
+
+            return;
+        }
+
+        findMinMaxDepth(node.leftChildIdx, currentDepth + 1, minDepth, maxDepth);
+        findMinMaxDepth(node.leftChildIdx + 1, currentDepth + 1, minDepth, maxDepth);
     }
 }
