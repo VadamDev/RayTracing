@@ -76,6 +76,13 @@ struct HitInfo
     Material material;
 };
 
+struct TriHitInfo
+{
+    bool didHit;
+    float dst;
+    vec3 hitPos, normal;
+};
+
 /*
   IO
 */
@@ -191,9 +198,9 @@ HitInfo intersectSphere(Ray ray, vec3 pos, float radius)
 }
 
 // Möller–Trumbore intersection algorithm, thanks to https://cadxfem.org/inf/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf
-HitInfo intersectTriangle(Ray ray, Triangle tri)
+TriHitInfo intersectTriangle(Ray ray, Triangle tri)
 {
-    HitInfo result;
+    TriHitInfo result;
     result.didHit = false;
 
     vec3 edge1 = tri.posB - tri.posA;
@@ -225,7 +232,6 @@ HitInfo intersectTriangle(Ray ray, Triangle tri)
     result.dst = t;
     result.hitPos = ray.origin + ray.dir * t;
     result.normal = normalize(tri.normalA * w + tri.normalB * u + tri.normalC * v);
-
     return result;
 }
 
@@ -248,6 +254,55 @@ float intersectAABB(Ray ray, vec3 boxMin, vec3 boxMax)
   Shader
 */
 
+TriHitInfo traverseBVH(Ray localRay, int rootNodeIndex, inout vec2 stats)
+{
+    TriHitInfo result;
+    result.didHit = false;
+    result.dst = INFINITY;
+
+    int stack[BVH_TARGET_DEPTH];
+    int stackPtr = 0;
+    stack[stackPtr++] = rootNodeIndex;
+
+    while(stackPtr > 0)
+    {
+        BVHNode node = nodes[stack[--stackPtr]];
+
+        if(node.triCount > 0)
+        {
+            stats.y += node.triCount;
+
+            for(int i = node.triIndex; i < node.triIndex + node.triCount; i++)
+            {
+                TriHitInfo intersection = intersectTriangle(localRay, triangles[i]);
+                if(!intersection.didHit || intersection.dst >= result.dst)
+                    continue;
+
+                result = intersection;
+            }
+        }
+        else
+        {
+            int leftChildIdx = node.leftChildIdx;
+            int rightChildIdx = node.leftChildIdx + 1;
+            BVHNode leftChild = nodes[leftChildIdx];
+            BVHNode rightChild = nodes[rightChildIdx];
+
+            float dstLeft = intersectAABB(localRay, leftChild.boxMin, leftChild.boxMax);
+            float dstRight = intersectAABB(localRay, rightChild.boxMin, rightChild.boxMax);
+            stats.x += 2;
+
+            if(max(dstLeft, dstRight) < result.dst)
+                stack[stackPtr++] = dstLeft < dstRight ? rightChildIdx : leftChildIdx;
+
+            if(min(dstLeft, dstRight) < result.dst)
+                stack[stackPtr++] = dstLeft < dstRight ? leftChildIdx : rightChildIdx;
+        }
+    }
+
+    return result;
+}
+
 HitInfo intersectScene(Ray ray, inout vec2 stats)
 {
     HitInfo result;
@@ -260,7 +315,7 @@ HitInfo intersectScene(Ray ray, inout vec2 stats)
         Sphere sphere = spheres[i];
 
         HitInfo intersection = intersectSphere(ray, sphere.pos, sphere.radius);
-        if(!intersection.didHit || intersection.dst > result.dst)
+        if(!intersection.didHit || intersection.dst >= result.dst)
             continue;
 
         result = intersection;
@@ -298,54 +353,18 @@ HitInfo intersectScene(Ray ray, inout vec2 stats)
 
         Ray localRay;
         localRay.origin = (mesh.worldToLocal * vec4(ray.origin, 1)).xyz;
-        localRay.dir = normalize((mesh.worldToLocal * vec4(ray.dir, 0)).xyz);
+        localRay.dir = (mesh.worldToLocal * vec4(ray.dir, 0)).xyz;
         localRay.invDir = 1.0 / localRay.dir;
 
-        int stack[BVH_TARGET_DEPTH];
-        int stackPtr = 0;
-        stack[stackPtr++] = mesh.rootBVHNodeIndex;
+        TriHitInfo intersection = traverseBVH(localRay, mesh.rootBVHNodeIndex, stats);
+        if(!intersection.didHit || intersection.dst >= result.dst)
+            continue;
 
-        while(stackPtr > 0)
-        {
-            BVHNode node = nodes[stack[--stackPtr]];
-
-            if(node.triCount > 0)
-            {
-                stats.y += node.triCount;
-
-                for(int i = node.triIndex; i < node.triIndex + node.triCount; i++)
-                {
-                    HitInfo intersection = intersectTriangle(localRay, triangles[i]);
-                    if(!intersection.didHit || intersection.dst >= result.dst)
-                        continue;
-
-                    result.didHit = true;
-                    result.dst = intersection.dst;
-                    result.hitPos = ray.origin + ray.dir * intersection.dst;
-                    result.normal = normalize((mesh.localToWorld * vec4(intersection.normal, 0)).xyz);
-                    result.material = mesh.material;
-
-                    break; // TODO: i'm not sure if this is correct, if 2+ triangles are overlappinng in the same bvh box it will only render one of them
-                }
-            }
-            else
-            {
-                int leftChildIdx = node.leftChildIdx;
-                int rightChildIdx = node.leftChildIdx + 1;
-                BVHNode leftChild = nodes[leftChildIdx];
-                BVHNode rightChild = nodes[rightChildIdx];
-
-                float dstLeft = intersectAABB(localRay, leftChild.boxMin, leftChild.boxMax);
-                float dstRight = intersectAABB(localRay, rightChild.boxMin, rightChild.boxMax);
-                stats.x += 2;
-
-                if(max(dstLeft, dstRight) < result.dst)
-                    stack[stackPtr++] = dstLeft < dstRight ? rightChildIdx : leftChildIdx;
-
-                if(min(dstLeft, dstRight) < result.dst)
-                    stack[stackPtr++] = dstLeft < dstRight ? leftChildIdx : rightChildIdx;
-            }
-        }
+        result.didHit = true;
+        result.dst = intersection.dst;
+        result.hitPos = ray.origin + ray.dir * intersection.dst;
+        result.normal = normalize((mesh.localToWorld * vec4(intersection.normal, 0)).xyz);
+        result.material = mesh.material;
     }
 
     return result;

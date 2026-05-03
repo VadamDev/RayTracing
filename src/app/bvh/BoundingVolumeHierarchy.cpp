@@ -15,7 +15,7 @@ namespace application {
         splitNode(triangles, 0, 0);
         nodes.shrink_to_fit();
 
-        stats.buildTimeMs = duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - before).count() / 1e6f;
+        stats.buildTimeMs = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::steady_clock::now() - before).count() / 1e6f;
         collectStats();
     }
 
@@ -92,14 +92,14 @@ namespace application {
 
     void BoundingVolumeHierarchy::collectStats()
     {
-        int minTriCount = std::numeric_limits<int>::max();
-        int maxTriCount = std::numeric_limits<int>::min();
+        stats.nodeCount = nodes.size();
 
         int minDepth = std::numeric_limits<int>::max();
         int maxDepth = std::numeric_limits<int>::min();
+        findMinMaxDepth(0, 0, minDepth, maxDepth);
 
-        stats.nodeCount = nodes.size();
-
+        int minTriCount = std::numeric_limits<int>::max();
+        int maxTriCount = std::numeric_limits<int>::min();
         for (const auto &node : nodes)
         {
             const int triCount = node.triCount;
@@ -118,8 +118,6 @@ namespace application {
 
         stats.minTriCount = minTriCount;
         stats.maxTriCount = maxTriCount;
-
-        findMinMaxDepth(0, 0, minDepth, maxDepth);
         stats.minDepth = minDepth;
         stats.maxDepth = maxDepth;
     }
