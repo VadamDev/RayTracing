@@ -69,14 +69,6 @@ namespace application
         void deserialize(const nlohmann::json &componentJson) override {}
     };
 
-    struct alignas(16) RaytracedBoxComponent : engine::SerializableComponent
-    {
-        RaytracedBox box;
-
-        void serialize(nlohmann::json &componentJson) const override {}
-        void deserialize(const nlohmann::json &componentJson) override {}
-    };
-
     struct RaytracedMeshComponent : engine::SerializableComponent
     {
         std::string name;

@@ -64,11 +64,9 @@ namespace application
 
     void Renderer::render()
     {
-
         if (shouldUpdateBuffers)
         {
             updateSpheres();
-            updateBoxes();
             updateMeshDataBuffers();
             updateTriangleMeshes();
 
@@ -116,32 +114,6 @@ namespace application
         }
 
         shader->updateSpheresBuffer(allSpheres);
-    }
-
-    void Renderer::updateBoxes() const
-    {
-        std::vector<RaytracedBox> allBoxes;
-
-        engine::Scene *currentScene = application->getActiveScene();
-        for (auto &entityHandle : currentScene->registry.view<RaytracedMaterialComponent, RaytracedBoxComponent>())
-        {
-            const engine::Entity entity = { entityHandle, currentScene };
-
-            auto &box = entity.getComponent<RaytracedBoxComponent>().box;
-            if (entity.hasComponent<TransformComponent>())
-            {
-                const auto &transform = entity.getComponent<TransformComponent>();
-
-                glm::vec3 halfScale = transform.scale * 0.5f;
-                box.boxMin = transform.position - halfScale;
-                box.boxMax = transform.position + halfScale;
-            }
-
-            box.material = entity.getComponent<RaytracedMaterialComponent>().material;
-            allBoxes.push_back(box);
-        }
-
-        shader->updateBoxesBuffer(allBoxes);
     }
 
     void Renderer::updateMeshDataBuffers() const

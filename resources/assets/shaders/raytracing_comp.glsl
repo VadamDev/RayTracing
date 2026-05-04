@@ -104,19 +104,15 @@ layout(std430, binding = 0) readonly buffer SphereBuffer {
     Sphere spheres[];
 };
 
-layout(std430, binding = 1) readonly buffer BoxBuffer {
-    Box boxes[];
-};
-
-layout(std430, binding = 2) readonly buffer TriangleBuffer {
+layout(std430, binding = 1) readonly buffer TriangleBuffer {
     Triangle triangles[];
 };
 
-layout(std430, binding = 3) readonly buffer BVHNodeBuffer {
+layout(std430, binding = 2) readonly buffer BVHNodeBuffer {
     BVHNode nodes[];
 };
 
-layout(std430, binding = 4) readonly buffer MeshesBuffer {
+layout(std430, binding = 3) readonly buffer MeshesBuffer {
     TriangleMesh meshes[];
 };
 
@@ -125,7 +121,7 @@ const float EPSILON = 1e-6;
 const float PI = 3.1415926;
 const float TAU = PI * 2;
 
-#define BVH_TARGET_DEPTH 32
+#define BVH_STACK_DEPTH 32
 
 /*
   Random Generation
@@ -260,7 +256,7 @@ TriHitInfo traverseBVH(Ray localRay, int rootNodeIndex, inout vec2 stats)
     result.didHit = false;
     result.dst = INFINITY;
 
-    int stack[BVH_TARGET_DEPTH];
+    int stack[BVH_STACK_DEPTH];
     int stackPtr = 0;
     stack[stackPtr++] = rootNodeIndex;
 
@@ -322,30 +318,6 @@ HitInfo intersectScene(Ray ray, inout vec2 stats)
         result.material = sphere.material;
     }
 
-    //Boxes
-    for(int i = 0; i < boxes.length(); i++)
-    {
-        Box box = boxes[i];
-
-        float dst = intersectAABB(ray, box.boxMin, box.boxMax);
-        if(dst <= 0 || dst >= result.dst)
-            continue;
-
-        result.didHit = true;
-        result.dst = dst;
-        result.hitPos = ray.origin + ray.dir * dst;
-        result.normal = -sign(ray.dir) * step(vec3(dst), min((box.boxMin - ray.origin) * ray.invDir, (box.boxMax - ray.origin) * ray.invDir));
-        result.material = box.material;
-
-        // Checkerboard Material
-        if(result.material.type == 1)
-        {
-            vec2 checkerboard = mod(floor(result.hitPos.xz), 2);
-            if(checkerboard.x == checkerboard.y)
-                result.material.color = result.material.emissionColor;
-        }
-    }
-
     // Meshes
     for(int i = 0; i < meshes.length(); i++)
     {
@@ -367,6 +339,20 @@ HitInfo intersectScene(Ray ray, inout vec2 stats)
         result.hitPos = ray.origin + ray.dir * intersection.dst;
         result.normal = normalize(normalMat * intersection.normal);
         result.material = mesh.material;
+
+        if(mesh.material.type == 1)
+        {
+            vec2 uv = result.hitPos.xy;
+            vec3 absNormal = abs(result.normal);
+            if (absNormal.x > max(absNormal.y, absNormal.z))
+                uv = result.hitPos.yz;
+            else if (absNormal.y > max(absNormal.x, absNormal.z))
+                uv = result.hitPos.xz;
+
+            vec2 checker = mod(floor(uv), 2);
+            if(checker.x == checker.y)
+                result.material.color = mesh.material.emissionColor;
+        }
     }
 
     return result;

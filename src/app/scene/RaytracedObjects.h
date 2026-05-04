@@ -28,15 +28,6 @@ namespace application {
         RaytracedMaterial material {};
     };
 
-    // Box
-    struct alignas(16) RaytracedBox
-    {
-        glm::vec3 boxMin = glm::vec3(0); float pad0 = 0;
-        glm::vec3 boxMax = glm::vec3(0); float pad1 = 0;
-
-        RaytracedMaterial material {};
-    };
-
     // Triangles
     struct alignas(16) RaytracedBVHNode {
         glm::vec3 boxMin = glm::vec3(0); float pad0 = 0;

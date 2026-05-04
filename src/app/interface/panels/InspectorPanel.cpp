@@ -84,14 +84,9 @@ namespace application
         // Raytraced Sphere
         drawEmptyComponent<RaytracedSphereComponent>(entity, "Raytraced Sphere");
 
-        // Raytraced Box
-        drawEmptyComponent<RaytracedBoxComponent>(entity, "Raytraced Box");
-
         // Raytraced Mesh
         drawComponent<RaytracedMeshComponent>(entity, "Raytraced Mesh", [this](RaytracedMeshComponent &mesh) {
-            bool updBuffs = InputText("Mesh Name", mesh.name);
-
-            if (updBuffs)
+            if (InputText("Mesh Name", mesh.name))
                 updateBuffers();
         });
     }
@@ -178,9 +173,6 @@ namespace application
 
         // Raytraced Sphere
         drawAddComponent<RaytracedSphereComponent>(entity, "Raytraced Sphere");
-
-        // Raytraced Box
-        drawAddComponent<RaytracedBoxComponent>(entity, "Raytraced Box");
 
         // Raytraced Mesh
         drawAddComponent<RaytracedMeshComponent>(entity, "Raytraced Mesh");

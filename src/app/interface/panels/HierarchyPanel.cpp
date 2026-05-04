@@ -66,7 +66,7 @@ namespace application
 
             box.addComponent<TransformComponent>();
             box.addComponent<RaytracedMaterialComponent>();
-            box.addComponent<RaytracedBoxComponent>();
+            box.addComponent<RaytracedMeshComponent>().name = "cube";
 
             selectedEntity = box;
             resetAccumulation();

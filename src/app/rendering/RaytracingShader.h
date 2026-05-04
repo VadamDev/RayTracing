@@ -22,7 +22,6 @@ namespace application
         void setupUniforms() override;
 
         void updateSpheresBuffer(const std::vector<RaytracedSphere> &spheres);
-        void updateBoxesBuffer(const std::vector<RaytracedBox> &boxes);
         void updateMeshDataBuffers(const std::vector<RaytracedTriangle> &triangles, const std::vector<RaytracedBVHNode> &bvhNodes);
         void updateMeshesBuffer(const std::vector<TriangleMeshData> &meshes);
 
@@ -38,7 +37,6 @@ namespace application
         UniformAccess defocusStrength;
     private:
         engine::ShaderStorageBuffer<RaytracedSphere> spheresBuffer;
-        engine::ShaderStorageBuffer<RaytracedBox> boxesBuffer;
         engine::ShaderStorageBuffer<RaytracedTriangle> trianglesBuffer;
         engine::ShaderStorageBuffer<RaytracedBVHNode> bvhNodesBuffer;
         engine::ShaderStorageBuffer<TriangleMeshData> meshesBuffer;

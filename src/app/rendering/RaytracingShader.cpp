@@ -10,7 +10,6 @@ namespace application
         ComputeShader::create();
 
         spheresBuffer.create();
-        boxesBuffer.create();
         trianglesBuffer.create();
         bvhNodesBuffer.create();
         meshesBuffer.create();
@@ -46,26 +45,20 @@ namespace application
         spheresBuffer.update(spheres, 0, GL_DYNAMIC_DRAW);
     }
 
-    void RaytracingShader::updateBoxesBuffer(const std::vector<RaytracedBox> &boxes)
-    {
-        boxesBuffer.update(boxes, 1, GL_DYNAMIC_DRAW);
-    }
-
     void RaytracingShader::updateMeshDataBuffers(const std::vector<RaytracedTriangle> &triangles, const std::vector<RaytracedBVHNode> &bvhNodes)
     {
-        trianglesBuffer.update(triangles, 2, GL_DYNAMIC_DRAW);
-        bvhNodesBuffer.update(bvhNodes, 3, GL_DYNAMIC_DRAW);
+        trianglesBuffer.update(triangles, 1, GL_DYNAMIC_DRAW);
+        bvhNodesBuffer.update(bvhNodes, 2, GL_DYNAMIC_DRAW);
     }
 
     void RaytracingShader::updateMeshesBuffer(const std::vector<TriangleMeshData> &meshes)
     {
-        meshesBuffer.update(meshes, 4, GL_DYNAMIC_DRAW);
+        meshesBuffer.update(meshes, 3, GL_DYNAMIC_DRAW);
     }
 
     void RaytracingShader::unbindBuffers()
     {
         spheresBuffer.unbind();
-        boxesBuffer.unbind();
         trianglesBuffer.unbind();
         bvhNodesBuffer.unbind();
         meshesBuffer.unbind();

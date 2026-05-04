@@ -23,7 +23,6 @@ namespace application
         sceneSerializer.addSerializableComponent<TransformComponent>();
         sceneSerializer.addSerializableComponent<RaytracedMaterialComponent>();
         sceneSerializer.addSerializableComponent<RaytracedSphereComponent>();
-        sceneSerializer.addSerializableComponent<RaytracedBoxComponent>();
         sceneSerializer.addSerializableComponent<RaytracedMeshComponent>();
 
         try
