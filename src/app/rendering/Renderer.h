@@ -40,7 +40,7 @@ namespace application
         int drawDebugMode = 0;
         glm::vec2 statsThresholds = glm::vec2(1);
         bool accumulate = true;
-        int maxBounces = 4;
+        int maxBounces = 1;
         int raysPerPixel = 1;
         bool environmentLight = true;
         float divergeStrength = 0.5f;

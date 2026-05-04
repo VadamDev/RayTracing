@@ -121,7 +121,7 @@ layout(std430, binding = 4) readonly buffer MeshesBuffer {
 };
 
 const float INFINITY = 1.0 / 0.0;
-const float EPSILON = 0.0000001;
+const float EPSILON = 1e-6;
 const float PI = 3.1415926;
 const float TAU = PI * 2;
 
@@ -205,33 +205,33 @@ TriHitInfo intersectTriangle(Ray ray, Triangle tri)
 
     vec3 edge1 = tri.posB - tri.posA;
     vec3 edge2 = tri.posC - tri.posA;
-    vec3 pvec = cross(ray.dir, edge2);
+    vec3 normal = cross(edge1, edge2);
 
-    float det = dot(edge1, pvec);
-    if(det < EPSILON)
-        return result;
-
-    vec3 tvec = ray.origin - tri.posA;
-    float u = dot(tvec, pvec);
-    if(u < 0 || u > det)
-        return result;
-
-    vec3 qvec = cross(tvec, edge1);
-    float v = dot(ray.dir, qvec);
-    if(v < 0 || u + v > det)
+    float det = -dot(ray.dir, normal);
+    if(det < 0) // Fuck EPSILON here, this need to be so small that it doesn't even matter
         return result;
 
     float invDet = 1.0 / det;
-    float t = dot(edge2, qvec) * invDet;
 
-    u *= invDet;
-    v *= invDet;
-    float w = 1 - u - v;
+    vec3 ao = ray.origin - tri.posA;
+    float t = dot(ao, normal) * invDet;
+    if(t < 0)
+        return result;
 
-    result.didHit = true;
-    result.dst = t;
-    result.hitPos = ray.origin + ray.dir * t;
-    result.normal = normalize(tri.normalA * w + tri.normalB * u + tri.normalC * v);
+    vec3 dao = cross(ao, ray.dir);
+    float u = dot(edge2, dao) * invDet;
+    float v = -dot(edge1, dao) * invDet;
+
+    if(u >= 0 && v >= 0 && (u + v) <= 1)
+    {
+        float w = 1 - u - v;
+
+        result.didHit = true;
+        result.dst = t;
+        result.hitPos = ray.origin + ray.dir * t;
+        result.normal = normalize(tri.normalA * w + tri.normalB * u + tri.normalC * v);
+    }
+
     return result;
 }
 
@@ -360,10 +360,12 @@ HitInfo intersectScene(Ray ray, inout vec2 stats)
         if(!intersection.didHit || intersection.dst >= result.dst)
             continue;
 
+        mat3 normalMat = transpose(mat3(mesh.worldToLocal));
+
         result.didHit = true;
         result.dst = intersection.dst;
         result.hitPos = ray.origin + ray.dir * intersection.dst;
-        result.normal = normalize((mesh.localToWorld * vec4(intersection.normal, 0)).xyz);
+        result.normal = normalize(normalMat * intersection.normal);
         result.material = mesh.material;
     }
 
