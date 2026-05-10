@@ -33,8 +33,8 @@ namespace application {
         glm::vec3 boxMin = glm::vec3(0); float pad0 = 0;
         glm::vec3 boxMax = glm::vec3(0);
 
-        int leftChildIdx = 0;
-        int triIndex = 0, triCount = 0;
+        int index = 0;
+        int triCount = 0;
     };
     
     struct alignas(16) RaytracedTriangle

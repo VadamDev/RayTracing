@@ -48,8 +48,8 @@ struct BVHNode
 {
     vec3 boxMin, boxMax;
 
-    int leftChildIdx;
-    int triIndex, triCount;
+    int index;
+    int triCount;
 };
 
 struct TriangleMesh
@@ -204,7 +204,7 @@ TriHitInfo intersectTriangle(Ray ray, Triangle tri)
     vec3 normal = cross(edge1, edge2);
 
     float det = -dot(ray.dir, normal);
-    if(det < 0) // Fuck EPSILON here, this need to be so small that it doesn't even matter
+    if(det < 1e-8)
         return result;
 
     float invDet = 1.0 / det;
@@ -250,11 +250,11 @@ float intersectAABB(Ray ray, vec3 boxMin, vec3 boxMax)
   Shader
 */
 
-TriHitInfo traverseBVH(Ray localRay, int rootNodeIndex, inout vec2 stats)
+TriHitInfo traverseBVH(Ray localRay, float rayT, int rootNodeIndex, inout vec2 stats)
 {
     TriHitInfo result;
     result.didHit = false;
-    result.dst = INFINITY;
+    result.dst = rayT;
 
     int stack[BVH_STACK_DEPTH];
     int stackPtr = 0;
@@ -268,7 +268,7 @@ TriHitInfo traverseBVH(Ray localRay, int rootNodeIndex, inout vec2 stats)
         {
             stats.y += node.triCount;
 
-            for(int i = node.triIndex; i < node.triIndex + node.triCount; i++)
+            for(int i = node.index; i < node.index + node.triCount; i++)
             {
                 TriHitInfo intersection = intersectTriangle(localRay, triangles[i]);
                 if(!intersection.didHit || intersection.dst >= result.dst)
@@ -279,8 +279,8 @@ TriHitInfo traverseBVH(Ray localRay, int rootNodeIndex, inout vec2 stats)
         }
         else
         {
-            int leftChildIdx = node.leftChildIdx;
-            int rightChildIdx = node.leftChildIdx + 1;
+            int leftChildIdx = node.index;
+            int rightChildIdx = node.index + 1;
             BVHNode leftChild = nodes[leftChildIdx];
             BVHNode rightChild = nodes[rightChildIdx];
 
@@ -328,7 +328,7 @@ HitInfo intersectScene(Ray ray, inout vec2 stats)
         localRay.dir = (mesh.worldToLocal * vec4(ray.dir, 0)).xyz;
         localRay.invDir = 1.0 / localRay.dir;
 
-        TriHitInfo intersection = traverseBVH(localRay, mesh.rootBVHNodeIndex, stats);
+        TriHitInfo intersection = traverseBVH(localRay, result.dst, mesh.rootBVHNodeIndex, stats);
         if(!intersection.didHit || intersection.dst >= result.dst)
             continue;
 
