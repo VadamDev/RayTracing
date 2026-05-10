@@ -41,8 +41,7 @@ namespace application
         spdlog::info("Loading model {}...", path.filename().string());
 
         ObjReaderConfig readerConfig;
-        readerConfig.triangulate = true;
-        readerConfig.triangulation_method = "earcut";
+        //readerConfig.triangulation_method = "earcut";
         readerConfig.vertex_color = false;
 
         ObjReader reader;

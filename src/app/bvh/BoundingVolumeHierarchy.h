@@ -20,6 +20,11 @@ namespace application {
             }
         }
 
+        float getSAHCost() const
+        {
+            return bounds.getArea() * triCount;
+        }
+
         explicit operator RaytracedBVHNode() const
         {
             return {

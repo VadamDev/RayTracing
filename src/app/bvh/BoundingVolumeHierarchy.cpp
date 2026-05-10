@@ -1,9 +1,6 @@
 #include "BoundingVolumeHierarchy.h"
 
-#include <algorithm>
-#include <cmath>
 #include <limits>
-
 #include <spdlog/spdlog.h>
 
 namespace application {
@@ -25,7 +22,7 @@ namespace application {
         collectStats();
     }
 
-    float BoundingVolumeHierarchy::evaluateSAH(const BVHNode &node, const std::vector<BVHTriangle> &triangles, int axis, float splitPos)
+    float BoundingVolumeHierarchy::evaluateSAH(const BVHNode &node, const std::vector<BVHTriangle> &triangles, const int axis, const float splitPos)
     {
         BoundingBox left, right;
         int leftTriCount = 0, rightTriCount = 0;
@@ -44,11 +41,8 @@ namespace application {
                 rightTriCount++;
         }
 
-        float totalCost = std::numeric_limits<float>::infinity();
-        if (leftTriCount > 0 && rightTriCount > 0)
-            totalCost = left.getArea() * leftTriCount + right.getArea() * rightTriCount;
-
-        return totalCost;
+        const float cost = left.getArea() * leftTriCount + right.getArea() * rightTriCount;
+        return cost > 0 ? cost : std::numeric_limits<float>::infinity(); // A cost of 0 implicitly mean that the split failed
     }
 
     std::tuple<int, float, float> BoundingVolumeHierarchy::chooseSplit(const BVHNode &node, const std::vector<BVHTriangle> &triangles)
@@ -79,15 +73,14 @@ namespace application {
         return std::make_tuple(bestAxis, bestPos, bestCost);
     }
 
-    void BoundingVolumeHierarchy::splitNode(std::vector<BVHTriangle> &triangles, const int parentNodeIdx, int currentDepth)
+    void BoundingVolumeHierarchy::splitNode(std::vector<BVHTriangle> &triangles, const int parentNodeIdx, const int currentDepth)
     {
         BVHNode &parent = nodes[parentNodeIdx];
         if (currentDepth >= maxDepth || parent.triCount <= 1)
             return;
 
-        const float parentSAHCost = parent.bounds.getArea() * parent.triCount;
         const auto [splitAxis, splitPos, sahCost] = chooseSplit(parent, triangles);
-        if (sahCost >= parentSAHCost)
+        if (sahCost >= parent.getSAHCost())
             return;
 
         int i = parent.triIndex;

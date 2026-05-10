@@ -4,18 +4,12 @@
 
 namespace application
 {
-    class BoundingBox
+    struct BoundingBox
     {
-
-    public:
         glm::vec3 boxMin, boxMax;
-        glm::vec3 size = glm::vec3(0), center = glm::vec3(0);
 
         explicit BoundingBox()
-            : boxMin(std::numeric_limits<float>::infinity()), boxMax(-std::numeric_limits<float>::infinity())
-        {
-            update();
-        }
+            : boxMin(std::numeric_limits<float>::infinity()), boxMax(-std::numeric_limits<float>::infinity()) {}
 
         void growToInclude(const glm::vec3 &minPos, const glm::vec3 &maxPos)
         {
@@ -26,20 +20,12 @@ namespace application
             boxMax.x = std::max(boxMax.x, maxPos.x);
             boxMax.y = std::max(boxMax.y, maxPos.y);
             boxMax.z = std::max(boxMax.z, maxPos.z);
-
-            update();
         }
 
         float getArea() const
         {
+            const glm::vec3 size = boxMax - boxMin;
             return size.x * size.y + size.y * size.z + size.z * size.x;
-        }
-
-    private:
-        void update()
-        {
-            size = boxMax - boxMin;
-            center = boxMin + size * 0.5f;
         }
     };
 }
