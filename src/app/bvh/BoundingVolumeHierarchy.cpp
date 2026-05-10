@@ -1,8 +1,14 @@
 #include "BoundingVolumeHierarchy.h"
 
+#include <algorithm>
+#include <cmath>
+#include <limits>
+
 #include <spdlog/spdlog.h>
 
 namespace application {
+    static constexpr int SAH_TEST_PER_AXIS = 5;
+
     void BoundingVolumeHierarchy::build(std::vector<BVHTriangle> &triangles)
     {
         const auto before = std::chrono::steady_clock::now();
@@ -19,23 +25,70 @@ namespace application {
         collectStats();
     }
 
-    std::tuple<int, float> BoundingVolumeHierarchy::chooseSplit(const BoundingBox &bounds)
+    float BoundingVolumeHierarchy::evaluateSAH(const BVHNode &node, const std::vector<BVHTriangle> &triangles, int axis, float splitPos)
     {
-        const glm::vec3 &size = bounds.size;
+        BoundingBox left, right;
+        int leftTriCount = 0, rightTriCount = 0;
 
-        const int splitAxis = size.x > std::max(size.y, size.z) ? 0 : size.y > size.z ? 1 : 2;
-        const float splitPos = bounds.center[splitAxis];
+        for (int i = node.triIndex; i < node.triIndex + node.triCount; i++)
+        {
+            const BVHTriangle &tri = triangles[i];
 
-        return std::make_tuple(splitAxis, splitPos);
+            const bool isInLeft = tri.centroid[axis] < splitPos;
+            BoundingBox &boxToGrow = isInLeft ? left : right;
+            boxToGrow.growToInclude(tri.minPos, tri.maxPos);
+
+            if (isInLeft)
+                leftTriCount++;
+            else
+                rightTriCount++;
+        }
+
+        float totalCost = std::numeric_limits<float>::infinity();
+        if (leftTriCount > 0 && rightTriCount > 0)
+            totalCost = left.getArea() * leftTriCount + right.getArea() * rightTriCount;
+
+        return totalCost;
+    }
+
+    std::tuple<int, float, float> BoundingVolumeHierarchy::chooseSplit(const BVHNode &node, const std::vector<BVHTriangle> &triangles)
+    {
+        int bestAxis = 0;
+        float bestPos = 0, bestCost = std::numeric_limits<float>::infinity();
+
+        for (int axis = 0; axis < 3; axis++)
+        {
+            const float boxStart = node.bounds.boxMin[axis];
+            const float boxEnd = node.bounds.boxMax[axis];
+
+            for (int i = 1; i <= SAH_TEST_PER_AXIS; i++)
+            {
+                const float splitT = i / (SAH_TEST_PER_AXIS + 1.0f);
+                const float candidatePos = std::lerp(boxStart, boxEnd, splitT);
+
+                const float cost = evaluateSAH(node, triangles, axis, candidatePos);
+                if (cost >= bestCost)
+                    continue;
+
+                bestAxis = axis;
+                bestPos = candidatePos;
+                bestCost = cost;
+            }
+        }
+
+        return std::make_tuple(bestAxis, bestPos, bestCost);
     }
 
     void BoundingVolumeHierarchy::splitNode(std::vector<BVHTriangle> &triangles, const int parentNodeIdx, int currentDepth)
     {
         BVHNode &parent = nodes[parentNodeIdx];
-        if (currentDepth >= maxDepth || parent.triCount <= 2)
+        if (currentDepth >= maxDepth || parent.triCount <= 1)
             return;
 
-        const auto [splitAxis, splitPos] = chooseSplit(parent.bounds);
+        const float parentSAHCost = parent.bounds.getArea() * parent.triCount;
+        const auto [splitAxis, splitPos, sahCost] = chooseSplit(parent, triangles);
+        if (sahCost >= parentSAHCost)
+            return;
 
         int i = parent.triIndex;
         int j = parent.triIndex + parent.triCount - 1;

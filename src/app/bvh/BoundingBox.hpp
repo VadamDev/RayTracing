@@ -11,8 +11,8 @@ namespace application
         glm::vec3 boxMin, boxMax;
         glm::vec3 size = glm::vec3(0), center = glm::vec3(0);
 
-        explicit BoundingBox(const glm::vec3 &boxMin, const glm::vec3 &boxMax)
-            : boxMin(boxMin), boxMax(boxMax)
+        explicit BoundingBox()
+            : boxMin(std::numeric_limits<float>::infinity()), boxMax(-std::numeric_limits<float>::infinity())
         {
             update();
         }
@@ -30,11 +30,16 @@ namespace application
             update();
         }
 
+        float getArea() const
+        {
+            return size.x * size.y + size.y * size.z + size.z * size.x;
+        }
+
     private:
         void update()
         {
             size = boxMax - boxMin;
-            center = boxMin + size / 2.0f;
+            center = boxMin + size * 0.5f;
         }
     };
 }

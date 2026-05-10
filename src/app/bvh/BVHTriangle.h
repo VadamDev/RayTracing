@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glm/vec3.hpp>
-#include <algorithm>
 #include "../scene/RaytracedObjects.h"
 
 namespace application {

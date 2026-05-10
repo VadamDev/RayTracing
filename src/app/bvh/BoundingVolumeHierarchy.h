@@ -7,7 +7,7 @@
 namespace application {
     struct BVHNode
     {
-        BoundingBox bounds = BoundingBox(glm::vec3(std::numeric_limits<float>::infinity()), glm::vec3(-std::numeric_limits<float>::infinity()));
+        BoundingBox bounds;
         int leftChildIdx = -2;
         int triIndex = 0, triCount = 0;
 
@@ -24,11 +24,9 @@ namespace application {
         {
             return {
                 .boxMin = bounds.boxMin,
-                .pad0 = 0,
                 .boxMax = bounds.boxMax,
 
-                .leftChildIdx = leftChildIdx,
-                .triIndex = triIndex,
+                .index = triCount > 0 ? triIndex : leftChildIdx,
                 .triCount = triCount
             };
         }
@@ -62,7 +60,8 @@ namespace application {
         std::vector<BVHNode> nodes;
         BVHStats stats = {};
 
-        static std::tuple<int, float> chooseSplit(const BoundingBox &bounds);
+        static float evaluateSAH(const BVHNode &node, const std::vector<BVHTriangle> &triangles, int axis, float splitPos);
+        static std::tuple<int, float, float> chooseSplit(const BVHNode &node, const std::vector<BVHTriangle> &triangles);
         void splitNode(std::vector<BVHTriangle> &triangles, int parentNodeIdx, int currentDepth);
 
         void collectStats();
