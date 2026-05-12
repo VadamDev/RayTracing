@@ -15,6 +15,9 @@ namespace application
         if (ImGui::IsWindowHovered() && ImGui::IsMouseDown(0))
             selectedEntity = {};
 
+        if (ImGui::IsKeyPressed(ImGuiKey_Escape))
+            selectedEntity = {};
+
         // Quick remove entity
         const auto &inputsManager= application->getWindow().getInputsManager();
         if (selectedEntity && inputsManager->isKeyDown(engine::KeyboardKeys::KEY_DELETE) && !ImGui::GetIO().WantCaptureKeyboard)

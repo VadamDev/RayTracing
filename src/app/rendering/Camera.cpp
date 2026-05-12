@@ -1,5 +1,8 @@
 #include "Camera.h"
 
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_projection.hpp>
+
 #include "Renderer.h"
 #include "../../engine/messenger/Messenger.hpp"
 
@@ -16,6 +19,8 @@ namespace application
             this->windowHeight = event->newHeight;
 
             this->aspectRatio = event->newAspectRatio;
+
+            projMatrix = glm::perspective(glm::atan(glm::tan(glm::radians(this->fov / 2.0f)) / 2) * 2, aspectRatio, this->nearClipPlane, 1000.f); //TODO: change me!
         });
     }
 

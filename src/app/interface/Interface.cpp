@@ -19,10 +19,10 @@ namespace application
 
         registerPanel<ToolbarPanel>(application);
         registerPanel<SettingsPanel>(application, renderer, controller);
-        registerPanel<ViewportPanel>(window, renderer);
-
         const auto hierarchyPanel = registerPanel<HierarchyPanel>(application);
         registerPanel<InspectorPanel>(hierarchyPanel.get(), application);
+
+        registerPanel<ViewportPanel>(window, renderer, hierarchyPanel.get());
     }
 
     void Interface::draw()

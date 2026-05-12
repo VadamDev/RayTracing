@@ -139,15 +139,7 @@ namespace application
 
             auto transformMatrix = glm::identity<glm::mat4>();
             if (entity.hasComponent<TransformComponent>())
-            {
-                const auto &transform = entity.getComponent<TransformComponent>();
-
-                transformMatrix = glm::translate(transformMatrix, transform.position);
-                transformMatrix = glm::rotate(transformMatrix, glm::radians(transform.rotation.x), glm::vec3(1, 0, 0));
-                transformMatrix = glm::rotate(transformMatrix, glm::radians(transform.rotation.y), glm::vec3(0, 1, 0));
-                transformMatrix = glm::rotate(transformMatrix, glm::radians(transform.rotation.z), glm::vec3(0, 0, 1));
-                transformMatrix = glm::scale(transformMatrix, transform.scale);
-            }
+                transformMatrix = entity.getComponent<TransformComponent>().toTransformMat();
 
             const TriangleMesh &mesh = meshesMap.at(meshName);
             const TriangleMeshData data {

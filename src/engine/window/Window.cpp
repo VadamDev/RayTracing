@@ -3,6 +3,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include <ImGuizmo.h>
 #include "../messenger/Messenger.hpp"
 
 #include "spdlog/spdlog.h"
@@ -147,6 +148,7 @@ namespace engine
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        ImGuizmo::BeginFrame();
 
         // ImGui is currently rendered before world rendering. We're always rendering to a framebuffer so it'll never cause issues
         for (const auto &imguiWindow : imguiWindows)

@@ -15,6 +15,7 @@ find_package(glm CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
+find_package(imguizmo CONFIG REQUIRED)
 
 file(GLOB_RECURSE PROJECT_SOURCE_FILES src/*.cpp)
 
@@ -30,6 +31,7 @@ target_link_libraries(${PROJECT_NAME}
         nlohmann_json::nlohmann_json
         tinyobjloader::tinyobjloader
         imgui::imgui
+        imguizmo::imguizmo
 )
 
 # portable-file-dialogs

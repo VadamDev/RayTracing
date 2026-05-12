@@ -2,6 +2,9 @@
 
 #include <string>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+
 #include "../../engine/scene/SerializableComponent.h"
 #include "RaytracedObjects.h"
 
@@ -12,6 +15,15 @@ namespace application
         glm::vec3 position = glm::vec3(0, 0, 0);
         glm::vec3 rotation = glm::vec3(0, 0, 0);
         glm::vec3 scale = glm::vec3(1);
+
+        glm::mat4 toTransformMat() const
+        {
+            const glm::mat4 translate = glm::translate(glm::identity<glm::mat4>(), position);
+            const glm::mat4 rotate = glm::toMat4(glm::quat(glm::radians(rotation)));
+            const glm::mat4 scale = glm::scale(glm::identity<glm::mat4>(), this->scale);
+
+            return translate * rotate * scale;
+        }
 
         void serialize(nlohmann::json &componentJson) const override
         {

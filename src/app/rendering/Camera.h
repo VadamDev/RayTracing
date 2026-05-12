@@ -29,6 +29,7 @@ namespace application
         float getAspectRatio() const { return aspectRatio; }
 
         glm::mat4& getLocalToWorldMatrix() { return localToWorldMatrix; }
+        glm::mat4& getProjMatrix() { return projMatrix; }
 
         float fov, nearClipPlane;
         float targetAspectRatio = DEFAULT_ASPECT_RATIO;
@@ -43,5 +44,6 @@ namespace application
         engine::Messenger *messenger;
 
         glm::mat4 localToWorldMatrix = glm::identity<glm::mat4>();
+        glm::mat4 projMatrix = glm::identity<glm::mat4>();
     };
 }
