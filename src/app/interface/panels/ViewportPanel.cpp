@@ -9,9 +9,6 @@
 
 namespace application
 {
-    static constexpr ImVec4 BLANK4(0, 0, 0, 0);
-    static constexpr ImVec2 BLANK2(0, 0);
-
     static constexpr glm::mat4 FACE_TO_NEG_Z(
         1, 0,  0, 0,
         0, 1,  0, 0,
@@ -39,18 +36,10 @@ namespace application
             renderer->getGlobalMessenger()->dispatch(event);
         }
 
-        ImGui::PushStyleColor(ImGuiCol_Button, BLANK4);
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, BLANK4);
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive, BLANK4);
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, BLANK2);
-
-        const ImVec2 viewportStart = ImVec2((windowWidth - accurateDims.x) / 2, (windowHeight - accurateDims.y) / 2);
+        const auto viewportStart = ImVec2((windowWidth - accurateDims.x) / 2, (windowHeight - accurateDims.y) / 2);
 
         ImGui::SetCursorPos(viewportStart);
         ImGui::Image(canvas->getTextureHandle(), ImVec2(accurateDims.x, accurateDims.y), {0, 1}, {1, 0});
-
-        ImGui::PopStyleVar();
-        ImGui::PopStyleColor(3);
 
         /*
          * Guizmo
