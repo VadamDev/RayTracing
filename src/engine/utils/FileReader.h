@@ -3,24 +3,19 @@
 #include <fstream>
 #include <spdlog/spdlog.h>
 
-namespace engine::utils {
+namespace engine::utils
+{
     inline std::string readFile(const std::string &filePath)
     {
-        std::ifstream in;
-        in.open(filePath);
-
-        std::string result;
-        if (!in.is_open())
+        const std::ifstream in(filePath);
+        if (!in || !in.is_open())
         {
             spdlog::error("Failed to open file at path {}", filePath);
-            return result;
+            return {};
         }
 
-        std::string line;
-        while(getline(in, line))
-            result.append(line).append("\n");
-
-        return result;
+        std::stringstream buffer;
+        buffer << in.rdbuf();
+        return buffer.str();
     }
 }
-

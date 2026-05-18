@@ -1,21 +1,20 @@
 #pragma once
 
-#include "../IAppLifecycle.h"
-#include "../window/Window.h"
-
 namespace engine
 {
+    class Window;
+    class IAppLifecycle;
+
     class AbstractClock
     {
 
     public:
-        explicit AbstractClock(Window &window, IAppLifecycle &game)
-            : window(window), game(game) {}
-
+        explicit AbstractClock(Window &window, IAppLifecycle &app)
+            : window(window), app(app) {}
         virtual ~AbstractClock() = default;
 
         /*
-         * Start / Stop
+         * Management
          */
 
         virtual void start() = 0;
@@ -26,16 +25,12 @@ namespace engine
          */
 
         virtual int getFPS() const = 0;
-        bool isRunning() const { return bRunning; }
-
-        float getDeltaTime() const { return deltaTime; }
+        bool isRunning() const { return running; }
 
     protected:
         Window &window;
-        IAppLifecycle &game;
+        IAppLifecycle &app;
 
-        bool bRunning = false;
-
-        float deltaTime;
+        bool running = false;
     };
 }

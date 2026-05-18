@@ -3,14 +3,14 @@
 
 ### Features
 - Live ECS based editor.
-- Scene system with json based load/save
-- GPU accelerated (compute shader) raytracer with Spheres, Boxes and Triangle intersections
+- Scene system with JSON based load/save
+- GPU accelerated (compute shader) raytracer with Spheres and Triangle intersections
 - .obj model loading
+- Bounding volume hierarchy generation with Surface Area Heuristic split
 - Depth of Field
 - Naive, ray diverge based Anti-Aliasing
 
 #### Planned
-- SAH BVH (see: https://jacco.ompf2.com/2022/04/13/how-to-build-a-bvh-part-1-basics/)
 - Multiple Importance Sampling (see: https://lisyarus.github.io/blog/posts/multiple-importance-sampling.html / https://www.youtube.com/watch?v=p772XkEnEIU)
 
 ## Dependencies
@@ -24,13 +24,14 @@
 - [ImGui](https://github.com/ocornut/imgui) - 1.91.9
 - [portable-file-dialogs](https://github.com/samhocevar/portable-file-dialogs) - 0.1.0
 
-*Dependencies are managed using Vcpkg and CMake*
+*Dependencies are managed using Vcpkg and CMake, see vcpkg.json*
 
 ## Resources Used
 
 - The only, "Ray Tracing in One Weekend": https://raytracing.github.io/books/RayTracingInOneWeekend.html
+- How to build a BVH: https://jacco.ompf2.com/2022/04/13/how-to-build-a-bvh-part-1-basics/
 - Sebastian Lague's raytracing serie: https://www.youtube.com/playlist?list=PLFt_AvWsXl0dlgwe4JQ0oZuleqOTjmox3
 - PCG random number generators in glsl: https://observablehq.com/@riccardoscalco/pcg-random-number-generators-in-glsl
-- DomNomNom's Ray-AABB intersection: https://gist.github.com/DomNomNom/46bb1ce47f68d255fd5d
+- Slab ray AABB intersection: https://tavianator.com/2022/ray_box_boundary.html
 - Jacob Gordiak's raytracing serie: https://www.youtube.com/@JacobGordiak
 - The Cherno's game engine youtube serie: https://www.youtube.com/playlist?list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT

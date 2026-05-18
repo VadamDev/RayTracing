@@ -1,49 +1,42 @@
 #pragma once
 
 #include <chrono>
+#include <string>
 #include <unordered_map>
 
-namespace engine {
-    using namespace std::chrono;
-
+namespace engine
+{
     class ProfilerEntry;
 
     /*
-     * SteadyProfiler
+     * Profiler
      */
 
     class SteadyProfiler
     {
 
     public:
-        ProfilerEntry* newEntry(const std::string &name);
-        ProfilerEntry& retrieveEntry(const std::string &name);
+        ProfilerEntry* newEntry(const std::string &name, int maxSamples);
+        ProfilerEntry& getEntry(const std::string &name);
 
         std::vector<ProfilerEntry> allEntries();
-
-        nanoseconds calculateTotalSpentTime();
-        float calculateTotalSpentTimeMs() { return calculateTotalSpentTime().count() / 1e6f; }
-
-        uint64_t calculateTotalNumCalls();
-
-        uint64_t profilersCount() const { return entries.size(); }
 
     private:
         std::unordered_map<std::string, ProfilerEntry> entries;
     };
 
     /*
-     * ProfilerEntry
+     * Entry
      */
 
     class ProfilerEntry
     {
 
     public:
-        explicit ProfilerEntry(std::string name)
-            : name(std::move(name))
+        explicit ProfilerEntry(std::string name, const int maxSamples)
+            : name(std::move(name)), maxSamples(maxSamples)
         {
-            startTime = steady_clock::now();
+            samples.reserve(maxSamples);
         }
 
         /*
@@ -54,44 +47,32 @@ namespace engine {
         void end();
 
         void reset();
-        void stop();
 
         /*
          * Getters
          */
 
         std::string& getName() { return name; }
+        int getMaxSamples() const { return maxSamples; }
+        bool isProfiling() const { return profiling; }
 
-        // Start / End time of the profiler
-        time_point<steady_clock> getStartTime() const { return startTime; }
-        time_point<steady_clock> getEndTime() const { return endTime; }
-
-        // Total accumulated time since profiler started
-        nanoseconds getAccumulatedTime() const { return accumulatedTime; }
+        std::chrono::time_point<std::chrono::steady_clock> getStartTime() const { return startTime; }
+        std::vector<float>& getSamples() { return samples; }
 
         // Last spent time
-        nanoseconds getLastSpentTime() const { return lastSpentTime; }
-        float getLastSpentTimeMs() const { return getLastSpentTime().count() / 1e6f; }
-
-        // Amount of time the profiler has run
-        uint64_t getNumCalls() const { return numCalls; }
-
-        // Average time spent
-        nanoseconds calculateSpentTimeAvg() const;
-        float calculateSpentTimeAvgMs() const { return calculateSpentTimeAvg().count() / 1e6f; }
-
-        bool isProfiling() const { return bProfiling; }
-        bool isClosed() const { return bClosed; }
+        std::chrono::nanoseconds getLastSpentTime() const { return lastSpentTime; }
+        float getLastSpentTimeMs() const { return lastSpentTime.count() / 1e6f; }
+        float getSpentTimeAvgMs() const { return spentTimeAvgMs; }
 
     private:
         std::string name;
+        int maxSamples;
+        bool profiling = false;
 
-        time_point<steady_clock> startTime, endTime;
-        time_point<steady_clock> beginTime;
+        std::chrono::time_point<std::chrono::steady_clock> startTime, beginTime;
+        std::vector<float> samples;
+        float spentTimeAvgMs = -1;
 
-        nanoseconds accumulatedTime = nanoseconds::zero(), lastSpentTime = nanoseconds::zero();
-        uint64_t numCalls = 0;
-
-        bool bProfiling = false, bClosed = false;
+        std::chrono::nanoseconds lastSpentTime = std::chrono::nanoseconds::zero();
     };
 }

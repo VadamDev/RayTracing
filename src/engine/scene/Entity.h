@@ -3,19 +3,20 @@
 #include <utility>
 
 #include "Scene.h"
-#include "SerializableComponent.h"
+#include "../serial/IJsonSerializable.h"
 
 namespace engine
 {
-    struct TagComponent : SerializableComponent
+    struct TagComponent : IJsonSerializable
     {
+        static constexpr auto DEFAULT_TAG = "EMPTY ENTITY";
         std::string tag;
 
         explicit TagComponent(std::string tag)
             : tag(std::move(tag)) {}
 
         explicit TagComponent()
-            : tag("Empty Entity") {}
+            : tag(DEFAULT_TAG) {}
 
         void serialize(nlohmann::json &componentJson) const override
         {
@@ -24,7 +25,7 @@ namespace engine
 
         void deserialize(const nlohmann::json &componentJson) override
         {
-            tag = componentJson.value("tag", "MISSING TAG");
+            tag = componentJson.value("tag", DEFAULT_TAG);
         }
     };
 
