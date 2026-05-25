@@ -7,10 +7,13 @@ namespace editor
 {
     void RaytracingApp::init()
     {
+        sceneHandler = std::make_unique<SceneHandler>(&globalMessenger);
+        sceneHandler->openNewEmptyScene();
+
         auto clock = dynamic_cast<engine::SimpleClock*>(this->clock);
 
-        window.registerLayer<RaytraceComputeLayer>(clock);
-        window.registerLayer<ImGuiLayer>(clock);
+        window.registerLayer<RaytraceComputeLayer>(sceneHandler.get());
+        window.registerLayer<ImGuiLayer>(clock, sceneHandler.get());
     }
 
     void RaytracingApp::processInputs(const float deltaTime)

@@ -5,12 +5,14 @@
 
 namespace editor
 {
+    class SceneHandler;
+
     class RaytraceComputeLayer : public engine::IRenderLayer
     {
 
     public:
-        explicit RaytraceComputeLayer(engine::SimpleClock *clock)
-            : clock(clock) {}
+        explicit RaytraceComputeLayer(SceneHandler *sceneHandler)
+            : sceneHandler(sceneHandler) {}
 
         void onInit(GLFWwindow *window) override;
 
@@ -22,6 +24,6 @@ namespace editor
         void onDestroy() const noexcept override;
 
     private:
-        engine::SimpleClock *clock;
+        SceneHandler *sceneHandler;
     };
 }

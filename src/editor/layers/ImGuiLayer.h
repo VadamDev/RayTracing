@@ -6,12 +6,14 @@
 
 namespace editor
 {
+    class SceneHandler;
+
     class ImGuiLayer : public engine::IRenderLayer
     {
 
     public:
-        explicit ImGuiLayer(engine::SimpleClock *clock)
-            : clock(clock) {}
+        explicit ImGuiLayer(engine::SimpleClock *clock, SceneHandler *sceneHandler)
+            : clock(clock), sceneHandler(sceneHandler) {}
 
         void onInit(GLFWwindow *window) override;
 
@@ -23,6 +25,8 @@ namespace editor
 
     private:
         engine::SimpleClock *clock;
+        SceneHandler *sceneHandler;
+
         std::vector<std::shared_ptr<UIPanel>> panels;
 
         template<std::derived_from<UIPanel> T, typename... Args>

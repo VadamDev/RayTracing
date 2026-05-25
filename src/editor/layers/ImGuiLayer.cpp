@@ -1,12 +1,15 @@
 #include "ImGuiLayer.h"
 
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <ImGuizmo.h>
 #include <implot.h>
 
-#include "../ui/TestPanel.h"
+#include "../ui/inspector/HierarchyPanel.h"
+#include "../ui/inspector/InspectorPanel.h"
+#include "../ui/toolbar/ToolbarPanel.h"
 
 namespace editor
 {
@@ -26,7 +29,9 @@ namespace editor
         setupImGuiStyle();
 
         // Register Panels
-        registerPanel<TestPanel>(clock);
+        const auto toolbarPanel = registerPanel<ToolbarPanel>(sceneHandler);
+        const auto hierarchyPanel = registerPanel<HierarchyPanel>(sceneHandler);
+        const auto inspectorPanel = registerPanel<InspectorPanel>(sceneHandler, hierarchyPanel.get());
     }
 
     void ImGuiLayer::onFramePush(float deltaTime) const
@@ -35,6 +40,34 @@ namespace editor
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         ImGuizmo::BeginFrame();
+
+        // Dockspace Shit
+        static const ImGuiID DOCKSPACE_ID = ImGui::GetID("Dockspace");
+
+        const ImGuiViewport *imguiViewport = ImGui::GetMainViewport();
+        if (ImGui::DockBuilderGetNode(DOCKSPACE_ID) == nullptr)
+        {
+            ImGui::DockBuilderAddNode(DOCKSPACE_ID, ImGuiDockNodeFlags_DockSpace);
+            ImGui::DockBuilderSetNodeSize(DOCKSPACE_ID, imguiViewport->Size);
+
+            ImGuiID dockId_Left = 0;
+            ImGuiID dockId_Main = DOCKSPACE_ID;
+            ImGui::DockBuilderSplitNode(dockId_Main, ImGuiDir_Left, 0.28f, &dockId_Left, &dockId_Main);
+
+            ImGuiID dockId_Settings = 0;
+            ImGui::DockBuilderSplitNode(dockId_Main, ImGuiDir_Right, 0.225f, &dockId_Settings, &dockId_Main);
+
+            ImGuiID dockId_Hierarchy = 0;
+            ImGuiID dockId_Inspector = 0;
+            ImGui::DockBuilderSplitNode(dockId_Left, ImGuiDir_Up, 0.50f, &dockId_Hierarchy, &dockId_Inspector);
+
+            //ImGui::DockBuilderDockWindow("Settings", dockId_Settings);
+            //ImGui::DockBuilderDockWindow("Viewport", dockId_Main);
+            ImGui::DockBuilderDockWindow("Hierarchy", dockId_Hierarchy);
+            ImGui::DockBuilderDockWindow("Inspector", dockId_Inspector);
+        }
+
+        ImGui::DockSpaceOverViewport(DOCKSPACE_ID, imguiViewport, ImGuiDockNodeFlags_PassthruCentralNode);
 
         for (const auto &panel : panels)
             panel->draw();
@@ -105,7 +138,7 @@ namespace editor
     }
 
     template<std::derived_from<UIPanel> T, typename... Args>
-    std::shared_ptr<T> ImGuiLayer::registerPanel(Args &&... args)
+    std::shared_ptr<T> ImGuiLayer::registerPanel(Args&&... args)
     {
         auto panel = std::make_shared<T>(std::forward<Args>(args)...);
         panels.push_back(panel);

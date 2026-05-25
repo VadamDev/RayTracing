@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../engine/Application.h"
+#include "scene/SceneHandler.h"
 
 namespace editor
 {
@@ -13,5 +14,8 @@ namespace editor
         void init() override;
         void processInputs(float deltaTime) override;
         void destroy() noexcept override;
+
+    private:
+        std::unique_ptr<SceneHandler> sceneHandler;
     };
 }

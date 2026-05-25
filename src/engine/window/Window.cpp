@@ -113,7 +113,9 @@ namespace engine
         }
 
         frameTime = static_cast<float>(glfwGetTime());
-        inputsManager.getMouse().processDeltas();
+
+        if (grabbed)
+            inputsManager.getMouse().processDeltas();
 
         glClear(GL_COLOR_BUFFER_BIT);
         auto activeLayers = renderLayers | std::views::filter([](const auto &layer) { return layer->canRender(); });
