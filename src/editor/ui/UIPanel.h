@@ -2,8 +2,6 @@
 
 #include <string>
 
-#include "ImGuiUtils.hpp"
-
 namespace editor
 {
     class UIPanel

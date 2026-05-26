@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../engine/clock/SimpleClock.h"
 #include "../../engine/window/IRenderLayer.h"
 
 namespace editor

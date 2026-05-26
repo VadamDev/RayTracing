@@ -2,6 +2,7 @@
 
 #include "../../scene/SceneHandler.h"
 #include "../../scene/Components.h"
+#include "../ImGuiUtils.hpp"
 
 namespace editor
 {

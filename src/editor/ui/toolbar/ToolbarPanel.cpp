@@ -9,6 +9,8 @@
 
 #include "../../scene/SceneHandler.h"
 
+#include "../ImGuiUtils.hpp"
+
 namespace editor
 {
     void ToolbarPanel::draw()

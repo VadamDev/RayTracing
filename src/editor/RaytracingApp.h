@@ -1,10 +1,15 @@
 #pragma once
 
 #include "../engine/Application.h"
-#include "scene/SceneHandler.h"
+#include "rendering/RenderingCanvas.h"
+#include "rendering/CameraSystem.h"
 
 namespace editor
 {
+    class SceneHandler;
+
+    class RenderingCanvas;
+
     class RaytracingApp : public engine::Application
     {
 
@@ -17,5 +22,8 @@ namespace editor
 
     private:
         std::unique_ptr<SceneHandler> sceneHandler;
+
+        std::unique_ptr<RenderingCanvas> canvas;
+        std::unique_ptr<CameraSystem> cameraSystem;
     };
 }
