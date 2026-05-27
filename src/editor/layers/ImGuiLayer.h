@@ -7,13 +7,14 @@
 namespace editor
 {
     class SceneHandler;
+    class RenderingCanvas;
 
     class ImGuiLayer : public engine::IRenderLayer
     {
 
     public:
-        explicit ImGuiLayer(engine::SimpleClock *clock, SceneHandler *sceneHandler)
-            : clock(clock), sceneHandler(sceneHandler) {}
+        explicit ImGuiLayer(engine::Window &window, SceneHandler *sceneHandler, RenderingCanvas *canvas)
+            : window(window), sceneHandler(sceneHandler), canvas(canvas) {}
 
         void onInit(GLFWwindow *window) override;
 
@@ -24,8 +25,9 @@ namespace editor
         void onDestroy() const noexcept override;
 
     private:
-        engine::SimpleClock *clock;
+        engine::Window &window;
         SceneHandler *sceneHandler;
+        RenderingCanvas *canvas;
 
         std::vector<std::shared_ptr<UIPanel>> panels;
 

@@ -10,6 +10,7 @@
 #include "../ui/inspector/HierarchyPanel.h"
 #include "../ui/inspector/InspectorPanel.h"
 #include "../ui/toolbar/ToolbarPanel.h"
+#include "../ui/viewport/ViewportPanel.h"
 
 namespace editor
 {
@@ -32,6 +33,7 @@ namespace editor
         const auto toolbarPanel = registerPanel<ToolbarPanel>(sceneHandler);
         const auto hierarchyPanel = registerPanel<HierarchyPanel>(sceneHandler);
         const auto inspectorPanel = registerPanel<InspectorPanel>(sceneHandler, hierarchyPanel.get());
+        const auto viewportPanel = registerPanel<ViewportPanel>(this->window, canvas);
     }
 
     void ImGuiLayer::onFramePush(float deltaTime) const
@@ -62,7 +64,7 @@ namespace editor
             ImGui::DockBuilderSplitNode(dockId_Left, ImGuiDir_Up, 0.50f, &dockId_Hierarchy, &dockId_Inspector);
 
             //ImGui::DockBuilderDockWindow("Settings", dockId_Settings);
-            //ImGui::DockBuilderDockWindow("Viewport", dockId_Main);
+            ImGui::DockBuilderDockWindow("Viewport", dockId_Main);
             ImGui::DockBuilderDockWindow("Hierarchy", dockId_Hierarchy);
             ImGui::DockBuilderDockWindow("Inspector", dockId_Inspector);
         }

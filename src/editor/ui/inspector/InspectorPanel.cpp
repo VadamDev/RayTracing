@@ -51,6 +51,20 @@ namespace editor
             }
         });
 
+        // Camera
+        drawComponent<CameraComponent>(entity, "Camera", [this](CameraComponent &camera) {
+            bool updBuffs = false;
+
+            updBuffs |= Checkbox("Primary", camera.primary);
+            updBuffs |= Drag1f("FOV", camera.fov, 1, 45, 130, "%.0f");
+            updBuffs |= Drag1f("Focal Plane", camera.focalPlane, 0.01f, 1, 1e9f, "%.2f");
+
+            if (updBuffs)
+            {
+                //updateBuffers();
+            }
+        });
+
         // Raytraced Material
         drawComponent<RaytracedMaterialComponent>(entity, "Raytraced Material", [this](RaytracedMaterialComponent &component) {
             RaytracedMaterial &material = component.material;
@@ -102,6 +116,7 @@ namespace editor
 
         // List every addeable component
         drawAddComponent<TransformComponent>(entity, "Transform");
+        drawAddComponent<CameraComponent>(entity, "Camera");
         drawAddComponent<RaytracedMaterialComponent>(entity, "Raytraced Material");
         drawAddComponent<RaytracedSphereComponent>(entity, "Raytraced Sphere");
         drawAddComponent<RaytracedMeshComponent>(entity, "Raytraced Mesh");
