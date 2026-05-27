@@ -15,6 +15,37 @@ namespace editor
         controller->processInputs(deltaTime);
     }
 
+    void CameraSystem::findPrimaryCamera()
+    {
+        if (!sceneHandler->isSceneOpened() || !isAnyPresent(sceneHandler->getOpenedScene()))
+            return;
+
+        CameraRef result = {};
+
+        engine::Scene *scene = sceneHandler->getOpenedScene();
+        for (const auto &entityHandle : scene->registry.view<CameraComponent>())
+        {
+            const engine::Entity entity = { entityHandle, scene };
+            if (!entity.hasComponent<TransformComponent>())
+                continue;
+
+            auto &cameraCp = entity.getComponent<CameraComponent>();
+            auto &transformCp = entity.getComponent<TransformComponent>();
+
+            if (!result || cameraCp.primary)
+            {
+                result.entity = entity;
+
+                result.camera = &cameraCp;
+                result.transform = &transformCp;
+            }
+        }
+
+        primaryCamera = result;
+        updateLocalToWorldMatrix();
+        updateProjectionMatrix();
+    }
+
     void CameraSystem::updateLocalToWorldMatrix()
     {
         if (!isCameraPresent())
@@ -35,36 +66,5 @@ namespace editor
 
         const CameraComponent *camera = primaryCamera.camera;
         projectionMat = glm::perspective(glm::atan(glm::tan(glm::radians(camera->fov / 2.0f)) / 2) * 2, canvas->getAspectRatio(), camera->focalPlane, 1000.f); //TODO: change me!
-    }
-
-    void CameraSystem::findPrimaryCamera()
-    {
-        if (!sceneHandler->isSceneOpened() || !isAnyPresent(sceneHandler->getOpenedScene()))
-            return;
-
-        CameraRef result = {};
-
-        engine::Scene *scene = sceneHandler->getOpenedScene();
-        for (const auto &entityHandle : scene->registry.view<CameraComponent>())
-        {
-            const engine::Entity entity = { entityHandle, scene };
-            if (!entity.hasComponent<TransformComponent>())
-                continue;
-
-            CameraComponent &camera = entity.getComponent<CameraComponent>();
-            TransformComponent &transformCp = entity.getComponent<TransformComponent>();
-
-            if (!result || camera.primary)
-            {
-                result.entity = entity;
-
-                result.camera = &camera;
-                result.transform = &transformCp;
-            }
-        }
-
-        primaryCamera = result;
-        updateLocalToWorldMatrix();
-        updateProjectionMatrix();
     }
 }

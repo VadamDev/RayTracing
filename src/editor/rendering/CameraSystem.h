@@ -35,6 +35,7 @@ namespace editor
         }
 
         void processInputs(float deltaTime) const;
+        void findPrimaryCamera();
 
         void updateLocalToWorldMatrix();
         void updateProjectionMatrix();
@@ -54,7 +55,5 @@ namespace editor
 
         glm::mat4 localToWorldMat = glm::identity<glm::mat4>();
         glm::mat4 projectionMat = glm::identity<glm::mat4>();
-
-        void findPrimaryCamera();
     };
 }
