@@ -1,8 +1,15 @@
 #pragma once
 
-#include "../../engine/clock/SimpleClock.h"
+#include <vector>
+#include <memory>
+
 #include "../../engine/window/IRenderLayer.h"
 #include "../ui/UIPanel.h"
+
+namespace engine
+{
+    class Window;
+}
 
 namespace editor
 {

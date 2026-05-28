@@ -1,5 +1,3 @@
-#include <spdlog/spdlog.h>
-
 #include "engine/window/Window.h"
 #include "editor/RaytracingApp.h"
 #include "engine/clock/SimpleClock.h"

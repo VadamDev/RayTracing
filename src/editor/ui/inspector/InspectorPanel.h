@@ -1,7 +1,13 @@
 #pragma once
 
+#include <functional>
+
 #include "../UIPanel.h"
-#include "../../../engine/scene/Entity.h"
+
+namespace engine
+{
+    class Entity;
+}
 
 namespace editor
 {

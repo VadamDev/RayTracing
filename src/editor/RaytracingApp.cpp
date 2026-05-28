@@ -1,6 +1,5 @@
 #include "RaytracingApp.h"
 
-#include "scene/SceneHandler.h"
 #include "controller/FreecamController.h"
 #include "layers/ImGuiLayer.h"
 #include "layers/RaytraceComputeLayer.h"

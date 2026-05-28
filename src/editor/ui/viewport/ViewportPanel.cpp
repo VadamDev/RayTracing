@@ -38,7 +38,7 @@ namespace editor
         glm::ivec2 result(0, 0);
 
         const float viewportAR = windowWidth / windowHeight;
-        const float targetAR = 16.0f / 9.0f;//renderer->getCamera()->targetAspectRatio;
+        const float targetAR = 16.0f / 9.0f;// TODO: renderer->getCamera()->targetAspectRatio;
 
         if (viewportAR > targetAR)
         {

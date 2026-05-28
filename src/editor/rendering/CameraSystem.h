@@ -5,11 +5,11 @@
 #include "../../engine/scene/ComponentSystem.hpp"
 #include "../controller/ICamController.h"
 #include "../scene/Components.h"
-#include "../scene/SceneHandler.h"
 
 namespace editor
 {
     class RenderingCanvas;
+    class SceneHandler;
 
     struct CameraRef
     {

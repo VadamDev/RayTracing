@@ -1,5 +1,7 @@
 #include "RaytraceShader.h"
 
+#include "CameraSystem.h"
+
 namespace editor
 {
     void RaytraceShader::create()

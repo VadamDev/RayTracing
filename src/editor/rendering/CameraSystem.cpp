@@ -1,6 +1,7 @@
 #include "CameraSystem.h"
 
 #include "RenderingCanvas.h"
+#include "../scene/SceneHandler.h"
 
 namespace editor
 {

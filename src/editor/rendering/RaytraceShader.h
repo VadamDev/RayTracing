@@ -3,10 +3,11 @@
 #include "../../engine/graphics/shaders/ComputeShader.h"
 #include "../scene/RaytracedObjects.h"
 #include "../../engine/graphics/shaders/ShaderStorageBuffer.hpp"
-#include "CameraSystem.h"
 
 namespace editor
 {
+    class CameraSystem;
+
     struct RaytracerSettings
     {
         bool accumulate = false;
