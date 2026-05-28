@@ -7,20 +7,26 @@
 
 namespace editor
 {
-    void RaytracingApp::init()
+    void RaytracingApp::onInit()
     {
         sceneHandler = std::make_unique<SceneHandler>(&globalMessenger);
         sceneHandler->openNewEmptyScene();
 
         canvas = std::make_unique<RenderingCanvas>(window.getWidth(), window.getHeight());
+
         cameraSystem = std::make_unique<CameraSystem>(canvas.get(), sceneHandler.get());
         cameraSystem->registerController<FreecamController>(cameraSystem.get(), window.getInputsManager());
 
-        window.registerLayer<RaytraceComputeLayer>(sceneHandler.get());
+        window.registerLayer<RaytraceComputeLayer>(sceneHandler.get(), canvas.get(), cameraSystem.get());
         window.registerLayer<ImGuiLayer>(window, sceneHandler.get(), canvas.get());
     }
 
-    void RaytracingApp::processInputs(const float deltaTime)
+    void RaytracingApp::onPostInit()
+    {
+        canvas->create();
+    }
+
+    void RaytracingApp::onProcessInputs(const float deltaTime)
     {
         if (window.getInputsManager().isKeyDown(engine::KeyboardKeys::KEY_ESCAPE) && window.isGrabbed())
             window.setGrabbed(false);
@@ -28,7 +34,7 @@ namespace editor
         cameraSystem->processInputs(deltaTime);
     }
 
-    void RaytracingApp::destroy() noexcept
+    void RaytracingApp::onDestroy() noexcept
     {
 
     }

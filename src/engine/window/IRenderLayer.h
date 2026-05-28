@@ -14,9 +14,9 @@ namespace engine
         virtual void onInit(GLFWwindow *window) = 0;
 
         virtual bool canRender() const = 0;
-        virtual void onFramePush(float deltaTime) const = 0;
-        virtual void onFramePop() const = 0;
+        virtual void onFramePush(float deltaTime) = 0;
+        virtual void onFramePop() = 0;
 
-        virtual void onDestroy() const noexcept = 0;
+        virtual void onDestroy() noexcept = 0;
     };
 }

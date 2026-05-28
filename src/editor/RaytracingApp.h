@@ -16,9 +16,10 @@ namespace editor
     public:
         using Application::Application;
 
-        void init() override;
-        void processInputs(float deltaTime) override;
-        void destroy() noexcept override;
+        void onInit() override;
+        void onPostInit() override;
+        void onProcessInputs(float deltaTime) override;
+        void onDestroy() noexcept override;
 
     private:
         std::unique_ptr<SceneHandler> sceneHandler;

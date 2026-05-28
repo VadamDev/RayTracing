@@ -19,10 +19,10 @@ namespace editor
         void onInit(GLFWwindow *window) override;
 
         bool canRender() const override { return true; }
-        void onFramePush(float deltaTime) const override;
-        void onFramePop() const override;
+        void onFramePush(float deltaTime) override;
+        void onFramePop() override;
 
-        void onDestroy() const noexcept override;
+        void onDestroy() noexcept override;
 
     private:
         engine::Window &window;

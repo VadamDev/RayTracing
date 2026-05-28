@@ -8,8 +8,9 @@ namespace engine
     public:
         virtual ~IAppLifecycle() = default;
 
-        virtual void init() = 0;
-        virtual void processInputs(float deltaTime) = 0;
-        virtual void destroy() noexcept = 0;
+        virtual void onInit() = 0;
+        virtual void onPostInit() = 0;
+        virtual void onProcessInputs(float deltaTime) = 0;
+        virtual void onDestroy() noexcept = 0;
     };
 }

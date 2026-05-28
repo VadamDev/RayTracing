@@ -36,7 +36,7 @@ namespace editor
         const auto viewportPanel = registerPanel<ViewportPanel>(this->window, canvas);
     }
 
-    void ImGuiLayer::onFramePush(float deltaTime) const
+    void ImGuiLayer::onFramePush(const float deltaTime)
     {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -75,13 +75,13 @@ namespace editor
             panel->draw();
     }
 
-    void ImGuiLayer::onFramePop() const
+    void ImGuiLayer::onFramePop()
     {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
-    void ImGuiLayer::onDestroy() const noexcept
+    void ImGuiLayer::onDestroy() noexcept
     {
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();

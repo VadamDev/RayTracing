@@ -53,6 +53,14 @@ namespace editor
         if (ImGui::MenuItem("New [Empty Entity]"))
             scene->newEntity("Empty Entity");
 
+        // Camera
+        if (ImGui::MenuItem("New [Camera]"))
+        {
+            const engine::Entity camera = scene->newEntity("Camera");
+            camera.addComponent<TransformComponent>();
+            camera.addComponent<CameraComponent>();
+        }
+
         // Raytraced Sphere
         if (ImGui::MenuItem("New [Raytraced Sphere]"))
         {

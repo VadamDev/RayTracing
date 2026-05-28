@@ -1,5 +1,6 @@
 #include "SceneHandler.h"
 
+#include "../../engine/scene/Entity.h"
 #include "Components.h"
 
 namespace editor
@@ -45,6 +46,11 @@ namespace editor
     void SceneHandler::openNewEmptyScene()
     {
         auto *scene = new engine::Scene(messenger);
+
+        engine::Entity camera = scene->newEntity("Camera");
+        camera.addComponent<TransformComponent>();
+        camera.addComponent<CameraComponent>();
+
         openScene(scene);
     }
 

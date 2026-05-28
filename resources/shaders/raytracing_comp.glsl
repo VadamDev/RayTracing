@@ -90,8 +90,6 @@ struct TriHitInfo
 uniform uint frameIndex; // Index of the frame currently being rendered
 uniform vec3 viewParams; // planeWidth, planeHeight, focalLength;
 uniform mat4 localToWorld; // Camera localToWorld matrix
-uniform int drawDebugMode;
-uniform vec2 statsThresholds;
 
 uniform bool accumulate; // Should accumulate the result with the previous frame?
 uniform int maxBounces; // Max number of bounces for a given ray
@@ -99,6 +97,9 @@ uniform int raysPerPixel; // Number of rays to shoot per pixel, makes the editor
 uniform bool environmentLight; // Should the ray gather light from the environment (=fake skybox) if it doesn't hit anything?
 uniform float divergeStrength; // Blur used for a rudimentary AA, or whole scene blurring
 uniform float defocusStrength; // Blur used for DOF. change the focal length parameter to focus on different parts of the scene
+
+uniform int drawDebugMode;
+uniform vec2 statsThresholds;
 
 layout(std430, binding = 0) readonly buffer SphereBuffer {
     Sphere spheres[];

@@ -20,8 +20,9 @@ namespace engine
         // Init application, window is initialized AFTER because window.create() initialize render layers
         try
         {
-            app.init();
+            app.onInit();
             window.create();
+            app.onPostInit();
         }
         catch (std::exception &e)
         {
@@ -59,7 +60,7 @@ namespace engine
             {
                 renderProfiler->begin();
 
-                app.processInputs(deltaTime);
+                app.onProcessInputs(deltaTime);
                 window.pushAndPop(deltaTime);
 
                 renderProfiler->end();
@@ -82,7 +83,7 @@ namespace engine
             }
         }
 
-        app.destroy();
+        app.onDestroy();
     }
 
     void SimpleClock::setupProfilers()
