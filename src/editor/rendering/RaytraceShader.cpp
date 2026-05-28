@@ -43,7 +43,7 @@ namespace editor
 
     void RaytraceShader::updateRaytracerDebugSettings(const DebugSettings &debugSettings) const
     {
-        drawDebugMode->set1i(debugSettings.drawMode);
+        drawDebugMode->set1i(static_cast<int>(debugSettings.drawMode));
         statsThresholds->set2f(debugSettings.statsThreshold);
     }
 

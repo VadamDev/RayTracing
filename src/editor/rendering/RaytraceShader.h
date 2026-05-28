@@ -17,10 +17,19 @@ namespace editor
         float defocusStrength = 0;
     };
 
+    enum class DrawMode : int
+    {
+        DEFAULT = 0,
+        BOX_TESTS = 1,
+        TRI_TESTS = 2,
+        BOX_AND_TRI_TESTS = 3,
+        NORMALS = 4
+    };
+
     struct DebugSettings
     {
-        int drawMode = 0;
-        glm::vec2 statsThreshold;
+        DrawMode drawMode = DrawMode::DEFAULT;
+        glm::vec2 statsThreshold = { 1, 1 };
     };
 
     class RaytraceShader : public engine::ComputeShader
