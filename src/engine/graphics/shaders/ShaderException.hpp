@@ -41,7 +41,7 @@ namespace engine::exceptions
         unsigned int getType() const { return type; }
         std::string formattedType() const { return formatShaderType(type); }
 
-    private:
+    protected:
         const unsigned int type;
     };
 

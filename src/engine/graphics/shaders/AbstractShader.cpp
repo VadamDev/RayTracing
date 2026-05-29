@@ -10,7 +10,7 @@ namespace engine
 {
     AbstractShader::~AbstractShader()
     {
-        if (bBound)
+        if (bound)
             unbind();
 
         if (programId != 0)
@@ -20,17 +20,20 @@ namespace engine
     void AbstractShader::bind()
     {
         glUseProgram(programId);
-        bBound = true;
+        bound = true;
     }
 
     void AbstractShader::unbind()
     {
         glUseProgram(0);
-        bBound = false;
+        bound = false;
     }
 
     std::unique_ptr<IUniformAccess> AbstractShader::accessUniform(const std::string &name) const
     {
+        if (programId == 0)
+            throw exceptions::ProgramException("Failed to access uniform location, the program hasn't been created!", 0);
+
         const int location = glGetUniformLocation(programId, name.c_str());
         if (location < 0)
         {

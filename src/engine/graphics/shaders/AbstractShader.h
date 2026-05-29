@@ -20,13 +20,13 @@ namespace engine
 
         std::unique_ptr<IUniformAccess> accessUniform(const std::string &name) const;
 
-        bool isBound() const { return bBound; }
+        bool isBound() const { return bound; }
 
         static unsigned int createShader(const char *source, unsigned int type);
 
     protected:
         unsigned int programId = 0;
-        bool bBound = false;
+        bool bound = false;
 
         virtual void setupUniforms() = 0;
 

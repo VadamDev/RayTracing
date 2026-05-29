@@ -16,28 +16,26 @@ namespace engine
             if (bound)
                 unbind();
 
-            if (ssbo != 0)
-                glDeleteBuffers(1, &ssbo);
+            if (ssboHandle != 0)
+                glDeleteBuffers(1, &ssboHandle);
         }
 
         void create()
         {
-            glGenBuffers(1, &ssbo);
+            glGenBuffers(1, &ssboHandle);
         }
 
         void bind()
         {
-            if (ssbo == 0)
-                throw std::runtime_error("Failed to bind SSBO: The SSBO hasn't been created");
+            assertCreated();
 
-            glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+            glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssboHandle);
             bound = true;
         }
 
         void unbind()
         {
-            if (ssbo == 0)
-                throw std::runtime_error("Failed to unbind SSBO: The SSBO hasn't been created");
+            assertCreated();
 
             if (!bound)
                 return;
@@ -48,24 +46,29 @@ namespace engine
 
         void update(const std::vector<T> &data, const unsigned int binding, const unsigned int usage)
         {
-            if (ssbo == 0)
-                throw std::runtime_error("Failed to update SSBO: The SSBO hasn't been created");
+            assertCreated();
 
             currentSize = data.size();
 
             bind();
 
-            glNamedBufferData(ssbo, sizeof(T) * currentSize, data.data(), usage);
-            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, ssbo);
+            glNamedBufferData(ssboHandle, sizeof(T) * currentSize, data.data(), usage);
+            glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, ssboHandle);
         }
 
         bool isBound() const { return bound; }
         size_t size() const { return currentSize; }
 
     private:
-        unsigned int ssbo = 0;
+        unsigned int ssboHandle = 0;
         bool bound = false;
 
         size_t currentSize = 0;
+
+        void assertCreated() const
+        {
+            if (ssboHandle == 0)
+                throw std::runtime_error("The SSBO hasn't been created");
+        }
     };
 }

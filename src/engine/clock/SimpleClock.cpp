@@ -8,6 +8,8 @@
 
 namespace engine
 {
+    static constexpr float NANO = 1e9f;
+
     /*
      * Managament
      */
@@ -52,9 +54,7 @@ namespace engine
         while (running && !window.shouldClose())
         {
             const auto now = steady_clock::now();
-            const int64_t elapsedSinceLastRender = duration_cast<nanoseconds>(now - lastRenderTime).count();
-
-            const float deltaTime = elapsedSinceLastRender / 1e9f;
+            const float deltaTime = duration_cast<nanoseconds>(now - lastRenderTime).count() / NANO;
 
             try
             {

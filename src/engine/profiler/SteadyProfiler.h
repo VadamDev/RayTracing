@@ -75,4 +75,22 @@ namespace engine
 
         std::chrono::nanoseconds lastSpentTime = std::chrono::nanoseconds::zero();
     };
+
+    /*
+     * Exceptions
+     */
+
+    namespace exceptions
+    {
+        class ProfilerException : public std::runtime_error
+        {
+
+        public:
+            explicit ProfilerException(const std::string &message)
+                : ProfilerException(message.c_str()) {}
+
+            explicit ProfilerException(const char *message)
+                : runtime_error(message) {}
+        };
+    }
 }

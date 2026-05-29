@@ -7,7 +7,7 @@ namespace engine
     template<typename T>
     struct ComponentSystem
     {
-        ~ComponentSystem() = default;
+        virtual ~ComponentSystem() = default;
 
         static bool isAnyPresent(Scene *scene)
         {

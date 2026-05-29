@@ -2,7 +2,6 @@
 
 #include <numeric>
 #include <ranges>
-#include <stdexcept>
 
 namespace engine
 {
@@ -15,7 +14,7 @@ namespace engine
     ProfilerEntry* SteadyProfiler::newEntry(const std::string &name, int maxSamples)
     {
         if (entries.contains(name))
-            throw std::runtime_error("An entry with that name already exists!");
+            throw exceptions::ProfilerException("An entry with that name already exists!");
 
         auto [it, _] = entries.try_emplace(name, name, maxSamples);
         return &it->second;
@@ -39,7 +38,7 @@ namespace engine
     void ProfilerEntry::begin()
     {
         if (profiling)
-            throw std::runtime_error("A profiler has already been started");
+            throw exceptions::ProfilerException("A profiler has already been started");
 
         beginTime = steady_clock::now();
         profiling = true;
@@ -48,7 +47,7 @@ namespace engine
     void ProfilerEntry::end()
     {
         if (!profiling)
-            throw std::runtime_error("The profiler hasn't been started");
+            throw exceptions::ProfilerException("The profiler hasn't been started");
 
         const nanoseconds durationNs = steady_clock::now() - beginTime;
         lastSpentTime = durationNs;
