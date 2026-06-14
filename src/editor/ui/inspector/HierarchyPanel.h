@@ -3,6 +3,11 @@
 #include "../UIPanel.h"
 #include "../../../engine/scene/Entity.h"
 
+namespace engine
+{
+    class Window;
+}
+
 namespace editor
 {
     class SceneHandler;
@@ -11,13 +16,14 @@ namespace editor
     {
 
     public:
-        explicit HierarchyPanel(SceneHandler *sceneHandler)
-            : UIPanel("Hierarchy"), sceneHandler(sceneHandler) {}
+        explicit HierarchyPanel(engine::Window &window, SceneHandler *sceneHandler)
+            : UIPanel("Hierarchy"), window(window), sceneHandler(sceneHandler) {}
 
         void draw() override;
 
         engine::Entity selectedEntity;
     private:
+        engine::Window &window;
         SceneHandler *sceneHandler;
 
         void drawHierarchyCtxPopup(engine::Scene *scene);

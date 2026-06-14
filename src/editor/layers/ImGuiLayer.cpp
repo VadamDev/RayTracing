@@ -31,7 +31,7 @@ namespace editor
 
         // Register Panels
         const auto toolbarPanel = registerPanel<ToolbarPanel>(sceneHandler);
-        const auto hierarchyPanel = registerPanel<HierarchyPanel>(sceneHandler);
+        const auto hierarchyPanel = registerPanel<HierarchyPanel>(this->window, sceneHandler);
         const auto inspectorPanel = registerPanel<InspectorPanel>(sceneHandler, hierarchyPanel.get());
         const auto viewportPanel = registerPanel<ViewportPanel>(this->window, canvas);
     }

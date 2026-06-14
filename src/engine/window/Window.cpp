@@ -128,6 +128,8 @@ namespace engine
 
         glfwPollEvents();
         glfwSwapBuffers(window);
+        
+        wasGrabbed = grabbed;
     }
 
     /*

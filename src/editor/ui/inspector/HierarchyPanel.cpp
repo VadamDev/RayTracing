@@ -3,6 +3,7 @@
 #include "../../scene/SceneHandler.h"
 #include "../../scene/Components.h"
 #include "../ImGuiUtils.hpp"
+#include "../../../engine/window/Window.h"
 
 namespace editor
 {
@@ -14,7 +15,7 @@ namespace editor
         {
             engine::Scene *scene = sceneHandler->getOpenedScene();
 
-            if (selectedEntity)
+            if (selectedEntity && !window.wasGrabbedBefore())
             {
                 // Deselect entity if clicked on nothing OR escape key is pressed
                 if ((ImGui::IsWindowHovered() && ImGui::IsMouseDown(0)) || ImGui::IsKeyPressed(ImGuiKey_Escape))

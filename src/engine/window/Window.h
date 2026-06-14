@@ -61,6 +61,7 @@ namespace engine
         float getFrameTime() const { return frameTime; }
 
         bool isGrabbed() const { return grabbed; }
+        bool wasGrabbedBefore() const { return wasGrabbed; }
 
         int getWidth() const { return width; }
         int getHeight() const { return height; }
@@ -84,7 +85,7 @@ namespace engine
         InputsManager inputsManager;
         Messenger *messenger = nullptr;
 
-        bool resized = true, grabbed = false;
+        bool resized = true, grabbed = false, wasGrabbed = false;
         float frameTime = 0;
 
         std::vector<std::shared_ptr<IRenderLayer>> renderLayers;
