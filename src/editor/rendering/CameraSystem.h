@@ -5,6 +5,7 @@
 #include "../../engine/scene/ComponentSystem.hpp"
 #include "../controller/ICamController.h"
 #include "../scene/Components.h"
+#include "../../engine/scene/Entity.h"
 
 namespace editor
 {

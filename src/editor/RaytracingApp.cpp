@@ -11,12 +11,14 @@ namespace editor
         sceneHandler = std::make_unique<SceneHandler>(&globalMessenger);
         sceneHandler->openNewEmptyScene();
 
+        modelManager = std::make_unique<ModelManager>();
+
         canvas = std::make_unique<RenderingCanvas>(window.getWidth(), window.getHeight());
 
         cameraSystem = std::make_unique<CameraSystem>(canvas.get(), sceneHandler.get());
         cameraSystem->registerController<FreecamController>(cameraSystem.get(), window.getInputsManager());
 
-        window.registerLayer<RaytraceComputeLayer>(sceneHandler.get(), canvas.get(), cameraSystem.get());
+        window.registerLayer<RaytraceComputeLayer>(sceneHandler.get(), modelManager.get(), canvas.get(), cameraSystem.get());
         window.registerLayer<ImGuiLayer>(window, sceneHandler.get(), canvas.get());
     }
 
@@ -25,11 +27,14 @@ namespace editor
         canvas->create();
     }
 
-    void RaytracingApp::onProcessInputs(const float deltaTime)
+    void RaytracingApp::onPreRender(const float deltaTime)
     {
         if (window.getInputsManager().isKeyDown(engine::KeyboardKeys::KEY_ESCAPE) && window.isGrabbed())
             window.setGrabbed(false);
 
+        sceneHandler->onFramePush();
+
+        cameraSystem->findPrimaryCamera(); // TODO: update only when necessary
         cameraSystem->processInputs(deltaTime);
     }
 

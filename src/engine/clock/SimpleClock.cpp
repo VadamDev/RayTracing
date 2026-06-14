@@ -60,7 +60,7 @@ namespace engine
             {
                 renderProfiler->begin();
 
-                app.onProcessInputs(deltaTime);
+                app.onPreRender(deltaTime);
                 window.pushAndPop(deltaTime);
 
                 renderProfiler->end();

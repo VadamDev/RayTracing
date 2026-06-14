@@ -5,6 +5,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "../../engine/serial/IJsonSerializable.h"
+#include "../model/ModelManager.h"
 #include "RaytracedObjects.h"
 
 namespace editor
@@ -101,6 +102,7 @@ namespace editor
     struct RaytracedMeshComponent : engine::IJsonSerializable
     {
         std::string name;
+        std::shared_ptr<RaytracedMesh> mesh = nullptr;
 
         void serialize(nlohmann::json &componentJson) const override
         {

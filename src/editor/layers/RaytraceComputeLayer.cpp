@@ -2,20 +2,30 @@
 
 #include "../rendering/RenderingCanvas.h"
 #include "../scene/SceneHandler.h"
-#include "../rendering/CameraSystem.h"
 
 namespace editor
 {
     void RaytraceComputeLayer::onInit(GLFWwindow *window)
     {
         shader.create();
+
+        sphereCpSystem = std::make_unique<RaytracedSphereSystem>(shader);
+        meshCpSystem = std::make_unique<RaytracedMeshSystem>(shader, modelManager);
+    }
+
+    bool RaytraceComputeLayer::canRender() const
+    {
+        return sceneHandler->isSceneOpened();
     }
 
     void RaytraceComputeLayer::onFramePush(const float deltaTime) {
-        sceneHandler->onFramePush();
-        cameraSystem->findPrimaryCamera();
+        engine::Scene *openedScene = sceneHandler->getOpenedScene();
 
         shader.bind();
+
+        shader.updateMeshDataBuffers(modelManager->getAllTriangles(), modelManager->getAllBvhNodes());
+        sphereCpSystem->updateData(openedScene);
+        meshCpSystem->updateData(openedScene);
 
         shader.updateFrameIndex(frameIndex++);
         shader.updateViewData(cameraSystem, canvas->getAspectRatio());
@@ -26,11 +36,6 @@ namespace editor
 
         shader.unbindBuffers();
         shader.unbind();
-    }
-
-    void RaytraceComputeLayer::onFramePop()
-    {
-
     }
 
     void RaytraceComputeLayer::onDestroy() noexcept

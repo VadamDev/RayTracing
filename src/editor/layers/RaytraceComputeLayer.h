@@ -1,11 +1,13 @@
 #pragma once
 
 #include "../../engine/window/IRenderLayer.h"
+#include "../rendering/RaytracedObjectsSystem.h"
 #include "../rendering/RaytraceShader.h"
 
 namespace editor
 {
     class SceneHandler;
+    class ModelManager;
     class RenderingCanvas;
     class CameraSystem;
 
@@ -13,15 +15,15 @@ namespace editor
     {
 
     public:
-        explicit RaytraceComputeLayer(SceneHandler *sceneHandler, RenderingCanvas *canvas, CameraSystem *cameraSystem)
-            : sceneHandler(sceneHandler), canvas(canvas), cameraSystem(cameraSystem) {}
+        explicit RaytraceComputeLayer(SceneHandler *sceneHandler, ModelManager *modelManager, RenderingCanvas *canvas, CameraSystem *cameraSystem)
+            : sceneHandler(sceneHandler), modelManager(modelManager), canvas(canvas), cameraSystem(cameraSystem) {}
 
         void onInit(GLFWwindow *window) override;
 
-        bool canRender() const override { return true; }
+        bool canRender() const override;
 
         void onFramePush(float deltaTime) override;
-        void onFramePop() override;
+        void onFramePop() override {}
 
         void onDestroy() noexcept override;
 
@@ -29,11 +31,14 @@ namespace editor
         DebugSettings debugSettings;
     private:
         SceneHandler *sceneHandler;
+        ModelManager *modelManager;
 
         RenderingCanvas *canvas;
         CameraSystem *cameraSystem;
 
         RaytraceShader shader;
+        std::unique_ptr<RaytracedSphereSystem> sphereCpSystem;
+        std::unique_ptr<RaytracedMeshSystem> meshCpSystem;
 
         unsigned int frameIndex = 1;
     };
