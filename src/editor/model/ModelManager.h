@@ -31,7 +31,7 @@ namespace editor
 
     public:
         ModelManager()
-            : AssetManager("resources/meshes/", [this](const std::string &path) { return meshLoader(path); }) {}
+            : AssetManager("resources/meshes/", [this](const std::filesystem::path &path) { return meshLoader(path); }) {}
         ~ModelManager();
 
         void handleMeshUnload(const RaytracedMesh *mesh);
@@ -45,7 +45,8 @@ namespace editor
 
         bool destroyed = false;
 
-        std::shared_ptr<RaytracedMesh> meshLoader(const std::string &path);
+        std::shared_ptr<RaytracedMesh> meshLoader(const std::filesystem::path &p);
         static BVHTriangle parseTriangle(const size_t &indiceIndex, const std::vector<tinyobj::index_t> &indices, const std::vector<tinyobj::real_t> &vertices, const std::vector<tinyobj::real_t> &normals);
+        std::tuple<int, int> emplaceMesh(const std::vector<BVHTriangle> &triangles, std::vector<RaytracedTriangle> &raytracedTriangles, BoundingVolumeHierarchy &bvh, std::vector<RaytracedBVHNode> &raytracedNodes);
     };
 }

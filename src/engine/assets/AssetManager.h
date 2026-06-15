@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <string>
 #include <memory>
 #include <functional>
@@ -9,7 +10,7 @@
 namespace engine
 {
     template<typename T>
-    using AssetLoader = std::function<std::shared_ptr<T>(const std::string &path)>;
+    using AssetLoader = std::function<std::shared_ptr<T>(const std::filesystem::path &path)>;
 
     template<typename T>
     class AssetManager
@@ -21,16 +22,16 @@ namespace engine
 
         std::shared_ptr<T> load(const std::string &path)
         {
-            auto it = assets.find(path);
-            if (it != assets.end())
-            {
-                if (std::shared_ptr<T> ref = it->second.lock())
-                    return it->second.lock();
-            }
+            std::filesystem::path sysPath(pathPrefix + path);
+            const std::string &name = sysPath.stem().string();
 
-            std::shared_ptr<T> ref = loader(pathPrefix + path);
+            auto it = assets.find(name);
+            if (std::shared_ptr<T> ref = it != assets.end() ? it->second.lock() : nullptr)
+                return ref;
+
+            std::shared_ptr<T> ref = loader(sysPath);
             if (ref)
-                assets.insert_or_assign(path, ref);
+                assets.insert_or_assign(name, ref);
 
             return ref;
         }

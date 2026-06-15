@@ -12,6 +12,8 @@ namespace editor
     using namespace std::filesystem;
     using namespace tinyobj;
 
+    static constexpr int MAX_BVH_DEPTH = 32;
+
     /*
      * Raytraced Mesh
      */
@@ -30,9 +32,9 @@ namespace editor
         destroyed = true;
     }
 
+    // Shift data after the mesh we removed to the left in triangle & node global arrays
     void ModelManager::handleMeshUnload(const RaytracedMesh *mesh)
     {
-        // Shift node data
         for (size_t i = mesh->nodeOffset + mesh->numNodes; i < allBvhNodes.size(); i++)
         {
             RaytracedBVHNode &node = allBvhNodes[i];
@@ -59,21 +61,24 @@ namespace editor
         allBvhNodes.erase(allBvhNodes.begin() + mesh->nodeOffset, allBvhNodes.begin() + (mesh->nodeOffset + mesh->numNodes));
     }
 
-    std::shared_ptr<RaytracedMesh> ModelManager::meshLoader(const std::string &path)
+    std::shared_ptr<RaytracedMesh> ModelManager::meshLoader(const path &p)
     {
-        const std::filesystem::path sysPath(path);
-        if (path == pathPrefix || !exists(sysPath) || !is_regular_file(sysPath))
-            return nullptr; // If the file doesn't even exist
+        path path = p;
+        if (!path.has_extension())
+            path.replace_extension(".obj");
 
-        const std::string name = sysPath.stem().string();
-        spdlog::info("Loading {}...", sysPath.filename().string());
+        if (!exists(path) || !is_regular_file(path))
+            return nullptr; // nullptr is automatically managed by the AssetManager class
 
+        spdlog::info("Loading {}...", path.filename().string());
+
+        // Load triangles in obj file
         ObjReaderConfig readerConfig;
         //readerConfig.triangulation_method = "earcut";
         readerConfig.vertex_color = false;
 
         ObjReader reader;
-        if (!reader.ParseFromFile(path, readerConfig))
+        if (!reader.ParseFromFile(path.string(), readerConfig))
         {
             std::string error = reader.Error();
             if (error.empty())
@@ -90,7 +95,6 @@ namespace editor
         {
             const auto &indices = shape.mesh.indices;
 
-            //If input doesn't have triangle faces we are fucked
             for (size_t i = 0; i < indices.size(); i += 3)
                 triangles.push_back(parseTriangle(i, indices, attribs.vertices, attribs.normals));
         }
@@ -98,38 +102,16 @@ namespace editor
         spdlog::info("-> Loaded {} triangles", triangles.size());
 
         // Build BVH & sort triangles
-        BoundingVolumeHierarchy bvh(32);
+        BoundingVolumeHierarchy bvh(MAX_BVH_DEPTH);
         bvh.build(triangles);
 
         const BVHStats &bvhStats = bvh.getStats();
         spdlog::info("-> BVH built in {:.3f}ms, {} nodes ({} leaf | Tri min/max: {}, {}) (Depth min/max {}, {})", bvhStats.buildTimeMs, bvhStats.nodeCount, bvhStats.leafNodeCount, bvhStats.minTriCount, bvhStats.maxTriCount, bvhStats.minDepth, bvhStats.maxDepth);
 
-        // Create shader compatible triangle struct
+        // Emplace data inside global triangle & nodes array
         std::vector<RaytracedTriangle> raytracedTriangles;
-        raytracedTriangles.reserve(triangles.size());
-        std::ranges::copy(triangles, std::back_inserter(raytracedTriangles));
-
-        // Insert mesh triangles to the global triangles list
-        const int triOffset = allTriangles.size();
-        allTriangles.reserve(triOffset + raytracedTriangles.size());
-        allTriangles.insert(allTriangles.end(), raytracedTriangles.begin(), raytracedTriangles.end());
-
-        // Create shader compatible bvh node struct
         std::vector<RaytracedBVHNode> raytracedNodes;
-        raytracedNodes.reserve(bvh.getNodes().size());
-
-        const int nodeOffset = allBvhNodes.size();
-        for (BVHNode node : bvh.getNodes())
-        {
-            node.leftChildIdx += nodeOffset;
-            node.triIndex += triOffset;
-
-            raytracedNodes.push_back(node);
-        }
-
-        // Insert bvh nodes to the global nodes list
-        allBvhNodes.reserve(nodeOffset + raytracedNodes.size());
-        allBvhNodes.insert(allBvhNodes.end(), raytracedNodes.begin(), raytracedNodes.end());
+        const auto [triOffset, nodeOffset] = emplaceMesh(triangles, raytracedTriangles, bvh, raytracedNodes);
 
         spdlog::info("-> Done!");
 
@@ -188,5 +170,35 @@ namespace editor
         );
 
         return tri;
+    }
+
+    std::tuple<int, int> ModelManager::emplaceMesh(const std::vector<BVHTriangle> &triangles, std::vector<RaytracedTriangle> &raytracedTriangles, BoundingVolumeHierarchy &bvh, std::vector<RaytracedBVHNode> &raytracedNodes)
+    {
+        // Shader compatible triangle list
+        raytracedTriangles.reserve(triangles.size());
+        std::ranges::copy(triangles, std::back_inserter(raytracedTriangles));
+
+        const int triOffset = allTriangles.size();
+        allTriangles.reserve(triOffset + raytracedTriangles.size());
+        allTriangles.insert(allTriangles.end(), raytracedTriangles.begin(), raytracedTriangles.end());
+
+        // Create shader compatible bvh node struct
+        const std::vector<BVHNode> &nodes = bvh.getNodes();
+        raytracedNodes.reserve(nodes.size());
+
+        const int nodeOffset = allBvhNodes.size();
+        for (BVHNode node : nodes)
+        {
+            node.leftChildIdx += nodeOffset;
+            node.triIndex += triOffset;
+
+            raytracedNodes.push_back(node);
+        }
+
+        // Insert bvh nodes to the global nodes list
+        allBvhNodes.reserve(nodeOffset + raytracedNodes.size());
+        allBvhNodes.insert(allBvhNodes.end(), raytracedNodes.begin(), raytracedNodes.end());
+
+        return std::make_tuple(triOffset, nodeOffset);
     }
 }
