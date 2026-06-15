@@ -101,6 +101,8 @@ namespace editor
         drawComponent<RaytracedMeshComponent>(entity, "Raytraced Mesh", [this](RaytracedMeshComponent &mesh) {
             if (InputText("Mesh Name", mesh.name))
             {
+                mesh.mesh = nullptr; // allows the RaytracedMeshSystem to retrieve the asset from the Model Manager (again)
+
                 //updateBuffers();
             }
         });
