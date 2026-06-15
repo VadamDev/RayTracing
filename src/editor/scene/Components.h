@@ -49,12 +49,18 @@ namespace editor
 
         void serialize(nlohmann::json &componentJson) const override
         {
-            
+            componentJson["fov"] = fov;
+            componentJson["focalPlane"] = focalPlane;
+
+            componentJson["primary"] = primary;
         }
 
         void deserialize(const nlohmann::json &componentJson) override
         {
+            fov = componentJson.value("fov", fov);
+            focalPlane = componentJson.value("focalPlane", focalPlane);
 
+            primary = componentJson.value("primary", primary);
         }
     };
 
