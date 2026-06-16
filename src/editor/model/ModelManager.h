@@ -6,6 +6,11 @@
 #include "../scene/RaytracedObjects.h"
 #include "bvh/BoundingVolumeHierarchy.h"
 
+namespace engine
+{
+    class Messenger;
+}
+
 namespace editor
 {
     class RaytracedMesh
@@ -30,8 +35,8 @@ namespace editor
     {
 
     public:
-        ModelManager()
-            : AssetManager("resources/meshes/", [this](const std::filesystem::path &path) { return meshLoader(path); }) {}
+        explicit ModelManager(engine::Messenger &globalMessenger)
+            : AssetManager("resources/meshes/", [this](const std::filesystem::path &path) { return meshLoader(path); }), globalMessenger(globalMessenger) {}
         ~ModelManager();
 
         void handleMeshUnload(const RaytracedMesh *mesh);
@@ -40,6 +45,8 @@ namespace editor
         std::vector<RaytracedBVHNode>& getAllBvhNodes() { return allBvhNodes; }
 
     private:
+        engine::Messenger &globalMessenger;
+
         std::vector<RaytracedTriangle> allTriangles;
         std::vector<RaytracedBVHNode> allBvhNodes;
 

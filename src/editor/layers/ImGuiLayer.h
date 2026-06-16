@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 
+#include "RaytraceComputeLayer.h"
 #include "../../engine/window/IRenderLayer.h"
 #include "../ui/UIPanel.h"
 
@@ -33,6 +34,7 @@ namespace editor
 
         void onDestroy() noexcept override;
 
+        engine::Messenger& getGlobalMessenger() const { return raytraceComputeLayer->getGlobalMessenger(); }
     private:
         engine::Window &window;
         engine::SimpleClock *clock;

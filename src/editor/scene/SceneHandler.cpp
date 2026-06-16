@@ -5,8 +5,8 @@
 
 namespace editor
 {
-    SceneHandler::SceneHandler(engine::Messenger *messenger)
-        : messenger(messenger)
+    SceneHandler::SceneHandler(engine::Messenger &globalMessenger)
+        : globalMessenger(globalMessenger)
     {
         // Register components that we want to save
         serializer.registerSerializable<TransformComponent>();
@@ -39,17 +39,17 @@ namespace editor
 
     void SceneHandler::openScene(const std::string &path)
     {
-        engine::Scene *loadedScene = serializer.deserializeScene(path, messenger);
+        engine::Scene *loadedScene = serializer.deserializeScene(path, &globalMessenger);
         openScene(loadedScene);
     }
 
     void SceneHandler::openNewEmptyScene()
     {
-        auto *scene = new engine::Scene(messenger);
+        auto *scene = new engine::Scene(&globalMessenger);
 
         engine::Entity camera = scene->newEntity("Camera");
         camera.addComponent<TransformComponent>();
-        camera.addComponent<CameraComponent>();
+        camera.addComponent<CameraComponent>().primary = true;
 
         openScene(scene);
     }

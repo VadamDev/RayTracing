@@ -18,7 +18,7 @@ namespace editor
         explicit FreecamController(CameraSystem *cameraSystem, engine::InputsManager &inputsManager)
             : ICamController(cameraSystem), inputsManager(inputsManager) {}
 
-        void processInputs(float deltaTime) override;
+        bool processInputs(float deltaTime) override;
 
         float sensitivity = 0.2f;
         float cameraSpeed = 5;

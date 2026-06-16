@@ -11,17 +11,17 @@ namespace editor
     {
         auto clock = dynamic_cast<engine::SimpleClock*>(this->clock);
 
-        sceneHandler = std::make_unique<SceneHandler>(&globalMessenger);
+        sceneHandler = std::make_unique<SceneHandler>(globalMessenger);
         sceneHandler->openNewEmptyScene();
 
-        modelManager = std::make_unique<ModelManager>();
+        modelManager = std::make_unique<ModelManager>(globalMessenger);
 
         canvas = std::make_unique<RenderingCanvas>(window.getWidth(), window.getHeight());
 
-        cameraSystem = std::make_unique<CameraSystem>(canvas.get(), sceneHandler.get());
+        cameraSystem = std::make_unique<CameraSystem>(globalMessenger, canvas.get(), sceneHandler.get());
         cameraSystem->registerController<FreecamController>(cameraSystem.get(), window.getInputsManager());
 
-        const auto raytraceLayer = window.registerLayer<RaytraceComputeLayer>(sceneHandler.get(), modelManager.get(), canvas.get(), cameraSystem.get());
+        const auto raytraceLayer = window.registerLayer<RaytraceComputeLayer>(globalMessenger, sceneHandler.get(), modelManager.get(), canvas.get(), cameraSystem.get());
         const auto imguiLayer = window.registerLayer<ImGuiLayer>(window, clock, raytraceLayer.get(), sceneHandler.get(), canvas.get());
     }
 

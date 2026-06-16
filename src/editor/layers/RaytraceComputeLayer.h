@@ -15,8 +15,8 @@ namespace editor
     {
 
     public:
-        explicit RaytraceComputeLayer(SceneHandler *sceneHandler, ModelManager *modelManager, RenderingCanvas *canvas, CameraSystem *cameraSystem)
-            : sceneHandler(sceneHandler), modelManager(modelManager), canvas(canvas), cameraSystem(cameraSystem) {}
+        explicit RaytraceComputeLayer(engine::Messenger &globalMessenger, SceneHandler *sceneHandler, ModelManager *modelManager, RenderingCanvas *canvas, CameraSystem *cameraSystem)
+            : globalMessenger(globalMessenger), sceneHandler(sceneHandler), modelManager(modelManager), canvas(canvas), cameraSystem(cameraSystem) {}
 
         void onInit(GLFWwindow *window) override;
 
@@ -27,9 +27,13 @@ namespace editor
 
         void onDestroy() noexcept override;
 
+        engine::Messenger& getGlobalMessenger() const { return globalMessenger; }
+
         RaytracerSettings settings;
         DebugSettings debugSettings;
     private:
+        engine::Messenger &globalMessenger;
+
         SceneHandler *sceneHandler;
         ModelManager *modelManager;
 
@@ -41,5 +45,9 @@ namespace editor
         std::unique_ptr<RaytracedMeshSystem> meshCpSystem;
 
         unsigned int frameIndex = 1;
+
+        bool shouldUpdateRaytracedObjectBuffers = true, shouldUpdateMeshesDataBuffers = true;
+        void dispatchResetAccumulationEvent() const;
+        void dispatchUpdateBuffersEvent() const;
     };
 }

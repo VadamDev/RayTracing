@@ -42,7 +42,7 @@ namespace editor
 
     struct CameraComponent : engine::IJsonSerializable
     {
-        float fov = 75;
+        float fov = 90;
         float focalPlane = 1;
 
         bool primary = false;

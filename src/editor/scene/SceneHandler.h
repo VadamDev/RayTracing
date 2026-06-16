@@ -13,7 +13,7 @@ namespace editor
     {
 
     public:
-        explicit SceneHandler(engine::Messenger *messenger);
+        explicit SceneHandler(engine::Messenger &globalMessenger);
         ~SceneHandler();
 
         /*
@@ -38,9 +38,10 @@ namespace editor
         engine::Scene* getOpenedScene() const { return currentScene; }
 
         engine::SceneSerializer& getSerializer() { return serializer; }
+        engine::Messenger& getGlobalMessenger() const { return globalMessenger; }
 
     private:
-        engine::Messenger *messenger;
+        engine::Messenger &globalMessenger;
         engine::SceneSerializer serializer;
 
         // Since the current scene ptr will be modified DURING a frame, its important to switch scene AFTER everything has been rendered

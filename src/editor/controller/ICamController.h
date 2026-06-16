@@ -12,7 +12,7 @@ namespace editor
             : cameraSystem(cameraSystem) {}
         virtual ~ICamController() = default;
 
-        virtual void processInputs(float deltaTime) = 0;
+        virtual bool processInputs(float deltaTime) = 0;
 
     protected:
         CameraSystem *cameraSystem;

@@ -3,6 +3,9 @@
 #include "HierarchyPanel.h"
 #include "../../scene/Components.h"
 #include "../ImGuiUtils.hpp"
+#include "../../../engine/messenger/Messenger.hpp"
+#include "../../rendering/RenderingEvents.h"
+#include "../../scene/SceneHandler.h"
 
 namespace editor
 {
@@ -46,9 +49,7 @@ namespace editor
             updBuffs |= DragLinked3f("Scale", transform.scale, linkedScaling, 0.01f, 0, std::numeric_limits<float>::infinity(), "%.2f");
 
             if (updBuffs)
-            {
-                //updateBuffers();
-            }
+                updateBuffers();
         });
 
         // Camera
@@ -60,9 +61,7 @@ namespace editor
             updBuffs |= Drag1f("Focal Plane", camera.focalPlane, 0.01f, 1, 1e9f, "%.2f");
 
             if (updBuffs)
-            {
-                //updateBuffers();
-            }
+                updateBuffers();
         });
 
         // Raytraced Material
@@ -89,9 +88,7 @@ namespace editor
             updBuffs |= Drag1i("Material Type", material.type, 1, 0, 1);
 
             if (updBuffs)
-            {
-                //updateBuffers();
-            }
+                updateBuffers();
         });
 
         // Raytraced Sphere
@@ -102,8 +99,7 @@ namespace editor
             if (InputText("Mesh Name", mesh.name))
             {
                 mesh.mesh = nullptr; // allows the RaytracedMeshSystem to retrieve the asset from the Model Manager (again)
-
-                //updateBuffers();
+                updateBuffers();
             }
         });
     }
@@ -198,5 +194,11 @@ namespace editor
         }
 
         ImGui::NewLine();
+    }
+
+    void InspectorPanel::updateBuffers() const
+    {
+        UpdateRaytracedObjectsBuffersEvent event;
+        sceneHandler->getGlobalMessenger().dispatch(event);
     }
 }

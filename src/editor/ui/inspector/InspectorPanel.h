@@ -38,5 +38,7 @@ namespace editor
 
         template<typename T>
         static void drawEmptyComponent(const engine::Entity &entity, const std::string &name, bool removable = true);
+
+        void updateBuffers() const;
     };
 }

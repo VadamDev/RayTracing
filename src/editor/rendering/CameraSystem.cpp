@@ -1,6 +1,8 @@
 #include "CameraSystem.h"
 
 #include "RenderingCanvas.h"
+#include "RenderingEvents.h"
+#include "../../engine/messenger/Messenger.hpp"
 #include "../scene/SceneHandler.h"
 
 namespace editor
@@ -13,7 +15,11 @@ namespace editor
         if (controller == nullptr || !isCameraPresent())
             return;
 
-        controller->processInputs(deltaTime);
+        if (controller->processInputs(deltaTime))
+        {
+            PrimaryCameraMovedEvent event;
+            globalMessenger.dispatch(event);
+        }
     }
 
     void CameraSystem::findPrimaryCamera()

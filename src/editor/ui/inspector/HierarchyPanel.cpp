@@ -3,7 +3,9 @@
 #include "../../scene/SceneHandler.h"
 #include "../../scene/Components.h"
 #include "../ImGuiUtils.hpp"
+#include "../../../engine/messenger/Messenger.hpp"
 #include "../../../engine/window/Window.h"
+#include "../../rendering/RenderingEvents.h"
 
 namespace editor
 {
@@ -60,6 +62,9 @@ namespace editor
             const engine::Entity camera = scene->newEntity("Camera");
             camera.addComponent<TransformComponent>();
             camera.addComponent<CameraComponent>();
+
+            selectedEntity = camera;
+            resetAccumulation();
         }
 
         // Raytraced Sphere
@@ -72,7 +77,7 @@ namespace editor
             sphere.addComponent<RaytracedSphereComponent>();
 
             selectedEntity = sphere;
-            // todo: resetAccumulation();
+            resetAccumulation();
         }
 
         // Raytraced Box
@@ -85,7 +90,7 @@ namespace editor
             box.addComponent<RaytracedMeshComponent>().name = "cube";
 
             selectedEntity = box;
-            // todo: resetAccumulation();
+            resetAccumulation();
         }
 
         // Raytraced Mesh
@@ -98,7 +103,7 @@ namespace editor
             mesh.addComponent<RaytracedMeshComponent>();
 
             selectedEntity = mesh;
-            // todo: resetAccumulation();
+            resetAccumulation();
         }
     }
 
@@ -147,5 +152,11 @@ namespace editor
 
             scene->destroyEntity(entity);
         }
+    }
+
+    void HierarchyPanel::resetAccumulation() const
+    {
+        AccumulationResetEvent event;
+        sceneHandler->getGlobalMessenger().dispatch(event);
     }
 }

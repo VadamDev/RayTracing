@@ -10,17 +10,19 @@ namespace editor
 
     static constexpr float SPRINT_MULTIPLIER = 2.5f;
 
-    void FreecamController::processInputs(const float deltaTime)
+    bool FreecamController::processInputs(const float deltaTime)
     {
         TransformComponent *transform = cameraSystem->getPrimaryCamera().transform;
         processMouse(transform->rotation);
         processKeyboard(transform->position, transform->rotation, deltaTime);
 
-        if (moved)
-        {
-            cameraSystem->updateLocalToWorldMatrix();
-            moved = false;
-        }
+        if (!moved)
+            return false;
+
+        cameraSystem->updateLocalToWorldMatrix();
+        moved = false;
+
+        return true;
     }
 
     void FreecamController::processMouse(glm::vec3 &cameraRot)

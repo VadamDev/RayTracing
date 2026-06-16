@@ -5,6 +5,8 @@
 #include "../ImGuiUtils.hpp"
 #include "../../layers/RaytraceComputeLayer.h"
 #include "../../rendering/RenderingCanvas.h"
+#include "../../rendering/RenderingEvents.h"
+#include "../../../engine/messenger/Messenger.hpp"
 
 namespace editor
 {
@@ -68,6 +70,12 @@ namespace editor
             rstAcc |= Drag1f("Tri Threshold", debugSettings.statsThreshold.y, 1, 1, 1e9f, "%.0f", COLUMN_WIDTH);
 
             ImGui::NewLine();
+        }
+
+        if (rstAcc)
+        {
+            AccumulationResetEvent event;
+            raytraceComputeLayer->getGlobalMessenger().dispatch(event);
         }
 
         ImGui::End();

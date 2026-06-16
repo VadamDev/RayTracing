@@ -5,7 +5,9 @@
 #include <ranges>
 #include <spdlog/spdlog.h>
 
+#include "../../engine/messenger/Messenger.hpp"
 #include "bvh/BoundingVolumeHierarchy.h"
+#include "../rendering/RenderingEvents.h"
 
 namespace editor
 {
@@ -59,6 +61,9 @@ namespace editor
 
         allTriangles.erase(allTriangles.begin() + mesh->triOffset, allTriangles.begin() + (mesh->triOffset + mesh->numTri));
         allBvhNodes.erase(allBvhNodes.begin() + mesh->nodeOffset, allBvhNodes.begin() + (mesh->nodeOffset + mesh->numNodes));
+
+        UpdateMeshesDataBuffersEvent event;
+        globalMessenger.dispatch(event);
     }
 
     std::shared_ptr<RaytracedMesh> ModelManager::meshLoader(const path &p)
@@ -123,6 +128,9 @@ namespace editor
 
             this->handleMeshUnload(mesh);
         };
+        
+        UpdateMeshesDataBuffersEvent event;
+        globalMessenger.dispatch(event);
 
         return std::make_shared<RaytracedMesh>(raytracedTriangles.size(), raytracedNodes.size(), triOffset, nodeOffset, unloadFunc);
     }

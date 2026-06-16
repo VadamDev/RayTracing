@@ -30,5 +30,7 @@ namespace editor
 
         void drawEntity(engine::Scene *scene, const entt::entity &handle, const engine::Entity &entity);
         void drawEntityCtxPopup(engine::Scene *scene, const engine::Entity &entity);
+
+        void resetAccumulation() const;
     };
 }

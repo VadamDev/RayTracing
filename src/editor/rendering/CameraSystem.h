@@ -26,8 +26,8 @@ namespace editor
     {
 
     public:
-        explicit CameraSystem(RenderingCanvas *canvas, SceneHandler *sceneHandler)
-            : canvas(canvas), sceneHandler(sceneHandler) {}
+        explicit CameraSystem(engine::Messenger &globalMessenger, RenderingCanvas *canvas, SceneHandler *sceneHandler)
+            : globalMessenger(globalMessenger), canvas(canvas), sceneHandler(sceneHandler) {}
 
         template<std::derived_from<ICamController> T, typename... Args>
         void registerController(Args&&... args)
@@ -48,6 +48,8 @@ namespace editor
         glm::mat4& getProjectionMatrix() { return projectionMat; }
 
     private:
+        engine::Messenger &globalMessenger;
+
         RenderingCanvas *canvas;
         SceneHandler *sceneHandler;
         std::unique_ptr<ICamController> controller = nullptr;
