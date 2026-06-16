@@ -13,7 +13,7 @@
 
 namespace editor
 {
-    void ToolbarPanel::draw()
+    void ToolbarPanel::draw(float deltaTime)
     {
         if (!ImGui::BeginMainMenuBar())
             return;

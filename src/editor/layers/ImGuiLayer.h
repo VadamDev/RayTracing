@@ -8,6 +8,7 @@
 
 namespace engine
 {
+    class SimpleClock;
     class Window;
 }
 
@@ -15,13 +16,14 @@ namespace editor
 {
     class SceneHandler;
     class RenderingCanvas;
+    class RaytraceComputeLayer;
 
     class ImGuiLayer : public engine::IRenderLayer
     {
 
     public:
-        explicit ImGuiLayer(engine::Window &window, SceneHandler *sceneHandler, RenderingCanvas *canvas)
-            : window(window), sceneHandler(sceneHandler), canvas(canvas) {}
+        explicit ImGuiLayer(engine::Window &window, engine::SimpleClock *clock, RaytraceComputeLayer *raytraceComputeLayer, SceneHandler *sceneHandler, RenderingCanvas *canvas)
+            : window(window), clock(clock), raytraceComputeLayer(raytraceComputeLayer), sceneHandler(sceneHandler), canvas(canvas) {}
 
         void onInit(GLFWwindow *window) override;
 
@@ -33,6 +35,10 @@ namespace editor
 
     private:
         engine::Window &window;
+        engine::SimpleClock *clock;
+
+        RaytraceComputeLayer *raytraceComputeLayer;
+
         SceneHandler *sceneHandler;
         RenderingCanvas *canvas;
 

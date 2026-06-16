@@ -19,7 +19,7 @@ namespace editor
         explicit HierarchyPanel(engine::Window &window, SceneHandler *sceneHandler)
             : UIPanel("Hierarchy"), window(window), sceneHandler(sceneHandler) {}
 
-        void draw() override;
+        void draw(float deltaTime) override;
 
         engine::Entity selectedEntity;
     private:

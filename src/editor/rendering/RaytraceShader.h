@@ -18,6 +18,7 @@ namespace editor
         float defocusStrength = 0;
     };
 
+    const std::vector DRAW_MODE_NAMES = { "Default", "Box Tests", "Tri Tests", "Box + Tri Tests", "Normals" };
     enum class DrawMode : int
     {
         DEFAULT = 0,

@@ -9,6 +9,7 @@
 
 #include "../ui/inspector/HierarchyPanel.h"
 #include "../ui/inspector/InspectorPanel.h"
+#include "../ui/settings/SettingsPanel.h"
 #include "../ui/toolbar/ToolbarPanel.h"
 #include "../ui/viewport/ViewportPanel.h"
 
@@ -34,6 +35,7 @@ namespace editor
         const auto hierarchyPanel = registerPanel<HierarchyPanel>(this->window, sceneHandler);
         const auto inspectorPanel = registerPanel<InspectorPanel>(sceneHandler, hierarchyPanel.get());
         const auto viewportPanel = registerPanel<ViewportPanel>(this->window, canvas);
+        const auto settingsPanel = registerPanel<SettingsPanel>(clock, raytraceComputeLayer, canvas);
     }
 
     void ImGuiLayer::onFramePush(const float deltaTime)
@@ -63,7 +65,7 @@ namespace editor
             ImGuiID dockId_Inspector = 0;
             ImGui::DockBuilderSplitNode(dockId_Left, ImGuiDir_Up, 0.50f, &dockId_Hierarchy, &dockId_Inspector);
 
-            //ImGui::DockBuilderDockWindow("Settings", dockId_Settings);
+            ImGui::DockBuilderDockWindow("Settings", dockId_Settings);
             ImGui::DockBuilderDockWindow("Viewport", dockId_Main);
             ImGui::DockBuilderDockWindow("Hierarchy", dockId_Hierarchy);
             ImGui::DockBuilderDockWindow("Inspector", dockId_Inspector);
@@ -72,7 +74,7 @@ namespace editor
         ImGui::DockSpaceOverViewport(DOCKSPACE_ID, imguiViewport, ImGuiDockNodeFlags_PassthruCentralNode);
 
         for (const auto &panel : panels)
-            panel->draw();
+            panel->draw(deltaTime);
     }
 
     void ImGuiLayer::onFramePop()

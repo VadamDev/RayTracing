@@ -6,7 +6,7 @@
 
 namespace editor
 {
-    void ViewportPanel::draw()
+    void ViewportPanel::draw(float deltaTime)
     {
         ImGui::Begin(getName(), nullptr, ImGuiWindowFlags_NoScrollbar);
 

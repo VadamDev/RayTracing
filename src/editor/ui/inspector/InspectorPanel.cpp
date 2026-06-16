@@ -6,7 +6,7 @@
 
 namespace editor
 {
-    void InspectorPanel::draw()
+    void InspectorPanel::draw(float deltaTime)
     {
         ImGui::Begin(getName());
 

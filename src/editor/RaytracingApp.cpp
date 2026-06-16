@@ -3,11 +3,14 @@
 #include "controller/FreecamController.h"
 #include "layers/ImGuiLayer.h"
 #include "layers/RaytraceComputeLayer.h"
+#include "../engine/clock/SimpleClock.h"
 
 namespace editor
 {
     void RaytracingApp::onInit()
     {
+        auto clock = dynamic_cast<engine::SimpleClock*>(this->clock);
+
         sceneHandler = std::make_unique<SceneHandler>(&globalMessenger);
         sceneHandler->openNewEmptyScene();
 
@@ -18,8 +21,8 @@ namespace editor
         cameraSystem = std::make_unique<CameraSystem>(canvas.get(), sceneHandler.get());
         cameraSystem->registerController<FreecamController>(cameraSystem.get(), window.getInputsManager());
 
-        window.registerLayer<RaytraceComputeLayer>(sceneHandler.get(), modelManager.get(), canvas.get(), cameraSystem.get());
-        window.registerLayer<ImGuiLayer>(window, sceneHandler.get(), canvas.get());
+        const auto raytraceLayer = window.registerLayer<RaytraceComputeLayer>(sceneHandler.get(), modelManager.get(), canvas.get(), cameraSystem.get());
+        const auto imguiLayer = window.registerLayer<ImGuiLayer>(window, clock, raytraceLayer.get(), sceneHandler.get(), canvas.get());
     }
 
     void RaytracingApp::onPostInit()

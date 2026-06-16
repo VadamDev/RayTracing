@@ -20,7 +20,7 @@ namespace editor
         explicit ViewportPanel(engine::Window &window, RenderingCanvas *canvas)
             : UIPanel("Viewport"), window(window), canvas(canvas) {}
 
-        void draw() override;
+        void draw(float deltaTime) override;
 
     private:
         engine::Window &window;

@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <functional>
 #include <string>
+#include <sstream>
 
 namespace editor
 {
@@ -314,5 +315,28 @@ namespace editor
 
         EndColumnAlignedControl(disabledStyles);
         return changed;
+    }
+
+    /*
+     * Formatting
+     */
+    // Why is there no correct number formating in c++20...
+
+    template<typename T>
+    std::string formatNumber(T number, const char separator = ' ')
+    {
+        const std::string input = std::to_string(number);
+        const size_t length = input.length() - 1;
+
+        std::ostringstream oss;
+        for (size_t i = 0; i < length + 1; i++)
+        {
+            oss << input[i];
+
+            if ((length - i) % 3 == 0)
+                oss << separator;
+        }
+
+        return oss.str();
     }
 }

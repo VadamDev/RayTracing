@@ -7,7 +7,7 @@
 
 namespace editor
 {
-    void HierarchyPanel::draw()
+    void HierarchyPanel::draw(float deltaTime)
     {
         ImGui::Begin(getName());
 

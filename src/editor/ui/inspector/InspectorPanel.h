@@ -21,7 +21,7 @@ namespace editor
         explicit InspectorPanel(SceneHandler *sceneHandler, HierarchyPanel *hierarchyPanel)
             : UIPanel("Inspector"), sceneHandler(sceneHandler), hierarchyPanel(hierarchyPanel) {}
 
-        void draw() override;
+        void draw(float deltaTime) override;
 
     private:
         SceneHandler *sceneHandler;

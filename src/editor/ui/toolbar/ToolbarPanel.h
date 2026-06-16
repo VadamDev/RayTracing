@@ -13,7 +13,7 @@ namespace editor
         explicit ToolbarPanel(SceneHandler *sceneHandler)
             : UIPanel("Toolbar"), sceneHandler(sceneHandler) {}
 
-        void draw() override;
+        void draw(float deltaTime) override;
 
     private:
         SceneHandler *sceneHandler;
