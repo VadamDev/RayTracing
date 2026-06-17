@@ -25,7 +25,7 @@ namespace editor
                     selectedEntity = {};
                 }
                 // Quick remove entity by pressing delete
-                else if (ImGui::IsKeyPressed(ImGuiKey_Delete))
+                else if (ImGui::IsKeyPressed(ImGuiKey_Delete) && !ImGui::GetIO().WantCaptureKeyboard)
                 {
                     scene->destroyEntity(selectedEntity);
                     selectedEntity = {};

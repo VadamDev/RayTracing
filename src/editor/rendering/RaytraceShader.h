@@ -10,7 +10,7 @@ namespace editor
 
     struct RaytracerSettings
     {
-        bool accumulate = false;
+        bool accumulate = true;
         int maxBounces = 4;
         int raysPerPixel = 1;
         bool environmentalLight = true;

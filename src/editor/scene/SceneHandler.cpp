@@ -9,6 +9,7 @@ namespace editor
         : globalMessenger(globalMessenger)
     {
         // Register components that we want to save
+        serializer.registerSerializable<engine::TagComponent>();
         serializer.registerSerializable<TransformComponent>();
         serializer.registerSerializable<CameraComponent>();
         serializer.registerSerializable<RaytracedMaterialComponent>();
