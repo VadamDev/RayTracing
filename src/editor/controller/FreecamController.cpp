@@ -12,6 +12,9 @@ namespace editor
 
     bool FreecamController::processInputs(const float deltaTime)
     {
+        if (!window.isGrabbed())
+            return false;
+
         TransformComponent *transform = cameraSystem->getPrimaryCamera().transform;
         processMouse(transform->rotation);
         processKeyboard(transform->position, transform->rotation, deltaTime);
@@ -29,7 +32,7 @@ namespace editor
     {
         bool hasProcessed = false;
 
-        const glm::dvec2 &mouseDelta = inputsManager.getMouseDelta();
+        const glm::vec2 &mouseDelta = inputsManager.getMouseDelta();
 
         if (mouseDelta.x != 0)
         {

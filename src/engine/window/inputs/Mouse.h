@@ -41,13 +41,13 @@ namespace engine
          * Getters
          */
 
-        glm::dvec2& getPos() { return pos; }
-        glm::dvec2& getDelta() { return mouseDelta; }
+        glm::vec2& getPos() { return pos; }
+        glm::vec2& getDelta() { return mouseDelta; }
 
         float scrollX = 0, scrollY = 0;
     private:
-        glm::dvec2 pos = glm::dvec2(0, 0), oldPos = glm::dvec2(0, 0);
-        glm::dvec2 mouseDelta = glm::dvec2(0, 0);
+        glm::vec2 pos = glm::vec2(0, 0), oldPos = glm::vec2(0, 0);
+        glm::vec2 mouseDelta = glm::vec2(0, 0);
 
         bool buttons[GLFW_MOUSE_BUTTON_LAST] = {};
     };

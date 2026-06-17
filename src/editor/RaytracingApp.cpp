@@ -19,7 +19,7 @@ namespace editor
         canvas = std::make_unique<RenderingCanvas>(window.getWidth(), window.getHeight());
 
         cameraSystem = std::make_unique<CameraSystem>(globalMessenger, canvas.get(), sceneHandler.get());
-        cameraSystem->registerController<FreecamController>(cameraSystem.get(), window.getInputsManager());
+        cameraSystem->registerController<FreecamController>(cameraSystem.get(), window);
 
         const auto raytraceLayer = window.registerLayer<RaytraceComputeLayer>(globalMessenger, sceneHandler.get(), modelManager.get(), canvas.get(), cameraSystem.get());
         const auto imguiLayer = window.registerLayer<ImGuiLayer>(window, clock, raytraceLayer.get(), sceneHandler.get(), canvas.get());

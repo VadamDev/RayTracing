@@ -3,11 +3,7 @@
 #include <glm/vec3.hpp>
 
 #include "ICamController.h"
-
-namespace engine
-{
-    class InputsManager;
-}
+#include "../../engine/window/Window.h"
 
 namespace editor
 {
@@ -15,14 +11,15 @@ namespace editor
     {
 
     public:
-        explicit FreecamController(CameraSystem *cameraSystem, engine::InputsManager &inputsManager)
-            : ICamController(cameraSystem), inputsManager(inputsManager) {}
+        explicit FreecamController(CameraSystem *cameraSystem, engine::Window &window)
+            : ICamController(cameraSystem), window(window), inputsManager(window.getInputsManager()) {}
 
         bool processInputs(float deltaTime) override;
 
         float sensitivity = 0.2f;
         float cameraSpeed = 5;
     private:
+        engine::Window &window;
         engine::InputsManager &inputsManager;
 
         bool moved = false;

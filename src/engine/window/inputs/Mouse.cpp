@@ -35,5 +35,4 @@ namespace engine
         oldPos.x = pos.x;
         oldPos.y = pos.y;
     }
-
 }
