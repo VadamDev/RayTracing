@@ -48,13 +48,9 @@ target_link_libraries(${PROJECT_NAME}
 # ImViewGuizmo is not available with VCPKG so:
 target_include_directories(${PROJECT_NAME} PRIVATE thirdparty/ImViewGuizmo)
 
-# Copy Assets TODO: FIXME! this is ugly
-set(ASSET_OUT_DIR ${CMAKE_BINARY_DIR}/resources)
-
-add_custom_target(copy_assets ALL
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${ASSET_OUT_DIR}
-        COMMAND ${CMAKE_COMMAND} -E rm -rf ${ASSET_OUT_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/resources ${ASSET_OUT_DIR}
+# Copy Assets TODO: This is bad... It's using symlinks which requires Windows dev mode or administrator privileges
+file(CREATE_LINK
+        "${CMAKE_SOURCE_DIR}/resources"
+        "${CMAKE_BINARY_DIR}/resources"
+        SYMBOLIC
 )
-
-add_dependencies(${PROJECT_NAME} copy_assets)
