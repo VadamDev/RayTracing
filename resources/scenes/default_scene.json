@@ -2,11 +2,39 @@
   {
     "components": [
       {
-        "hs": 2281046661,
-        "tag": "Floor"
+        "hs": 1859633530,
+        "position": [
+          -3.0415890216827393,
+          3.0950052738189697,
+          -22.113008499145508
+        ],
+        "rotation": [
+          10.400178909301758,
+          10.001338005065918,
+          0.0
+        ],
+        "scale": [
+          1.0,
+          1.0,
+          1.0
+        ]
       },
       {
-        "hs": 2581203321,
+        "focalPlane": 1.0,
+        "fov": 90.0,
+        "hs": 2388798289,
+        "primary": true
+      },
+      {
+        "hs": 2281046661,
+        "tag": "Camera"
+      }
+    ]
+  },
+  {
+    "components": [
+      {
+        "hs": 1859633530,
         "position": [
           0.0,
           -8.0,
@@ -30,12 +58,12 @@
           1.0
         ],
         "emissionColor": [
-          0.09652507305145264,
-          0.09652507305145264,
-          0.09652507305145264
+          0.0,
+          0.0,
+          0.0
         ],
         "emissionStrength": 0.0,
-        "hs": 2520299631,
+        "hs": 4021333536,
         "smoothness": 0.0,
         "specularColor": [
           1.0,
@@ -46,123 +74,19 @@
         "type": 1
       },
       {
-        "hs": 1965619995,
+        "hs": 2553429836,
         "name": "cube"
+      },
+      {
+        "hs": 2281046661,
+        "tag": "Floor"
       }
     ]
   },
   {
     "components": [
       {
-        "hs": 2281046661,
-        "tag": "EAST Wall"
-      },
-      {
-        "hs": 2581203321,
-        "position": [
-          8.0,
-          0.0,
-          0.0
-        ],
-        "rotation": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          0.009999999776482582,
-          16.0,
-          16.0
-        ]
-      },
-      {
-        "color": [
-          0.0,
-          0.0,
-          1.0
-        ],
-        "emissionColor": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "emissionStrength": 0.0,
-        "hs": 2520299631,
-        "smoothness": 0.0,
-        "specularColor": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "specularProbability": 0.0,
-        "type": 0
-      },
-      {
-        "hs": 1965619995,
-        "name": "cube"
-      }
-    ]
-  },
-  {
-    "components": [
-      {
-        "hs": 2281046661,
-        "tag": "WEST Wall"
-      },
-      {
-        "hs": 2581203321,
-        "position": [
-          -8.0,
-          0.0,
-          0.0
-        ],
-        "rotation": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          0.009999999776482582,
-          16.0,
-          16.0
-        ]
-      },
-      {
-        "color": [
-          1.0,
-          0.0,
-          0.0
-        ],
-        "emissionColor": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "emissionStrength": 0.0,
-        "hs": 2520299631,
-        "smoothness": 0.0,
-        "specularColor": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "specularProbability": 0.0,
-        "type": 0
-      },
-      {
-        "hs": 1965619995,
-        "name": "cube"
-      }
-    ]
-  },
-  {
-    "components": [
-      {
-        "hs": 2281046661,
-        "tag": "NORTH Wall"
-      },
-      {
-        "hs": 2581203321,
+        "hs": 1859633530,
         "position": [
           0.0,
           0.0,
@@ -191,7 +115,7 @@
           0.0
         ],
         "emissionStrength": 0.0,
-        "hs": 2520299631,
+        "hs": 4021333536,
         "smoothness": 0.0,
         "specularColor": [
           1.0,
@@ -202,19 +126,123 @@
         "type": 0
       },
       {
-        "hs": 1965619995,
+        "hs": 2553429836,
         "name": "cube"
+      },
+      {
+        "hs": 2281046661,
+        "tag": "NORTH Wall"
       }
     ]
   },
   {
     "components": [
       {
-        "hs": 2281046661,
-        "tag": "Ceiling"
+        "hs": 1859633530,
+        "position": [
+          8.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          16.0,
+          16.0
+        ]
       },
       {
-        "hs": 2581203321,
+        "color": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "emissionColor": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "emissionStrength": 0.0,
+        "hs": 4021333536,
+        "smoothness": 0.0,
+        "specularColor": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "specularProbability": 0.0,
+        "type": 0
+      },
+      {
+        "hs": 2553429836,
+        "name": "cube"
+      },
+      {
+        "hs": 2281046661,
+        "tag": "EAST Wall"
+      }
+    ]
+  },
+  {
+    "components": [
+      {
+        "hs": 1859633530,
+        "position": [
+          -8.0,
+          0.0,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          0.009999999776482582,
+          16.0,
+          16.0
+        ]
+      },
+      {
+        "color": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "emissionColor": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "emissionStrength": 0.0,
+        "hs": 4021333536,
+        "smoothness": 0.0,
+        "specularColor": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "specularProbability": 0.0,
+        "type": 0
+      },
+      {
+        "hs": 2553429836,
+        "name": "cube"
+      },
+      {
+        "hs": 2281046661,
+        "tag": "WEST Wall"
+      }
+    ]
+  },
+  {
+    "components": [
+      {
+        "hs": 1859633530,
         "position": [
           0.0,
           8.0,
@@ -243,7 +271,7 @@
           0.0
         ],
         "emissionStrength": 0.0,
-        "hs": 2520299631,
+        "hs": 4021333536,
         "smoothness": 0.0,
         "specularColor": [
           1.0,
@@ -254,111 +282,64 @@
         "type": 0
       },
       {
-        "hs": 1965619995,
+        "hs": 2553429836,
         "name": "cube"
+      },
+      {
+        "hs": 2281046661,
+        "tag": "Ceiling"
       }
     ]
   },
   {
     "components": [
+      {
+        "hs": 1859633530,
+        "position": [
+          0.0,
+          7.900000095367432,
+          0.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "scale": [
+          8.0,
+          0.20000000298023224,
+          8.0
+        ]
+      },
+      {
+        "color": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "emissionColor": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "emissionStrength": 4.0,
+        "hs": 4021333536,
+        "smoothness": 0.0,
+        "specularColor": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "specularProbability": 0.0,
+        "type": 0
+      },
+      {
+        "hs": 2553429836,
+        "name": "cube"
+      },
       {
         "hs": 2281046661,
         "tag": "Ceiling Light"
-      },
-      {
-        "hs": 2581203321,
-        "position": [
-          0.0,
-          7.940000057220459,
-          0.0
-        ],
-        "rotation": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          5.300000190734863,
-          0.10000000149011612,
-          5.300000190734863
-        ]
-      },
-      {
-        "color": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "emissionColor": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "emissionStrength": 8.0,
-        "hs": 2520299631,
-        "smoothness": 0.0,
-        "specularColor": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "specularProbability": 0.0,
-        "type": 0
-      },
-      {
-        "hs": 1965619995,
-        "name": "cube"
-      }
-    ]
-  },
-  {
-    "components": [
-      {
-        "hs": 2281046661,
-        "tag": "Raytraced Sphere"
-      },
-      {
-        "hs": 2581203321,
-        "position": [
-          0.0,
-          -6.5,
-          1.5
-        ],
-        "rotation": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "scale": [
-          2.5,
-          1.0,
-          1.0
-        ]
-      },
-      {
-        "color": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "emissionColor": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "emissionStrength": 0.0,
-        "hs": 2520299631,
-        "smoothness": 1.0,
-        "specularColor": [
-          1.0,
-          1.0,
-          1.0
-        ],
-        "specularProbability": 1.0,
-        "type": 0
-      },
-      {
-        "hs": 3172698599
       }
     ]
   }

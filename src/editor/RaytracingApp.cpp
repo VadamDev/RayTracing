@@ -12,7 +12,7 @@ namespace editor
         auto clock = dynamic_cast<engine::SimpleClock*>(this->clock);
 
         sceneHandler = std::make_unique<SceneHandler>(globalMessenger);
-        sceneHandler->openNewEmptyScene();
+        sceneHandler->openScene("resources/scenes/default_scene.json");
 
         modelManager = std::make_unique<ModelManager>(globalMessenger);
 
