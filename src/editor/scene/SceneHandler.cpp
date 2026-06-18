@@ -17,42 +17,25 @@ namespace editor
         serializer.registerSerializable<RaytracedMeshComponent>();
     }
 
-    SceneHandler::~SceneHandler()
+    void SceneHandler::openScene(std::unique_ptr<engine::Scene> scene)
     {
-        // Scene memory is currently managed manually TODO: use smart pointers
-        if (currentScene != nullptr)
-        {
-            delete currentScene;
-            currentScene = nullptr;
-        }
-
-        if (sceneToOpen != nullptr)
-        {
-            delete sceneToOpen;
-            sceneToOpen = nullptr;
-        }
-    }
-
-    void SceneHandler::openScene(engine::Scene *scene)
-    {
-        sceneToOpen = scene;
+        sceneToOpen = std::move(scene);
     }
 
     void SceneHandler::openScene(const std::string &path)
     {
-        engine::Scene *loadedScene = serializer.deserializeScene(path, &globalMessenger);
-        openScene(loadedScene);
+        openScene(serializer.deserializeScene(path, &globalMessenger));
     }
 
     void SceneHandler::openNewEmptyScene()
     {
-        auto *scene = new engine::Scene(&globalMessenger);
+        auto scene = std::make_unique<engine::Scene>(&globalMessenger);
 
         engine::Entity camera = scene->newEntity("Camera");
         camera.addComponent<TransformComponent>();
         camera.addComponent<CameraComponent>().primary = true;
 
-        openScene(scene);
+        openScene(std::move(scene));
     }
 
     void SceneHandler::saveCurrentScene(const std::string &path)
@@ -60,7 +43,7 @@ namespace editor
         if (!isSceneOpened())
             return;
 
-        serializer.serializeScene(currentScene, path);
+        serializer.serializeScene(currentScene.get(), path);
     }
 
     void SceneHandler::closeCurrentScene()
@@ -75,19 +58,11 @@ namespace editor
     {
         if (shouldCloseCurrentScene)
         {
-            delete currentScene; // shouldCloseCurrentScene should only be set to true IF currentScene != nullptr
-            currentScene = nullptr;
-
+            currentScene = nullptr; // shouldCloseCurrentScene should only be set to true IF currentScene != nullptr
             return;
         }
 
         if (sceneToOpen != nullptr)
-        {
-            if (currentScene != nullptr)
-                delete currentScene;
-
-            currentScene = sceneToOpen;
-            sceneToOpen = nullptr;
-        }
+            currentScene = std::move(sceneToOpen);
     }
 }

@@ -46,7 +46,7 @@ namespace engine {
         file.close();
     }
 
-    Scene* SceneSerializer::deserializeScene(const std::string &path, Messenger *messenger)
+    std::unique_ptr<Scene> SceneSerializer::deserializeScene(const std::string &path, Messenger *messenger)
     {
         std::ifstream file(path);
         if (!file.is_open())
@@ -55,7 +55,7 @@ namespace engine {
         const json sceneJson = json::parse(file);
         file.close();
 
-        auto *scene = new Scene(messenger);
+        auto scene = std::make_unique<Scene>(messenger);
 
         for(const auto& [_, entityJson] : sceneJson.items())
         {

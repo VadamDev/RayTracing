@@ -18,7 +18,7 @@ namespace engine {
 
     public:
         void serializeScene(const Scene *scene, const std::string &name);
-        Scene* deserializeScene(const std::string &path, Messenger *messenger);
+        std::unique_ptr<Scene> deserializeScene(const std::string &path, Messenger *messenger);
 
         template<std::derived_from<IJsonSerializable> T>
         void registerSerializable()
