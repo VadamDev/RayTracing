@@ -49,6 +49,7 @@ namespace editor
         template<std::derived_from<UIPanel> T, typename... Args>
         std::shared_ptr<T> registerPanel(Args&&... args);
 
+        void registerPanels();
         static void setupImGuiStyle();
     };
 }

@@ -60,7 +60,7 @@ namespace editor
 
     struct alignas(16) TriangleMeshData
     {
-        int rootBVHNodeIndex = 0; float pad0[3]; // TODO: fixme!
+        int rootBVHNodeIndex = 0; int pad0[3] {};
 
         glm::mat4 localToWorld;
         glm::mat4 worldToLocal;

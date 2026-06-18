@@ -1,7 +1,6 @@
 #include "FreecamController.h"
 
 #include "../rendering/CameraSystem.h"
-#include "../../engine/window/inputs/InputsManager.h"
 
 namespace editor
 {
@@ -30,36 +29,24 @@ namespace editor
 
     void FreecamController::processMouse(glm::vec3 &cameraRot)
     {
-        bool hasProcessed = false;
-
         const glm::vec2 &mouseDelta = inputsManager.getMouseDelta();
+        if (mouseDelta.x == 0 && mouseDelta.y == 0)
+            return;
 
-        if (mouseDelta.x != 0)
-        {
-            cameraRot.y += mouseDelta.x * sensitivity;
-            hasProcessed = true;
-        }
+        cameraRot.y += mouseDelta.x * sensitivity;
+        cameraRot.x += mouseDelta.y * sensitivity;
 
-        if (mouseDelta.y != 0)
-        {
-            cameraRot.x += mouseDelta.y * sensitivity;
-            hasProcessed = true;
-        }
+        if (cameraRot.x > 90)
+            cameraRot.x = 90;
+        else if (cameraRot.x < -90)
+            cameraRot.x = -90;
 
-        if (hasProcessed)
-        {
-            if (cameraRot.x > 90)
-                cameraRot.x = 90;
-            else if (cameraRot.x < -90)
-                cameraRot.x = -90;
+        if (cameraRot.y > 360)
+            cameraRot.y -= 360;
+        else if (cameraRot.y < 0)
+            cameraRot.y += 360;
 
-            if (cameraRot.y > 360)
-                cameraRot.y -= 360;
-            else if (cameraRot.y < 0)
-                cameraRot.y += 360;
-        }
-
-        moved = hasProcessed;
+        moved = true;
     }
 
     void FreecamController::processKeyboard(glm::vec3 &cameraPos, const glm::vec3 &cameraRot, const float deltaTime)
@@ -92,7 +79,13 @@ namespace editor
             return;
 
         offset = glm::normalize(offset) * cameraSpeed * (sprinting ? SPRINT_MULTIPLIER : 1) * deltaTime;
+        moveCamera(offset, cameraPos, cameraRot);
 
+        moved = true;
+    }
+
+    void FreecamController::moveCamera(const glm::vec3 &offset, glm::vec3 &cameraPos, const glm::vec3 &cameraRot)
+    {
         const float yawRad = glm::radians(cameraRot.y);
 
         const glm::vec3 forward(glm::sin(yawRad), 0, glm::cos(yawRad));
@@ -101,7 +94,5 @@ namespace editor
         cameraPos += offset.x * right;
         cameraPos += offset.y * WORLD_UP;
         cameraPos += offset.z * forward;
-
-        moved = true;
     }
 }

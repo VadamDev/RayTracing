@@ -7,6 +7,9 @@
 
 namespace editor
 {
+    static constexpr int N_GROUP_X = 8;
+    static constexpr int N_GROUP_Y = 8;
+
     void RaytraceComputeLayer::onInit(GLFWwindow *window)
     {
         shader.create();
@@ -14,10 +17,11 @@ namespace editor
         sphereCpSystem = std::make_unique<RaytracedSphereSystem>(shader);
         meshCpSystem = std::make_unique<RaytracedMeshSystem>(shader, modelManager);
 
-        /*
-         * Events
-         */
+        registerListeners();
+    }
 
+    void RaytraceComputeLayer::registerListeners()
+    {
         // Reset accumulation on camera move
         globalMessenger.subscribe<PrimaryCameraMovedEvent>([this](const PrimaryCameraMovedEvent *event) {
             dispatchResetAccumulationEvent();
@@ -63,6 +67,20 @@ namespace editor
 
         shader.bind();
 
+        updateBuffers(openedScene);
+        shader.updateFrameIndex(frameIndex++);
+        shader.updateViewData(cameraSystem, canvas->getAspectRatio());
+        shader.updateRaytracerSettings(settings);
+        shader.updateRaytracerDebugSettings(debugSettings);
+
+        RaytraceShader::dispatchCompute(ceil(canvas->getWidth() / N_GROUP_X), ceil(canvas->getHeight() / N_GROUP_Y), 1, GL_TEXTURE_FETCH_BARRIER_BIT);
+
+        shader.unbindBuffers();
+        shader.unbind();
+    }
+
+    void RaytraceComputeLayer::updateBuffers(engine::Scene *openedScene)
+    {
         if (shouldUpdateRaytracedObjectBuffers)
         {
             sphereCpSystem->updateData(openedScene);
@@ -76,21 +94,6 @@ namespace editor
             shader.updateMeshDataBuffers(modelManager->getAllTriangles(), modelManager->getAllBvhNodes());
             shouldUpdateMeshesDataBuffers = false;
         }
-
-        shader.updateFrameIndex(frameIndex++);
-        shader.updateViewData(cameraSystem, canvas->getAspectRatio());
-        shader.updateRaytracerSettings(settings);
-        shader.updateRaytracerDebugSettings(debugSettings);
-
-        RaytraceShader::dispatchCompute(ceil(canvas->getWidth() / 8), ceil(canvas->getHeight() / 8), 1, GL_TEXTURE_FETCH_BARRIER_BIT);
-
-        shader.unbindBuffers();
-        shader.unbind();
-    }
-
-    void RaytraceComputeLayer::onDestroy() noexcept
-    {
-
     }
 
     void RaytraceComputeLayer::dispatchResetAccumulationEvent() const

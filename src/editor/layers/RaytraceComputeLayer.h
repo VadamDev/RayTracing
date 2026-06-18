@@ -25,7 +25,7 @@ namespace editor
         void onFramePush(float deltaTime) override;
         void onFramePop() override {}
 
-        void onDestroy() noexcept override;
+        void onDestroy() noexcept override {}
 
         engine::Messenger& getGlobalMessenger() const { return globalMessenger; }
 
@@ -46,7 +46,10 @@ namespace editor
 
         unsigned int frameIndex = 1;
 
+        void registerListeners();
+
         bool shouldUpdateRaytracedObjectBuffers = true, shouldUpdateMeshesDataBuffers = true;
+        void updateBuffers(engine::Scene *openedScene);
         void dispatchResetAccumulationEvent() const;
         void dispatchUpdateBuffersEvent() const;
     };

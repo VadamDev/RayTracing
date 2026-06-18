@@ -98,6 +98,7 @@ namespace editor
         std::vector<BVHTriangle> triangles;
         for (const shape_t &shape : reader.GetShapes())
         {
+            triangles.reserve(triangles.size() + shape.mesh.num_face_vertices.size());
             const auto &indices = shape.mesh.indices;
 
             for (size_t i = 0; i < indices.size(); i += 3)

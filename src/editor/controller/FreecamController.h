@@ -26,5 +26,7 @@ namespace editor
 
         void processMouse(glm::vec3 &cameraRot);
         void processKeyboard(glm::vec3 &cameraPos, const glm::vec3 &cameraRot, float deltaTime);
+
+        static void moveCamera(const glm::vec3 &offset, glm::vec3 &cameraPos, const glm::vec3 &cameraRot);
     };
 }

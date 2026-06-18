@@ -14,7 +14,7 @@ namespace editor
         meshes.create();
     }
 
-    void RaytraceShader::updateFrameIndex(const unsigned int frameIndex)
+    void RaytraceShader::updateFrameIndex(const unsigned int frameIndex) const
     {
         this->frameIndex->set1ui(frameIndex);
     }
@@ -26,7 +26,7 @@ namespace editor
 
         const CameraComponent *camera = cameraSystem->getPrimaryCamera().camera;
 
-        const float planeHeight = camera->focalPlane * tan(glm::radians(camera->fov / 2));
+        const float planeHeight = camera->focalPlane * glm::tan(glm::radians(camera->fov / 2));
         const float planeWidth = planeHeight * aspectRatio;
 
         viewParams->set3f(planeWidth, planeHeight, camera->focalPlane);

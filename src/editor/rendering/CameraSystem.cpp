@@ -58,12 +58,7 @@ namespace editor
         if (!isCameraPresent())
             return;
 
-        const TransformComponent *transform = primaryCamera.transform;
-
-        localToWorldMat = glm::identity<glm::mat4>();
-        localToWorldMat = glm::translate(localToWorldMat, transform->position);
-        localToWorldMat = glm::rotate(localToWorldMat, glm::radians(transform->rotation.y), UP);
-        localToWorldMat = glm::rotate(localToWorldMat, glm::radians(transform->rotation.x), RIGHT);
+        localToWorldMat = primaryCamera.transform->toTransformMat();
     }
 
     void CameraSystem::updateProjectionMatrix()

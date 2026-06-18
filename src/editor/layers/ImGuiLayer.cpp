@@ -30,7 +30,12 @@ namespace editor
         // Style
         setupImGuiStyle();
 
-        // Register Panels
+        // Panels
+        registerPanels();
+    }
+
+    void ImGuiLayer::registerPanels()
+    {
         const auto toolbarPanel = registerPanel<ToolbarPanel>(sceneHandler);
         const auto hierarchyPanel = registerPanel<HierarchyPanel>(this->window, sceneHandler);
         const auto inspectorPanel = registerPanel<InspectorPanel>(sceneHandler, hierarchyPanel.get());

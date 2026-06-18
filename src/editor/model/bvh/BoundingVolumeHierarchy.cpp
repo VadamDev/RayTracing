@@ -1,7 +1,7 @@
 #include "BoundingVolumeHierarchy.h"
 
 #include <limits>
-#include <spdlog/spdlog.h>
+#include <chrono>
 
 namespace editor {
     static constexpr int SAH_TEST_PER_AXIS = 5;

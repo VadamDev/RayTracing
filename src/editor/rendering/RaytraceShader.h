@@ -43,7 +43,7 @@ namespace editor
 
         void create() override;
 
-        void updateFrameIndex(unsigned int frameIndex);
+        void updateFrameIndex(unsigned int frameIndex) const;
         void updateViewData(CameraSystem *cameraSystem, float aspectRatio) const;
         void updateRaytracerSettings(const RaytracerSettings &settings) const;
         void updateRaytracerDebugSettings(const DebugSettings &debugSettings) const;
