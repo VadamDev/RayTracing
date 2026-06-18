@@ -48,8 +48,5 @@
   }, {
     "name" : "vcpkg-cmake",
     "version>=" : "2024-04-23"
-  }, {
-    "name" : "implot",
-    "version>=" : "1.0"
   } ]
 }

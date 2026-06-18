@@ -18,7 +18,6 @@ find_package(nlohmann_json CONFIG REQUIRED)
 find_package(tinyobjloader CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(imguizmo CONFIG REQUIRED)
-find_package(implot CONFIG REQUIRED)
 
 # portable-file-dialogs doesn't have a CMake config file...
 find_path(PFD_INCLUDE_DIR "portable-file-dialogs.h" REQUIRED)
@@ -41,7 +40,6 @@ target_link_libraries(${PROJECT_NAME}
         tinyobjloader::tinyobjloader
         imgui::imgui
         imguizmo::imguizmo
-        implot::implot
         portable-file-dialogs
 )
 

@@ -5,7 +5,6 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <ImGuizmo.h>
-#include <implot.h>
 
 #include "../ui/inspector/HierarchyPanel.h"
 #include "../ui/inspector/InspectorPanel.h"
@@ -21,7 +20,6 @@ namespace editor
         IMGUI_CHECKVERSION();
 
         ImGui::CreateContext();
-        ImPlot::CreateContext();
         ImGui::StyleColorsDark();
 
         ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -92,7 +90,6 @@ namespace editor
     {
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
-        ImPlot::DestroyContext();
         ImGui::DestroyContext();
     }
 
