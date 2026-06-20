@@ -3,6 +3,7 @@
 #include "../ImGuiUtils.hpp"
 #include "../../../engine/window/Window.h"
 #include "../../rendering/RenderingCanvas.h"
+#include "../inspector/HierarchyPanel.h"
 
 namespace editor
 {
@@ -26,9 +27,22 @@ namespace editor
         ImGui::SetCursorPos(drawPos);
         ImGui::Image(canvas->getGLTextureHandle(), ImVec2(targetDims.x, targetDims.y), { 0, 1 }, { 1, 0 });
 
+        const ImVec2 viewportMin = ImGui::GetItemRectMin();
+        const ImVec2 viewportSize = ImGui::GetItemRectSize();
+
         ImGui::SetCursorPos(drawPos);
-        if (ImGui::InvisibleButton("viewport", ImVec2(targetDims.x ,targetDims.y)))
-            window.setGrabbed(true);
+        if (hierarchyPanel->selectedEntity)
+        {
+            guizmoRenderer.processInputs();
+            guizmoRenderer.render(hierarchyPanel->selectedEntity, viewportMin, viewportSize);
+        }
+        else
+        {
+            if (ImGui::InvisibleButton("viewport", ImVec2(targetDims.x ,targetDims.y)))
+                window.setGrabbed(true);
+        }
+
+        guizmoRenderer.drawButtons(drawPos);
 
         ImGui::End();
     }

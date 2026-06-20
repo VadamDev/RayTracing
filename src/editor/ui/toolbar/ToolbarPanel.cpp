@@ -6,6 +6,7 @@
 #endif
 #include <spdlog/spdlog.h>
 #include <nlohmann/json.hpp>
+#include <IconsFontAwesome7.h>
 
 #include "../../scene/SceneHandler.h"
 
@@ -18,11 +19,11 @@ namespace editor
         if (!ImGui::BeginMainMenuBar())
             return;
 
-        if (ImGui::BeginMenu("File"))
+        if (ImGui::BeginMenu("Scene"))
         {
             // Save Scene
             beginDisableIf(!sceneHandler->isSceneOpened(), [this] {
-                if (ImGui::MenuItem("Save Scene"))
+                if (ImGui::MenuItem(ICON_FA_FILE_EXPORT " Save Scene"))
                 {
                     pfd::save_file dialog("Select a destination", ".", { "JSON", "*.json", "All Files", "*" });
 
@@ -39,7 +40,7 @@ namespace editor
             });
 
             // Load Scene
-            if (ImGui::MenuItem("Load Scene"))
+            if (ImGui::MenuItem(ICON_FA_FILE_IMPORT " Load Scene"))
             {
                 pfd::open_file dialog("Select a scene file", ".", {"JSON", "*.json", "All Files", "*"});
 
@@ -68,7 +69,7 @@ namespace editor
             }
 
             // Create Empty Scene
-            if (ImGui::MenuItem("New Empty Scene"))
+            if (ImGui::MenuItem(ICON_FA_PANORAMA " New Empty Scene"))
             {
                 sceneHandler->openNewEmptyScene();
             }

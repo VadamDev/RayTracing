@@ -23,8 +23,8 @@ namespace editor
     {
 
     public:
-        explicit ImGuiLayer(engine::Window &window, engine::SimpleClock *clock, RaytraceComputeLayer *raytraceComputeLayer, SceneHandler *sceneHandler, RenderingCanvas *canvas)
-            : window(window), clock(clock), raytraceComputeLayer(raytraceComputeLayer), sceneHandler(sceneHandler), canvas(canvas) {}
+        explicit ImGuiLayer(engine::Window &window, engine::SimpleClock *clock, RaytraceComputeLayer *raytraceComputeLayer, SceneHandler *sceneHandler, RenderingCanvas *canvas, CameraSystem *cameraSystem)
+            : window(window), clock(clock), raytraceComputeLayer(raytraceComputeLayer), sceneHandler(sceneHandler), canvas(canvas), cameraSystem(cameraSystem) {}
 
         void onInit(GLFWwindow *window) override;
 
@@ -43,6 +43,7 @@ namespace editor
 
         SceneHandler *sceneHandler;
         RenderingCanvas *canvas;
+        CameraSystem *cameraSystem;
 
         std::vector<std::shared_ptr<UIPanel>> panels;
 
@@ -51,5 +52,6 @@ namespace editor
 
         void registerPanels();
         static void setupImGuiStyle();
+        static void registerFonts();
     };
 }

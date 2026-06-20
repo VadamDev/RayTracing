@@ -45,6 +45,7 @@ target_link_libraries(${PROJECT_NAME}
 
 # ImViewGuizmo is not available with VCPKG so:
 target_include_directories(${PROJECT_NAME} PRIVATE thirdparty/ImViewGuizmo)
+target_include_directories(${PROJECT_NAME} PRIVATE thirdparty/IconFontCppHeaders)
 
 # Copy Assets TODO: This is bad... It's using symlinks which requires Windows dev mode or administrator privileges
 file(CREATE_LINK

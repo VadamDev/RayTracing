@@ -22,7 +22,7 @@ namespace editor
         cameraSystem->registerController<FreecamController>(cameraSystem.get(), window);
 
         const auto raytraceLayer = window.registerLayer<RaytraceComputeLayer>(globalMessenger, sceneHandler.get(), modelManager.get(), canvas.get(), cameraSystem.get());
-        const auto imguiLayer = window.registerLayer<ImGuiLayer>(window, clock, raytraceLayer.get(), sceneHandler.get(), canvas.get());
+        const auto imguiLayer = window.registerLayer<ImGuiLayer>(window, clock, raytraceLayer.get(), sceneHandler.get(), canvas.get(), cameraSystem.get());
     }
 
     void RaytracingApp::onPostInit()

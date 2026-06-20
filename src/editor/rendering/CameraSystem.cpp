@@ -7,9 +7,6 @@
 
 namespace editor
 {
-    static constexpr glm::vec3 RIGHT(1, 0, 0);
-    static constexpr glm::vec3 UP   (0, 1, 0);
-
     void CameraSystem::processInputs(const float deltaTime) const
     {
         if (controller == nullptr || !isCameraPresent())
@@ -30,11 +27,9 @@ namespace editor
         CameraRef result = {};
 
         engine::Scene *scene = sceneHandler->getOpenedScene();
-        for (const auto &entityHandle : scene->registry.view<CameraComponent>())
+        for (const auto &entityHandle : scene->registry.view<CameraComponent, TransformComponent>())
         {
             const engine::Entity entity = { entityHandle, scene };
-            if (!entity.hasComponent<TransformComponent>())
-                continue;
 
             auto &cameraCp = entity.getComponent<CameraComponent>();
             auto &transformCp = entity.getComponent<TransformComponent>();
@@ -67,6 +62,9 @@ namespace editor
             return;
 
         const CameraComponent *camera = primaryCamera.camera;
-        projectionMat = glm::perspective(glm::atan(glm::tan(glm::radians(camera->fov / 2.0f)) / 2) * 2, canvas->getAspectRatio(), camera->focalPlane, 1000.f); //TODO: change me!
+
+        const float halfHeight = glm::tan(glm::radians(camera->fov / 2.0f)) / 2.0f;
+        const float fov = glm::atan(halfHeight) * 2;
+        projectionMat = glm::perspective(fov, canvas->getAspectRatio(), camera->focalPlane, 1000.f);
     }
 }

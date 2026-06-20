@@ -5,6 +5,7 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <ImGuizmo.h>
+#include <IconsFontAwesome7.h>
 
 #include "../ui/inspector/HierarchyPanel.h"
 #include "../ui/inspector/InspectorPanel.h"
@@ -37,7 +38,7 @@ namespace editor
         const auto toolbarPanel = registerPanel<ToolbarPanel>(sceneHandler);
         const auto hierarchyPanel = registerPanel<HierarchyPanel>(this->window, sceneHandler);
         const auto inspectorPanel = registerPanel<InspectorPanel>(sceneHandler, hierarchyPanel.get());
-        const auto viewportPanel = registerPanel<ViewportPanel>(this->window, canvas);
+        const auto viewportPanel = registerPanel<ViewportPanel>(this->window, canvas, hierarchyPanel.get(), getGlobalMessenger(), cameraSystem);
         const auto settingsPanel = registerPanel<SettingsPanel>(clock, raytraceComputeLayer, canvas);
     }
 
@@ -101,7 +102,7 @@ namespace editor
 
         ImGuiIO &io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-        io.FontDefault = io.Fonts->AddFontFromFileTTF("resources/fonts/JetBrainsMono-Regular.ttf", 18);
+        registerFonts();
 
         /*
          * Style
@@ -141,6 +142,25 @@ namespace editor
         //Title
         colors[ImGuiCol_TitleBg] = { 0.100f, 0.100f, 0.100f, 1 };
         colors[ImGuiCol_TitleBgActive] = colors[ImGuiCol_TitleBg];
+    }
+
+    void ImGuiLayer::registerFonts()
+    {
+        static constexpr float BASE_FONT_SIZE = 18.0f;
+        static constexpr float ICON_FONT_SIZE = BASE_FONT_SIZE * (2.0f / 3.0f);
+
+        ImGuiIO &io = ImGui::GetIO();
+        io.FontDefault = io.Fonts->AddFontFromFileTTF("resources/fonts/JetBrainsMono-Regular.ttf", BASE_FONT_SIZE);
+
+        ImFontConfig config;
+        config.MergeMode = true;
+        config.PixelSnapH = true;
+        config.GlyphMinAdvanceX = ICON_FONT_SIZE;
+
+        static const ImWchar FONT_AWESOME_RANGES[] = { ICON_MIN_FA, ICON_MAX_16_FA, 0 };
+
+        io.Fonts->AddFontFromFileTTF("resources/fonts/FontAwesome7_Free-Solid-900.otf", ICON_FONT_SIZE, &config, FONT_AWESOME_RANGES);
+        io.Fonts->Build();
     }
 
     template<std::derived_from<UIPanel> T, typename... Args>
