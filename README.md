@@ -25,12 +25,11 @@
 - [tinyobjloader](https://github.com/tinyobjloader/tinyobjloader) - 2.0.0rc13
 - [ImGui](https://github.com/ocornut/imgui) - 1.92.7
 - [ImGuizmo](https://github.com/cedricguillemet/imguizmo) - 1.9
-- [ImViewGuizmo](https://github.com/Ka1serM/ImViewGuizmo) - 1.0.2
 - [portable-file-dialogs](https://github.com/samhocevar/portable-file-dialogs) - 0.1.0
 
 ### Fonts
 - [JetBrains Mono](https://www.jetbrains.com/fr-fr/lp/mono/)
-- [Font Awesome](https://fontawesome.com/)
+- [Font Awesome](https://fontawesome.com/) with [IconFontCppHeaders](https://github.com/juliettef/iconfontcppheaders)
 
 *Dependencies are managed using Vcpkg, see vcpkg.json*
 *Since some dependencies are not available with Vcpkg, they are located inside the `thirdparty/` folder.*
