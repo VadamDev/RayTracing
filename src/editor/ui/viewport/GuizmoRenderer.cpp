@@ -58,7 +58,11 @@ namespace editor
 
     void GuizmoRenderer::drawButtons(const ImVec2 &drawPos)
     {
-        ImGui::SetCursorPos(ImVec2(drawPos.x + 5, drawPos.y - 30)); // TODO: adaptive padding
+        const ImVec2 &framePadding = ImGui::GetStyle().FramePadding;
+        const float padX = framePadding.x * 1.5f;
+        const float padY = framePadding.y + ImGui::GetFontSize() + padX * 1.5f;
+
+        ImGui::SetCursorPos(ImVec2(drawPos.x + padX, drawPos.y - padY));
 
         drawOperationButton(ICON_FA_ARROWS_UP_DOWN_LEFT_RIGHT, ImGuizmo::OPERATION::TRANSLATE);
         ImGui::SameLine();

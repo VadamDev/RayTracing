@@ -36,11 +36,8 @@ namespace editor
             guizmoRenderer.processInputs();
             guizmoRenderer.render(hierarchyPanel->selectedEntity, viewportMin, viewportSize);
         }
-        else
-        {
-            if (ImGui::InvisibleButton("viewport", ImVec2(targetDims.x ,targetDims.y)))
-                window.setGrabbed(true);
-        }
+        else if (ImGui::InvisibleButton("viewport", ImVec2(targetDims.x ,targetDims.y)))
+            window.setGrabbed(true);
 
         guizmoRenderer.drawButtons(drawPos);
 
