@@ -152,7 +152,19 @@ namespace engine
 
     void Window::setGrabbed(const bool grabbed)
     {
+        if (this->grabbed == grabbed)
+            return;
+
         glfwSetInputMode(window, GLFW_CURSOR, grabbed ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
         this->grabbed = grabbed;
+    }
+
+    void Window::hideCursor(const bool hidden)
+    {
+        if (grabbed || hidden == cursorHidden)
+            return;
+
+        glfwSetInputMode(window, GLFW_CURSOR, hidden ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+        cursorHidden = hidden;
     }
 }

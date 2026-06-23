@@ -3,6 +3,7 @@
 #include <glm/vec2.hpp>
 
 #include "GuizmoRenderer.h"
+#include "RightViewportButtonsRenderer.h"
 #include "../UIPanel.h"
 
 namespace engine
@@ -20,7 +21,7 @@ namespace editor
 
     public:
         explicit ViewportPanel(engine::Window &window, RenderingCanvas *canvas, HierarchyPanel *hierarchyPanel, engine::Messenger &globalMessenger, CameraSystem *cameraSystem)
-            : UIPanel("Viewport"), window(window), canvas(canvas), hierarchyPanel(hierarchyPanel), guizmoRenderer(globalMessenger, cameraSystem) {}
+            : UIPanel("Viewport"), window(window), canvas(canvas), hierarchyPanel(hierarchyPanel), guizmoRenderer(globalMessenger, cameraSystem), rightButtonsRenderer(window, globalMessenger, cameraSystem) {}
 
         void draw(float deltaTime) override;
 
@@ -30,6 +31,7 @@ namespace editor
         HierarchyPanel *hierarchyPanel;
 
         GuizmoRenderer guizmoRenderer;
+        RightViewportButtonsRenderer rightButtonsRenderer;
 
         glm::ivec2 calculateViewportSize(float windowWidth, float windowHeight) const;
     };

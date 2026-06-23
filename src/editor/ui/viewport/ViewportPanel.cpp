@@ -30,6 +30,9 @@ namespace editor
         const ImVec2 viewportMin = ImGui::GetItemRectMin();
         const ImVec2 viewportSize = ImGui::GetItemRectSize();
 
+        if (!window.isGrabbed())
+            rightButtonsRenderer.render(drawPos);
+
         ImGui::SetCursorPos(drawPos);
         if (hierarchyPanel->selectedEntity)
         {

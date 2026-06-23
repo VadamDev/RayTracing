@@ -76,6 +76,7 @@ namespace engine
 
         void setTitle(std::string title);
         void setGrabbed(bool grabbed);
+        void hideCursor(bool hidden);
 
     private:
         int width, height;
@@ -85,7 +86,7 @@ namespace engine
         InputsManager inputsManager;
         Messenger *messenger = nullptr;
 
-        bool resized = true, grabbed = false, wasGrabbed = false;
+        bool resized = true, grabbed = false, wasGrabbed = false, cursorHidden = false;
         float frameTime = 0;
 
         std::vector<std::shared_ptr<IRenderLayer>> renderLayers;
