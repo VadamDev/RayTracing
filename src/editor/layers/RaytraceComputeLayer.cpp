@@ -1,6 +1,7 @@
 #include "RaytraceComputeLayer.h"
 
 #include "../../engine/messenger/Messenger.hpp"
+#include "../rendering/CameraSystem.h"
 #include "../rendering/RenderingCanvas.h"
 #include "../scene/SceneHandler.h"
 #include "../rendering/RenderingEvents.h"
@@ -59,7 +60,7 @@ namespace editor
 
     bool RaytraceComputeLayer::canRender() const
     {
-        return sceneHandler->isSceneOpened();
+        return sceneHandler->isSceneOpened() && cameraSystem->isCameraPresent();
     }
 
     void RaytraceComputeLayer::onFramePush(const float deltaTime) {

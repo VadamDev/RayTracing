@@ -22,7 +22,10 @@ namespace editor
     void CameraSystem::findPrimaryCamera()
     {
         if (!sceneHandler->isSceneOpened() || !isAnyPresent(sceneHandler->getOpenedScene()))
+        {
+            primaryCamera = {};
             return;
+        }
 
         CameraRef result = {};
 
