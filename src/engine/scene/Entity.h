@@ -70,6 +70,6 @@ namespace engine
 
     private:
         entt::entity handle = entt::null;
-        Scene *scene = nullptr; //TODO: it would probably be nicer to use weak_ptr here
+        Scene *scene = nullptr;
     };
 }

@@ -9,7 +9,7 @@ namespace engine::exceptions
      * Utils
      */
 
-    inline std::string formatShaderType(const unsigned int type)
+    constexpr std::string_view formatShaderType(const unsigned int type)
     {
         switch (type)
         {
@@ -39,7 +39,7 @@ namespace engine::exceptions
             : runtime_error(message), type(type) {}
 
         unsigned int getType() const { return type; }
-        std::string formattedType() const { return formatShaderType(type); }
+        std::string_view formattedType() const { return formatShaderType(type); }
 
     protected:
         const unsigned int type;

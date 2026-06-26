@@ -6,7 +6,7 @@
 
 namespace engine
 {
-    inline glm::vec2 valueVec2(const nlohmann::json &json, const std::string &key, const glm::vec2 &defaultValue)
+    inline glm::vec2 valueVec2(const nlohmann::json &json, std::string_view key, const glm::vec2 &defaultValue)
     {
         if (!json.contains(key) || !json[key].is_array() || json[key].size() != 2)
             return defaultValue;
@@ -14,7 +14,7 @@ namespace engine
         return { json[key][0], json[key][1] };
     }
 
-    inline glm::vec3 valueVec3(const nlohmann::json &json, const std::string &key, const glm::vec3 &defaultValue)
+    inline glm::vec3 valueVec3(const nlohmann::json &json, std::string_view key, const glm::vec3 &defaultValue)
     {
         if (!json.contains(key) || !json[key].is_array() || json[key].size() != 3)
             return defaultValue;
