@@ -14,6 +14,8 @@ namespace editor
 
         this->options = options;
         data = {};
+        data.startTime = std::chrono::steady_clock::now();
+
         renderMode = RenderMode::RENDER_ONLY;
     }
 

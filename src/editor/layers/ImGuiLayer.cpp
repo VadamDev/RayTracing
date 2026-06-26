@@ -47,7 +47,7 @@ namespace editor
 
         // Render Only Panels
         registerPreviewPanel<RenderPreviewPanel>(canvas);
-        registerPreviewPanel<RenderStatusPanel>(renderManager);
+        registerPreviewPanel<RenderStatusPanel>(clock, renderManager);
     }
 
     void ImGuiLayer::onFramePush(const float deltaTime)

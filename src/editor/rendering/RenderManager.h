@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <chrono>
 
 namespace engine
 {
@@ -46,6 +47,8 @@ namespace editor
     struct RenderData
     {
         int frames = 0;
+
+        std::chrono::time_point<std::chrono::steady_clock> startTime;
     };
 
     class RenderManager
