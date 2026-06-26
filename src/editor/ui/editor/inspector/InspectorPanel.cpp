@@ -1,17 +1,17 @@
 #include "InspectorPanel.h"
 
 #include "HierarchyPanel.h"
-#include "../../scene/Components.h"
-#include "../ImGuiUtils.hpp"
-#include "../../../engine/messenger/Messenger.hpp"
-#include "../../rendering/RenderingEvents.h"
-#include "../../scene/SceneHandler.h"
+#include "../../../scene/Components.h"
+#include "../../ImGuiUtils.hpp"
+#include "../../../../engine/messenger/Messenger.hpp"
+#include "../../../rendering/RenderingEvents.h"
+#include "../../../scene/SceneHandler.h"
 
 namespace editor
 {
     void InspectorPanel::draw(float deltaTime)
     {
-        ImGui::Begin(getName());
+        ImGui::Begin(getName(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing);
 
         if (const engine::Entity &selectedEntity = hierarchyPanel->selectedEntity)
             drawComponents(selectedEntity);

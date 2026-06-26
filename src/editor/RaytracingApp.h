@@ -5,6 +5,7 @@
 #include "scene/SceneHandler.h"
 #include "rendering/RenderingCanvas.h"
 #include "rendering/CameraSystem.h"
+#include "rendering/RenderManager.h"
 
 namespace editor
 {
@@ -17,8 +18,7 @@ namespace editor
         void onInit() override;
         void onPostInit() override;
         void onPreRender(float deltaTime) override;
-        void onDestroy() noexcept override;
-
+        void onDestroy() noexcept override {}
     private:
         std::unique_ptr<SceneHandler> sceneHandler;
 
@@ -26,5 +26,6 @@ namespace editor
 
         std::unique_ptr<RenderingCanvas> canvas;
         std::unique_ptr<CameraSystem> cameraSystem;
+        std::unique_ptr<RenderManager> renderManager;
     };
 }

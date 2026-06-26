@@ -1,12 +1,12 @@
 #include "SettingsPanel.h"
 
 #include <imgui.h>
-#include "../../../engine/clock/SimpleClock.h"
-#include "../ImGuiUtils.hpp"
-#include "../../layers/RaytraceComputeLayer.h"
-#include "../../rendering/RenderingCanvas.h"
-#include "../../rendering/RenderingEvents.h"
-#include "../../../engine/messenger/Messenger.hpp"
+#include "../../../../engine/clock/SimpleClock.h"
+#include "../../ImGuiUtils.hpp"
+#include "../../../layers/RaytraceComputeLayer.h"
+#include "../../../rendering/RenderingCanvas.h"
+#include "../../../rendering/RenderingEvents.h"
+#include "../../../../engine/messenger/Messenger.hpp"
 
 namespace editor
 {
@@ -21,7 +21,7 @@ namespace editor
             timer = 0;
         }
 
-        ImGui::Begin(getName());
+        ImGui::Begin(getName(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing);
 
         if (ImGui::CollapsingHeader("Stats", ImGuiTreeNodeFlags_DefaultOpen))
         {

@@ -1,13 +1,13 @@
 #pragma once
 
+#include <string>
 #include <imgui.h>
 #include <ImGuizmo.h>
-
-#include "../../../engine/scene/Entity.h"
 
 namespace engine
 {
     class Messenger;
+    class Entity;
 }
 
 namespace editor

@@ -7,11 +7,14 @@
 #include <ImGuizmo.h>
 #include <IconsFontAwesome7.h>
 
-#include "../ui/inspector/HierarchyPanel.h"
-#include "../ui/inspector/InspectorPanel.h"
-#include "../ui/settings/SettingsPanel.h"
-#include "../ui/toolbar/ToolbarPanel.h"
-#include "../ui/viewport/ViewportPanel.h"
+#include "../rendering/RenderManager.h"
+#include "../ui/editor/inspector/HierarchyPanel.h"
+#include "../ui/editor/inspector/InspectorPanel.h"
+#include "../ui/editor/settings/SettingsPanel.h"
+#include "../ui/editor/toolbar/ToolbarPanel.h"
+#include "../ui/editor/viewport/ViewportPanel.h"
+#include "../ui/preview/RenderPreviewPanel.h"
+#include "../ui/preview/RenderStatusPanel.h"
 
 namespace editor
 {
@@ -35,11 +38,16 @@ namespace editor
 
     void ImGuiLayer::registerPanels()
     {
-        const auto toolbarPanel = registerPanel<ToolbarPanel>(sceneHandler);
-        const auto hierarchyPanel = registerPanel<HierarchyPanel>(this->window, sceneHandler);
-        const auto inspectorPanel = registerPanel<InspectorPanel>(sceneHandler, hierarchyPanel.get());
-        const auto viewportPanel = registerPanel<ViewportPanel>(this->window, canvas, hierarchyPanel.get(), getGlobalMessenger(), cameraSystem);
-        const auto settingsPanel = registerPanel<SettingsPanel>(clock, raytraceComputeLayer, canvas);
+        // Editor Panels
+        const auto toolbarPanel = registerEditorPanel<ToolbarPanel>(sceneHandler, renderManager);
+        const auto hierarchyPanel = registerEditorPanel<HierarchyPanel>(this->window, sceneHandler);
+        const auto inspectorPanel = registerEditorPanel<InspectorPanel>(sceneHandler, hierarchyPanel.get());
+        const auto viewportPanel = registerEditorPanel<ViewportPanel>(this->window, canvas, hierarchyPanel.get(), getGlobalMessenger(), cameraSystem);
+        const auto settingsPanel = registerEditorPanel<SettingsPanel>(clock, raytraceComputeLayer, canvas);
+
+        // Render Only Panels
+        registerPreviewPanel<RenderPreviewPanel>(canvas);
+        registerPreviewPanel<RenderStatusPanel>(renderManager);
     }
 
     void ImGuiLayer::onFramePush(const float deltaTime)
@@ -47,11 +55,24 @@ namespace editor
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+
+        switch (renderManager->getRenderMode())
+        {
+            case RenderMode::EDITOR:
+                drawEditor(deltaTime);
+                break;
+            case RenderMode::RENDER_ONLY:
+                drawPreview(deltaTime);
+                break;
+        }
+    }
+
+    void ImGuiLayer::drawEditor(const float deltaTime) const
+    {
         ImGuizmo::BeginFrame();
 
-        // Dockspace Shit
+        // Dockspace Init
         static const ImGuiID DOCKSPACE_ID = ImGui::GetID("Dockspace");
-
         const ImGuiViewport *imguiViewport = ImGui::GetMainViewport();
         if (ImGui::DockBuilderGetNode(DOCKSPACE_ID) == nullptr)
         {
@@ -75,9 +96,16 @@ namespace editor
             ImGui::DockBuilderDockWindow("Inspector", dockId_Inspector);
         }
 
+        // Draw
         ImGui::DockSpaceOverViewport(DOCKSPACE_ID, imguiViewport, ImGuiDockNodeFlags_PassthruCentralNode);
 
-        for (const auto &panel : panels)
+        for (const auto &panel : editorPanels)
+            panel->draw(deltaTime);
+    }
+
+    void ImGuiLayer::drawPreview(const float deltaTime) const
+    {
+        for (const auto &panel : renderOnlyPanels)
             panel->draw(deltaTime);
     }
 
@@ -164,7 +192,19 @@ namespace editor
     }
 
     template<std::derived_from<UIPanel> T, typename... Args>
-    std::shared_ptr<T> ImGuiLayer::registerPanel(Args&&... args)
+    std::shared_ptr<T> ImGuiLayer::registerEditorPanel(Args&&... args)
+    {
+        return registerPanel<T>(editorPanels, std::forward<Args>(args)...);
+    }
+
+    template<std::derived_from<UIPanel> T, typename... Args>
+    std::shared_ptr<T> ImGuiLayer::registerPreviewPanel(Args &&... args)
+    {
+        return registerPanel<T>(renderOnlyPanels, std::forward<Args>(args)...);
+    }
+
+    template<std::derived_from<UIPanel> T, typename... Args>
+    std::shared_ptr<T> ImGuiLayer::registerPanel(std::vector<std::shared_ptr<UIPanel>> &panels, Args &&... args)
     {
         auto panel = std::make_shared<T>(std::forward<Args>(args)...);
         panels.push_back(panel);

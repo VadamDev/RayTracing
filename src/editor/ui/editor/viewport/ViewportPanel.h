@@ -4,7 +4,7 @@
 
 #include "GuizmoRenderer.h"
 #include "RightViewportButtonsRenderer.h"
-#include "../UIPanel.h"
+#include "../../UIPanel.h"
 
 namespace engine
 {

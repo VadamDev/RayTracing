@@ -2,10 +2,10 @@
 
 #include <IconsFontAwesome7.h>
 
-#include "../../../engine/messenger/Messenger.hpp"
-#include "../../../engine/window/Window.h"
-#include "../../rendering/CameraSystem.h"
-#include "../../rendering/RenderingEvents.h"
+#include "../../../../engine/messenger/Messenger.hpp"
+#include "../../../../engine/window/Window.h"
+#include "../../../rendering/CameraSystem.h"
+#include "../../../rendering/RenderingEvents.h"
 
 namespace editor
 {

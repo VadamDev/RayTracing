@@ -1,15 +1,15 @@
 #include "ViewportPanel.h"
 
-#include "../ImGuiUtils.hpp"
-#include "../../../engine/window/Window.h"
-#include "../../rendering/RenderingCanvas.h"
+#include "../../ImGuiUtils.hpp"
+#include "../../../../engine/window/Window.h"
+#include "../../../rendering/RenderingCanvas.h"
 #include "../inspector/HierarchyPanel.h"
 
 namespace editor
 {
     void ViewportPanel::draw(float deltaTime)
     {
-        ImGui::Begin(getName(), nullptr, ImGuiWindowFlags_NoScrollbar);
+        ImGui::Begin(getName());
 
         const float imguiWidth = ImGui::GetWindowWidth();
         const float imguiHeight = ImGui::GetWindowHeight() - (ImGui::GetFrameHeight() + ImGui::GetStyle().WindowPadding.y); // This weirdness is here to get actual height without the header bar

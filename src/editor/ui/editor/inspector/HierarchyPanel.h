@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../UIPanel.h"
-#include "../../../engine/scene/Entity.h"
+#include "../../UIPanel.h"
+#include "../../../../engine/scene/Entity.h"
 
 namespace engine
 {

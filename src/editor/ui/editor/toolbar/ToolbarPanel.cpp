@@ -8,9 +8,10 @@
 #include <nlohmann/json.hpp>
 #include <IconsFontAwesome7.h>
 
-#include "../../scene/SceneHandler.h"
+#include "../../../scene/SceneHandler.h"
 
-#include "../ImGuiUtils.hpp"
+#include "../../ImGuiUtils.hpp"
+#include "../../../rendering/RenderManager.h"
 
 namespace editor
 {
@@ -19,7 +20,7 @@ namespace editor
         if (!ImGui::BeginMainMenuBar())
             return;
 
-        if (ImGui::BeginMenu("Scene"))
+        if (ImGui::BeginMenu(ICON_FA_PANORAMA " Scene"))
         {
             // Save Scene
             beginDisableIf(!sceneHandler->isSceneOpened(), [this] {
@@ -69,9 +70,25 @@ namespace editor
             }
 
             // Create Empty Scene
-            if (ImGui::MenuItem(ICON_FA_PANORAMA " New Empty Scene"))
+            if (ImGui::MenuItem(ICON_FA_BORDER_NONE " New Empty Scene"))
             {
                 sceneHandler->openNewEmptyScene();
+            }
+
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu(ICON_FA_CAMERA " Render"))
+        {
+            if (ImGui::MenuItem(ICON_FA_ELLIPSIS " Settings"))
+            {
+                // TODO: open render settings screen
+            }
+
+            if (ImGui::MenuItem(ICON_FA_PLAY " Begin"))
+            {
+                RenderOptions options; // TODO: use settings
+                renderManager->beginRender(options);
             }
 
             ImGui::EndMenu();

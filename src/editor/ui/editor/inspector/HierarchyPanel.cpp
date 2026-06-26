@@ -1,17 +1,17 @@
 #include "HierarchyPanel.h"
 
-#include "../../scene/SceneHandler.h"
-#include "../../scene/Components.h"
-#include "../ImGuiUtils.hpp"
-#include "../../../engine/messenger/Messenger.hpp"
-#include "../../../engine/window/Window.h"
-#include "../../rendering/RenderingEvents.h"
+#include "../../../scene/SceneHandler.h"
+#include "../../../scene/Components.h"
+#include "../../ImGuiUtils.hpp"
+#include "../../../../engine/messenger/Messenger.hpp"
+#include "../../../../engine/window/Window.h"
+#include "../../../rendering/RenderingEvents.h"
 
 namespace editor
 {
     void HierarchyPanel::draw(float deltaTime)
     {
-        ImGui::Begin(getName());
+        ImGui::Begin(getName(), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoFocusOnAppearing);
 
         if (sceneHandler->isSceneOpened())
         {
