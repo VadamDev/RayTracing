@@ -19,10 +19,15 @@ find_package(tinyobjloader CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(imguizmo CONFIG REQUIRED)
 
-# portable-file-dialogs doesn't have a CMake config file...
+# portable-file-dialogs doesn't have a CMake config file
 find_path(PFD_INCLUDE_DIR "portable-file-dialogs.h" REQUIRED)
 add_library(portable-file-dialogs INTERFACE)
 target_include_directories(portable-file-dialogs INTERFACE ${PFD_INCLUDE_DIR})
+
+# stb_image_write doesn't have a CMake config file
+find_path(STB_IMAGE_WRITE_INCLUDE_DIR "stb_image_write.h" REQUIRED)
+add_library(stb-image-write INTERFACE)
+target_include_directories(stb-image-write INTERFACE ${STB_IMAGE_WRITE_INCLUDE_DIR})
 
 # SOURCE FILES
 file(GLOB_RECURSE PROJECT_SOURCE_FILES src/*.cpp)
@@ -41,6 +46,7 @@ target_link_libraries(${PROJECT_NAME}
         imgui::imgui
         imguizmo::imguizmo
         portable-file-dialogs
+        stb-image-write
 )
 
 # ImViewGuizmo is not available with VCPKG so:

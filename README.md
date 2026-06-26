@@ -8,9 +8,9 @@
 - .obj model loading
 - Bounding volume hierarchy generation with Surface Area Heuristic split
 - Depth of Field
-- Naive, ray diverge based Anti-Aliasing
+- Simple ray diverge Anti-Aliasing
 
-#### Planned
+#### Ideas for future updates (Soon™)
 - Enhanced UI and better camera controls
 - Scene rendering mode
 - Multiple Importance Sampling (see: https://lisyarus.github.io/blog/posts/multiple-importance-sampling.html / https://www.youtube.com/watch?v=p772XkEnEIU)
@@ -26,6 +26,7 @@
 - [ImGui](https://github.com/ocornut/imgui) - 1.92.7
 - [ImGuizmo](https://github.com/cedricguillemet/imguizmo) - 1.9
 - [portable-file-dialogs](https://github.com/samhocevar/portable-file-dialogs) - 0.1.0
+- [stb-image-write](https://github.com/nothings/stb/blob/master/stb_image_write.h) - 2024-07-29
 
 ### Fonts
 - [JetBrains Mono](https://www.jetbrains.com/fr-fr/lp/mono/)
