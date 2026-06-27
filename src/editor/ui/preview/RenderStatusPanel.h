@@ -16,7 +16,7 @@ namespace editor
 
     public:
         explicit RenderStatusPanel(engine::SimpleClock *clock, RenderManager *renderManager)
-            : UIPanel("Status"), clock(clock), renderManager(renderManager) {}
+            : UIPanel("Render Status"), clock(clock), renderManager(renderManager) {}
 
         void draw(float deltaTime) override;
     private:
