@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 namespace editor
 {
     class RenderingCanvas
@@ -12,6 +14,9 @@ namespace editor
 
         void create();
         void resize(float newWidth, float newHeight);
+
+        template<typename T>
+        std::vector<T> exportTextureAs(unsigned int type) const;
 
         unsigned int getGLTextureHandle() const { return textureHandle; }
         int getWidth() const { return width; }

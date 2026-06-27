@@ -26,6 +26,11 @@ namespace editor
         const auto remainingTime = std::chrono::seconds(remainingFrames / clock->getFPS());
         ImGui::Text(std::format("{:%Hh %Mm %Ss} remaining", remainingTime).c_str());
 
+        if (ImGui::Button(ICON_FA_ARROW_UP_FROM_BRACKET " Export Now & Cancel"))
+            renderManager->cancelRender(true);
+
+        ImGui::SameLine();
+
         if (ImGui::Button(ICON_FA_TRASH_CAN " Cancel"))
             renderManager->cancelRender();
 

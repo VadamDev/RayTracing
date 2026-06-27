@@ -10,15 +10,16 @@ namespace engine
 
 namespace editor
 {
+    class RenderingCanvas;
+
     enum class RenderMode
     {
-        EDITOR,
-        RENDER_ONLY
+        EDITOR, RENDER_ONLY
     };
 
     enum class ExportFormat
     {
-        PNG, JPG, BMP
+        PNG, JPG, BMP, HDR
     };
 
     constexpr std::string_view exportFormatToExtension(const ExportFormat exportFormat)
@@ -31,6 +32,8 @@ namespace editor
                 return ".jpg";
             case ExportFormat::BMP:
                 return ".bmp";
+            case ExportFormat::HDR:
+                return ".hdr";
             default:
                 return ".raw";
         }
@@ -42,6 +45,7 @@ namespace editor
 
         ExportFormat format = ExportFormat::PNG;
         std::string exportPath = "export";
+        int jpgQuality = 80;
     };
 
     struct RenderData
@@ -55,11 +59,11 @@ namespace editor
     {
 
     public:
-        explicit RenderManager(engine::Messenger &globalMessenger)
-            : globalMessenger(globalMessenger) {}
+        explicit RenderManager(engine::Messenger &globalMessenger, RenderingCanvas *canvas)
+            : globalMessenger(globalMessenger), canvas(canvas) {}
 
         void beginRender(const RenderOptions &options);
-        void cancelRender();
+        void cancelRender(bool exportImage = false);
 
         void onFramePush();
 
@@ -69,10 +73,13 @@ namespace editor
 
     private:
         engine::Messenger &globalMessenger;
+        RenderingCanvas *canvas;
 
         RenderMode renderMode = RenderMode::EDITOR;
 
         RenderOptions options;
         RenderData data;
+
+        void exportCanvas() const;
     };
 }
