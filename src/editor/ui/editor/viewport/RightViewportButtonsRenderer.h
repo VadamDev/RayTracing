@@ -22,7 +22,7 @@ namespace editor
 
         void render(const ImVec2 &drawPos) const;
 
-        float dragSensitivity = 0.08f;
+        float dragSensitivity = 0.02f;
     private:
         engine::Window &window;
         engine::Messenger &globalMessenger;
