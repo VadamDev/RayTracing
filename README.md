@@ -13,7 +13,7 @@
 #### Ideas for future updates (Soon™)
 - Skybox
 - Enhanced UI and better camera controls
-- Fix BVH Traversal overhead (*performances are not as high as they should be*)
+- Fix BVH Traversal overhead (*performance is not as high as it should be*)
 - Multiple Importance Sampling (see: https://lisyarus.github.io/blog/posts/multiple-importance-sampling.html / https://www.youtube.com/watch?v=p772XkEnEIU)
 
 ## Dependencies
