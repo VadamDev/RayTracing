@@ -19,6 +19,9 @@ namespace editor
 
     void GuizmoRenderer::processInputs()
     {
+        if (ImGui::GetIO().WantCaptureKeyboard)
+            return;
+
         if (ImGui::IsKeyPressed(ImGuiKey_T))
             operation = ImGuizmo::OPERATION::TRANSLATE;
         else if (ImGui::IsKeyPressed(ImGuiKey_R))
