@@ -13,7 +13,7 @@ namespace editor
         ~RenderingCanvas();
 
         void create();
-        void resize(float newWidth, float newHeight);
+        void resize(int newWidth, int newHeight);
 
         template<typename T>
         std::vector<T> exportTextureAs(unsigned int type) const;

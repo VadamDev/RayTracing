@@ -9,11 +9,22 @@
 #include "RenderingCanvas.h"
 #include "RenderingEvents.h"
 #include "../../engine/messenger/Messenger.hpp"
+#include "../layers/RaytraceComputeLayer.h"
 
 namespace editor
 {
     void RenderManager::beginRender(const RenderOptions &options)
     {
+        preRenderCanvasWidth = canvas->getWidth();
+        preRenderCanvasHeight = canvas->getHeight();
+        preRenderAccumulation = raytraceComputeLayer->settings.accumulate;
+
+        if (!options.useViewportResolution && (canvas->getWidth() != options.renderWidth || canvas->getHeight() != options.renderHeight))
+            canvas->resize(options.renderWidth, options.renderHeight);
+
+        if (!raytraceComputeLayer->settings.accumulate)
+            raytraceComputeLayer->settings.accumulate = true;
+
         AccumulationResetEvent event;
         globalMessenger.dispatch(event);
 
@@ -24,18 +35,29 @@ namespace editor
         renderMode = RenderMode::RENDER_ONLY;
     }
 
-    void RenderManager::cancelRender(const bool exportImage)
+    void RenderManager::stopRender(const bool exportImage)
     {
         if (exportImage)
             exportCanvas();
+
+        if (preRenderCanvasWidth != canvas->getWidth() || preRenderCanvasHeight != canvas->getHeight())
+        {
+            canvas->resize(preRenderCanvasWidth, preRenderCanvasHeight);
+
+            AccumulationResetEvent event;
+            globalMessenger.dispatch(event);
+        }
+
+        if (preRenderAccumulation != raytraceComputeLayer->settings.accumulate)
+            raytraceComputeLayer->settings.accumulate = preRenderAccumulation;
 
         renderMode = RenderMode::EDITOR;
     }
 
     void RenderManager::onFramePush()
     {
-        if (data.frames++ > options.accumulatedFramesPerImage)
-            cancelRender(true);
+        if (++data.frames > options.accumulatedFramesPerImage)
+            stopRender(true);
     }
 
     void RenderManager::exportCanvas() const

@@ -20,12 +20,20 @@ namespace editor
     class RenderManager;
     class RaytraceComputeLayer;
 
+    static constexpr int NUM_PANEL_TYPES = 3;
+    enum class PanelType : int
+    {
+        EDITOR = 0,
+        PREVIEW = 1,
+        MENU = 2
+    };
+
     class ImGuiLayer : public engine::IRenderLayer
     {
 
     public:
-        explicit ImGuiLayer(engine::Window &window, engine::SimpleClock *clock, RenderManager *renderManager, RaytraceComputeLayer *raytraceComputeLayer, SceneHandler *sceneHandler, RenderingCanvas *canvas, CameraSystem *cameraSystem)
-            : window(window), clock(clock), renderManager(renderManager), raytraceComputeLayer(raytraceComputeLayer), sceneHandler(sceneHandler), canvas(canvas), cameraSystem(cameraSystem) {}
+        explicit ImGuiLayer(engine::Window &window, engine::SimpleClock *clock, engine::Messenger &globalMessenger, RenderManager *renderManager, RaytraceComputeLayer *raytraceComputeLayer, SceneHandler *sceneHandler, RenderingCanvas *canvas, CameraSystem *cameraSystem)
+            : window(window), clock(clock), globalMessenger(globalMessenger), renderManager(renderManager), raytraceComputeLayer(raytraceComputeLayer), sceneHandler(sceneHandler), canvas(canvas), cameraSystem(cameraSystem) {}
 
         void onInit(GLFWwindow *window) override;
 
@@ -34,11 +42,10 @@ namespace editor
         void onFramePop() override;
 
         void onDestroy() noexcept override;
-
-        engine::Messenger& getGlobalMessenger() const { return raytraceComputeLayer->getGlobalMessenger(); }
     private:
         engine::Window &window;
         engine::SimpleClock *clock;
+        engine::Messenger &globalMessenger;
 
         RaytraceComputeLayer *raytraceComputeLayer;
 
@@ -47,21 +54,24 @@ namespace editor
         CameraSystem *cameraSystem;
         RenderManager *renderManager;
 
-        std::vector<std::shared_ptr<UIPanel>> editorPanels, renderOnlyPanels;
+        std::array<std::vector<std::unique_ptr<UIPanel>>, NUM_PANEL_TYPES> panels;
+        std::unordered_map<std::string, UIPanel*> menuDictionary;
+        std::vector<UIPanel*> openedMenus;
 
         void registerPanels();
+        void registerListeners();
 
         void drawEditor(float deltaTime) const;
         void drawPreview(float deltaTime) const;
 
         template<std::derived_from<UIPanel> T, typename... Args>
-        std::shared_ptr<T> registerEditorPanel(Args&&... args);
+        T* registerPanel(PanelType type, Args&&... args);
 
-        template<std::derived_from<UIPanel> T, typename... Args>
-        std::shared_ptr<T> registerPreviewPanel(Args&&... args);
+        std::vector<UIPanel*> getPanels(PanelType type) const;
 
-        template<std::derived_from<UIPanel> T, typename... Args>
-        static std::shared_ptr<T> registerPanel(std::vector<std::shared_ptr<UIPanel>> &panels, Args&&... args);
+        void openMenu(std::string_view name);
+        void closeMenu(std::string_view name);
+        UIPanel* findMenu(std::string_view name);
 
         static void setupImGuiStyle();
         static void registerFonts();

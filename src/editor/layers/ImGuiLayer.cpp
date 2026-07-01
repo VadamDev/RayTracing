@@ -7,9 +7,11 @@
 #include <ImGuizmo.h>
 #include <IconsFontAwesome7.h>
 
+#include "../../engine/messenger/Messenger.hpp"
 #include "../rendering/RenderManager.h"
 #include "../ui/editor/inspector/HierarchyPanel.h"
 #include "../ui/editor/inspector/InspectorPanel.h"
+#include "../ui/editor/settings/RenderSettingsPanel.h"
 #include "../ui/editor/settings/SettingsPanel.h"
 #include "../ui/editor/toolbar/ToolbarPanel.h"
 #include "../ui/editor/viewport/ViewportPanel.h"
@@ -20,7 +22,6 @@ namespace editor
 {
     void ImGuiLayer::onInit(GLFWwindow *window)
     {
-        // Init ImGui / ImPlot
         IMGUI_CHECKVERSION();
 
         ImGui::CreateContext();
@@ -29,25 +30,36 @@ namespace editor
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init("#version 460");
 
-        // Style
         setupImGuiStyle();
-
-        // Panels
         registerPanels();
+        registerListeners();
     }
 
     void ImGuiLayer::registerPanels()
     {
+        const auto renderSettingsMenu = registerPanel<RenderSettingsPanel>(PanelType::MENU, globalMessenger, canvas);
+
         // Editor Panels
-        const auto toolbarPanel = registerEditorPanel<ToolbarPanel>(sceneHandler, renderManager);
-        const auto hierarchyPanel = registerEditorPanel<HierarchyPanel>(this->window, sceneHandler);
-        const auto inspectorPanel = registerEditorPanel<InspectorPanel>(sceneHandler, hierarchyPanel.get());
-        const auto viewportPanel = registerEditorPanel<ViewportPanel>(this->window, canvas, hierarchyPanel.get(), getGlobalMessenger(), cameraSystem);
-        const auto settingsPanel = registerEditorPanel<SettingsPanel>(clock, raytraceComputeLayer, canvas);
+        registerPanel<ToolbarPanel>(PanelType::EDITOR, globalMessenger, sceneHandler, renderManager, renderSettingsMenu);
+        const auto hierarchyPanel = registerPanel<HierarchyPanel>(PanelType::EDITOR, this->window, sceneHandler);
+        registerPanel<InspectorPanel>(PanelType::EDITOR, sceneHandler, hierarchyPanel);
+        registerPanel<ViewportPanel>(PanelType::EDITOR, this->window, canvas, hierarchyPanel, globalMessenger, cameraSystem);
+        registerPanel<SettingsPanel>(PanelType::EDITOR, clock, raytraceComputeLayer, canvas);
 
         // Render Only Panels
-        registerPreviewPanel<RenderPreviewPanel>(canvas);
-        registerPreviewPanel<RenderStatusPanel>(clock, renderManager);
+        registerPanel<RenderPreviewPanel>(PanelType::PREVIEW, canvas);
+        registerPanel<RenderStatusPanel>(PanelType::PREVIEW, clock, renderManager);
+    }
+
+    void ImGuiLayer::registerListeners()
+    {
+        globalMessenger.subscribe<OpenMenuEvent>([this](const OpenMenuEvent *event) {
+            openMenu(event->name);
+        });
+
+        globalMessenger.subscribe<CloseMenuEvent>([this](const CloseMenuEvent *event) {
+            closeMenu(event->name);
+        });
     }
 
     void ImGuiLayer::onFramePush(const float deltaTime)
@@ -99,13 +111,25 @@ namespace editor
         // Draw
         ImGui::DockSpaceOverViewport(DOCKSPACE_ID, imguiViewport, ImGuiDockNodeFlags_PassthruCentralNode);
 
-        for (const auto &panel : editorPanels)
+        const bool isMenuOpened = !openedMenus.empty();
+        if (isMenuOpened)
+        {
+            for (const auto &menu : openedMenus)
+                menu->draw(deltaTime);
+
+            ImGui::BeginDisabled();
+        }
+
+        for (const auto &panel : getPanels(PanelType::EDITOR))
             panel->draw(deltaTime);
+
+        if (isMenuOpened)
+            ImGui::EndDisabled();
     }
 
     void ImGuiLayer::drawPreview(const float deltaTime) const
     {
-        for (const auto &panel : renderOnlyPanels)
+        for (const auto &panel : getPanels(PanelType::PREVIEW))
             panel->draw(deltaTime);
     }
 
@@ -120,6 +144,33 @@ namespace editor
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
+    }
+
+    void ImGuiLayer::openMenu(const std::string_view name)
+    {
+        UIPanel *menu = findMenu(name);
+        if (std::ranges::count(openedMenus, menu) > 0)
+            return;
+
+        openedMenus.push_back(menu);
+    }
+
+    void ImGuiLayer::closeMenu(const std::string_view name)
+    {
+        UIPanel *menu = findMenu(name);
+        if (std::ranges::count(openedMenus, menu) <= 0)
+            return;
+
+        std::erase(openedMenus, menu);
+    }
+
+    UIPanel *ImGuiLayer::findMenu(const std::string_view name)
+    {
+        const auto &it = menuDictionary.find(name.data());
+        if (it == menuDictionary.end())
+            throw std::runtime_error(std::format("Failed to find menu with name: {}", name));
+
+        return it->second;
     }
 
     void ImGuiLayer::setupImGuiStyle()
@@ -192,23 +243,27 @@ namespace editor
     }
 
     template<std::derived_from<UIPanel> T, typename... Args>
-    std::shared_ptr<T> ImGuiLayer::registerEditorPanel(Args&&... args)
+    T* ImGuiLayer::registerPanel(PanelType type, Args&&... args)
     {
-        return registerPanel<T>(editorPanels, std::forward<Args>(args)...);
+        auto panel = std::make_unique<T>(std::forward<Args>(args)...);
+        T* panelPtr = panel.get();
+
+        if (type == PanelType::MENU)
+            menuDictionary.emplace(panel->getName(), panelPtr);
+
+        panels[static_cast<int>(type)].push_back(std::move(panel));
+        return panelPtr;
     }
 
-    template<std::derived_from<UIPanel> T, typename... Args>
-    std::shared_ptr<T> ImGuiLayer::registerPreviewPanel(Args &&... args)
+    std::vector<UIPanel*> ImGuiLayer::getPanels(PanelType type) const
     {
-        return registerPanel<T>(renderOnlyPanels, std::forward<Args>(args)...);
-    }
+        std::vector<UIPanel*> result;
 
-    template<std::derived_from<UIPanel> T, typename... Args>
-    std::shared_ptr<T> ImGuiLayer::registerPanel(std::vector<std::shared_ptr<UIPanel>> &panels, Args &&... args)
-    {
-        auto panel = std::make_shared<T>(std::forward<Args>(args)...);
-        panels.push_back(panel);
+        const auto &subPanelList = panels[static_cast<int>(type)];
+        result.reserve(subPanelList.size());
+        for (const auto &panel : subPanelList)
+            result.push_back(panel.get());
 
-        return panel;
+        return result;
     }
 }

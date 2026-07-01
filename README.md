@@ -11,8 +11,9 @@
 - Simple ray diverge Anti-Aliasing
 
 #### Ideas for future updates (Soon™)
+- Skybox
 - Enhanced UI and better camera controls
-- Scene rendering mode
+- Fix BVH Traversal overhead (*performances are not as high as they should be*)
 - Multiple Importance Sampling (see: https://lisyarus.github.io/blog/posts/multiple-importance-sampling.html / https://www.youtube.com/watch?v=p772XkEnEIU)
 
 ## Dependencies

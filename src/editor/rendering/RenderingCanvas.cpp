@@ -15,7 +15,7 @@ namespace editor
         textureHandle = createTexture(0, GL_READ_WRITE);
     }
 
-    void RenderingCanvas::resize(const float newWidth, const float newHeight)
+    void RenderingCanvas::resize(const int newWidth, const int newHeight)
     {
         this->width = newWidth;
         this->height = newHeight;

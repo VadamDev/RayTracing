@@ -70,7 +70,7 @@ namespace editor
 
         // Export Now & Cancel Button
         if (ImGui::Button(ICON_FA_ARROW_UP_FROM_BRACKET " Export Now & Cancel", ImVec2(185, 0)))
-            renderManager->cancelRender(true);
+            renderManager->stopRender(true);
 
         ImGui::SameLine();
 
@@ -80,7 +80,7 @@ namespace editor
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.9f, 0.2f, 0.2f, 1));
 
         if (ImGui::Button(ICON_FA_TRASH_CAN " Cancel", ImVec2(-1, 0)))
-            renderManager->cancelRender();
+            renderManager->stopRender();
 
         ImGui::PopStyleColor(3);
 

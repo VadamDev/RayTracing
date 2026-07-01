@@ -9,9 +9,11 @@
 #include <IconsFontAwesome7.h>
 
 #include "../../../scene/SceneHandler.h"
-
 #include "../../ImGuiUtils.hpp"
 #include "../../../rendering/RenderManager.h"
+#include "../Menu.h"
+#include "../../../../engine/messenger/Messenger.hpp"
+#include "../settings/RenderSettingsPanel.h"
 
 namespace editor
 {
@@ -71,25 +73,23 @@ namespace editor
 
             // Create Empty Scene
             if (ImGui::MenuItem(ICON_FA_BORDER_NONE " New Empty Scene"))
-            {
                 sceneHandler->openNewEmptyScene();
-            }
 
             ImGui::EndMenu();
         }
 
         if (ImGui::BeginMenu(ICON_FA_CAMERA " Render"))
         {
+            // Open Render Settings
             if (ImGui::MenuItem(ICON_FA_ELLIPSIS " Settings"))
             {
-                // TODO: open render settings screen
+                OpenMenuEvent event(menu::RENDER_SETTINGS_MENU);
+                globalMessenger.dispatch(event);
             }
 
+            // Select destination and start render
             if (ImGui::MenuItem(ICON_FA_PLAY " Begin"))
-            {
-                RenderOptions options; // TODO: use settings
-                renderManager->beginRender(options);
-            }
+                renderManager->beginRender(renderSettingsPanel->getSelectedRenderOptions());
 
             ImGui::EndMenu();
         }

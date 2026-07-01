@@ -10,6 +10,7 @@ namespace engine
 
 namespace editor
 {
+    class RaytraceComputeLayer;
     class RenderingCanvas;
 
     enum class RenderMode
@@ -17,6 +18,7 @@ namespace editor
         EDITOR, RENDER_ONLY
     };
 
+    static const std::vector EXPORT_FORMAT_NAMES = { "PNG (.png)", "JPG/JPEG (.jpg)", "BMP (.bmp)", "HDR (.hdr)"};
     enum class ExportFormat
     {
         PNG, JPG, BMP, HDR
@@ -43,6 +45,9 @@ namespace editor
     {
         int accumulatedFramesPerImage = 16384;
 
+        bool useViewportResolution = true;
+        int renderWidth = 0, renderHeight = 0;
+
         ExportFormat format = ExportFormat::PNG;
         std::string exportPath = "export";
         int jpgQuality = 80;
@@ -63,7 +68,7 @@ namespace editor
             : globalMessenger(globalMessenger), canvas(canvas) {}
 
         void beginRender(const RenderOptions &options);
-        void cancelRender(bool exportImage = false);
+        void stopRender(bool exportImage = false);
 
         void onFramePush();
 
@@ -71,11 +76,14 @@ namespace editor
         RenderOptions getRenderOptions() const { return options; }
         RenderData getRenderData() const { return data; }
 
+        RaytraceComputeLayer *raytraceComputeLayer;
     private:
         engine::Messenger &globalMessenger;
         RenderingCanvas *canvas;
 
         RenderMode renderMode = RenderMode::EDITOR;
+        int preRenderCanvasWidth = 0, preRenderCanvasHeight = 0;
+        bool preRenderAccumulation = false;
 
         RenderOptions options;
         RenderData data;
