@@ -4,6 +4,7 @@
 
 namespace engine
 {
+    class Window;
     class SimpleClock;
 }
 
@@ -16,12 +17,13 @@ namespace editor
     {
 
     public:
-        explicit SettingsPanel(engine::SimpleClock *clock, RaytraceComputeLayer *raytraceComputeLayer, RenderingCanvas *canvas)
-            : UIPanel("Settings"), clock(clock), raytraceComputeLayer(raytraceComputeLayer), canvas(canvas) {}
+        explicit SettingsPanel(engine::Window &window, engine::SimpleClock *clock, RaytraceComputeLayer *raytraceComputeLayer, RenderingCanvas *canvas)
+            : UIPanel("Settings"), window(window), clock(clock), raytraceComputeLayer(raytraceComputeLayer), canvas(canvas) {}
 
         void draw(float deltaTime) override;
 
     private:
+        engine::Window &window;
         engine::SimpleClock *clock;
 
         RaytraceComputeLayer *raytraceComputeLayer;

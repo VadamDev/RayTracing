@@ -56,7 +56,7 @@ namespace engine
 
         // Set context current
         glfwMakeContextCurrent(window);
-        glfwSwapInterval(0);
+        glfwSwapInterval(vsync ? 1 : 0);
 
         //Create OpenGL capabilities
         if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
@@ -148,6 +148,12 @@ namespace engine
     {
         this->title = std::move(title);
         glfwSetWindowTitle(window, title.c_str());
+    }
+
+    void Window::setVsync(const bool vsync)
+    {
+        this->vsync = vsync;
+        glfwSwapInterval(vsync ? 1 : 0);
     }
 
     void Window::setGrabbed(const bool grabbed)

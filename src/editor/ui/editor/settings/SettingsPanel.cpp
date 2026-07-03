@@ -7,6 +7,7 @@
 #include "../../../rendering/RenderingCanvas.h"
 #include "../../../rendering/RenderingEvents.h"
 #include "../../../../engine/messenger/Messenger.hpp"
+#include "../../../../engine/window/Window.h"
 
 namespace editor
 {
@@ -25,10 +26,11 @@ namespace editor
 
         if (ImGui::CollapsingHeader("Stats", ImGuiTreeNodeFlags_DefaultOpen))
         {
-            static bool vsync = false;
+            static bool vsync = window.isVsync();
 
             ImGui::Text(std::format("FPS: {} ({:.3f}ms) | Avg: {:.3f}ms", clock->getFPS(), lastSpentTimeMs, spentTimeAvgMs).c_str());
-            Checkbox("VSync", vsync, COLUMN_WIDTH);
+            if(Checkbox("VSync", vsync, COLUMN_WIDTH))
+                window.setVsync(vsync);
 
             ImGui::NewLine();
         }

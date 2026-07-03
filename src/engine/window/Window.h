@@ -28,8 +28,8 @@ namespace engine
         friend class Application;
 
     public:
-        Window(const int width, const int height, std::string title)
-            : width(width), height(height), title(std::move(title)) {}
+        Window(const int width, const int height, std::string title, const bool vsync = false)
+            : width(width), height(height), title(std::move(title)), vsync(vsync) {}
         ~Window();
 
         /*
@@ -67,6 +67,7 @@ namespace engine
         int getHeight() const { return height; }
         float getAspectRatio() const { return (float) width / height; }
         std::string getTitle() const { return title; }
+        bool isVsync() const { return vsync; }
 
         InputsManager& getInputsManager() { return inputsManager; }
 
@@ -74,6 +75,7 @@ namespace engine
          * Setters
          */
 
+        void setVsync(bool vsync);
         void setTitle(std::string title);
         void setGrabbed(bool grabbed);
         void hideCursor(bool hidden);
@@ -81,6 +83,7 @@ namespace engine
     private:
         int width, height;
         std::string title;
+        bool vsync = false;
 
         GLFWwindow *window = nullptr;
         InputsManager inputsManager;
