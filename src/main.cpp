@@ -10,7 +10,5 @@ int main()
     RaytracingApp app(window);
 
     engine::SimpleClock clock(window, app);
-    app.start(&clock);
-
-    return 0;
+    return app.start(&clock);
 }

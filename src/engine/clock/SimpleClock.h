@@ -18,7 +18,7 @@ namespace engine
          * Management
          */
 
-        void start() override;
+        int start() override;
         void stop() override;
 
         /*
@@ -37,6 +37,6 @@ namespace engine
         ProfilerEntry *renderProfiler = nullptr;
 
         void setupProfilers();
-        void loop();
+        int loop();
     };
 }

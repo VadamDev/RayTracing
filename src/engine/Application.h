@@ -17,13 +17,13 @@ namespace engine
             window.messenger = &globalMessenger;
         }
 
-        void start(AbstractClock *clock) noexcept
+        int start(AbstractClock *clock) noexcept
         {
             if (this->clock != nullptr && this->clock->isRunning())
-                return;
+                return 0;
 
             this->clock = clock;
-            clock->start();
+            return clock->start();
         }
 
         void stop() const noexcept

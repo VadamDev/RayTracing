@@ -14,7 +14,7 @@ namespace engine
      * Managament
      */
 
-    void SimpleClock::start()
+    int SimpleClock::start()
     {
         running = true;
         setupProfilers();
@@ -31,10 +31,10 @@ namespace engine
             spdlog::critical("A critical exception has been caught during init:\n{}", e.what());
             running = false;
             
-            return;
+            return -1;
         }
 
-        loop();
+        return loop();
     }
 
     void SimpleClock::stop()
@@ -42,7 +42,7 @@ namespace engine
         running = false;
     }
 
-    void SimpleClock::loop()
+    int SimpleClock::loop()
     {
         using namespace std::chrono;
 
@@ -68,7 +68,9 @@ namespace engine
             catch (std::runtime_error &e)
             {
                 spdlog::critical("An error has been caught during frame render:\n{}", e.what());
-                break;
+
+                app.onDestroy();
+                return -1;
             }
 
             frames++;
@@ -84,6 +86,7 @@ namespace engine
         }
 
         app.onDestroy();
+        return 0;
     }
 
     void SimpleClock::setupProfilers()
