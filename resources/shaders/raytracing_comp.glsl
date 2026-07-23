@@ -1,7 +1,6 @@
 #version 460
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
-layout(rgba32f, binding = 0) uniform image2D resultImage;
 
 /*
   Structs
@@ -86,6 +85,9 @@ struct TriHitInfo
 /*
   IO
 */
+
+layout(rgba32f, binding = 0) uniform image2D resultImage;
+layout(binding = 1) uniform samplerCube skyboxTex;
 
 uniform uint frameIndex; // Index of the frame currently being rendered
 uniform vec3 viewParams; // planeWidth, planeHeight, focalLength;
@@ -359,19 +361,12 @@ HitInfo intersectScene(Ray ray, inout vec2 stats)
     return result;
 }
 
-// Simple fake sky box TODO: add sun dir
 vec3 calculateEnvironmentLight(Ray ray)
 {
     if(!environmentLight)
         return vec3(0);
 
-    float verticalPos = clamp(ray.dir.y, 0, 1);
-    vec3 skyColor = mix(vec3(0.5, 0.7, 1.0), vec3(0.1, 0.3, 0.8), verticalPos);
-
-    float haze = pow(1.0 - verticalPos, 4.0);
-    skyColor = mix(skyColor, vec3(0.8, 0.8, 0.9), haze);
-
-    return skyColor * vec3(1.0, 0.9, 0.7);
+    return texture(skyboxTex, ray.dir).rgb;
 }
 
 // Main raytracing function, shoot the ray and gather the color it brings back

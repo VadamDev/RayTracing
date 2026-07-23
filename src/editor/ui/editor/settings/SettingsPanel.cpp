@@ -41,7 +41,6 @@ namespace editor
             const int height = canvas->getHeight();
 
             ImGui::Text(std::format("{}/{} | {} pixels", width, height, formatNumber(width * height)).c_str());
-
             ImGui::NewLine();
         }
 

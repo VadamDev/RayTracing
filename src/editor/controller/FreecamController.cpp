@@ -71,16 +71,13 @@ namespace editor
         if (inputsManager.isKeyDown(engine::KeyboardKeys::KEY_LEFT_CONTROL))
             offset.y -= 1;
 
-        bool sprinting = false;
-        if (inputsManager.isKeyDown(engine::KeyboardKeys::KEY_LEFT_SHIFT))
-            sprinting = true;
-
         if (offset == ZERO)
             return;
 
+        const bool sprinting = inputsManager.isKeyDown(engine::KeyboardKeys::KEY_LEFT_SHIFT);
         offset = glm::normalize(offset) * cameraSpeed * (sprinting ? SPRINT_MULTIPLIER : 1) * deltaTime;
-        moveCamera(offset, cameraPos, cameraRot);
 
+        moveCamera(offset, cameraPos, cameraRot);
         moved = true;
     }
 

@@ -11,12 +11,24 @@ namespace editor
     static constexpr int N_GROUP_X = 8;
     static constexpr int N_GROUP_Y = 8;
 
+    static const std::vector<std::string> SKYBOX_FACES = {
+        "resources/skybox/px.png", // Right
+        "resources/skybox/nx.png", // Left
+        "resources/skybox/py.png", // Top
+        "resources/skybox/ny.png", // Bottom
+        "resources/skybox/pz.png", // Back
+        "resources/skybox/nz.png", // Front
+    };
+
     void RaytraceComputeLayer::onInit(GLFWwindow *window)
     {
         shader.create();
 
         sphereCpSystem = std::make_unique<RaytracedSphereSystem>(shader);
         meshCpSystem = std::make_unique<RaytracedMeshSystem>(shader, modelManager);
+
+        cubemap = std::make_unique<engine::Cubemap>(512, 512, SKYBOX_FACES);
+        cubemap->create();
 
         registerListeners();
     }
@@ -66,6 +78,7 @@ namespace editor
     void RaytraceComputeLayer::onFramePush(const float deltaTime) {
         engine::Scene *openedScene = sceneHandler->getOpenedScene();
 
+        cubemap->bind();
         shader.bind();
 
         updateBuffers(openedScene);

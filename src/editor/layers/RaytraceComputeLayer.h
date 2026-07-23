@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../engine/window/IRenderLayer.h"
+#include "../../engine/graphics/Cubemap.h"
 #include "../rendering/RaytracedObjectsSystem.h"
 #include "../rendering/RaytraceShader.h"
 
@@ -36,6 +37,7 @@ namespace editor
 
         SceneHandler *sceneHandler;
         ModelManager *modelManager;
+        std::unique_ptr<engine::Cubemap> cubemap;
 
         RenderingCanvas *canvas;
         CameraSystem *cameraSystem;
