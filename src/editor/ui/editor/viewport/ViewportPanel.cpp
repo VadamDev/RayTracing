@@ -1,8 +1,10 @@
 #include "ViewportPanel.h"
 
 #include "../../ImGuiUtils.hpp"
+#include "../../../../engine/messenger/Messenger.hpp"
 #include "../../../../engine/window/Window.h"
 #include "../../../rendering/RenderingCanvas.h"
+#include "../../../rendering/RenderingEvents.h"
 #include "../inspector/HierarchyPanel.h"
 
 namespace editor
@@ -17,9 +19,12 @@ namespace editor
         // Calculate the size of the rendered image inside the viewport window
         const glm::ivec2 targetDims = calculateViewportSize(imguiWidth, imguiHeight);
 
-        if (targetDims.x != canvas->getWidth() || targetDims.y != canvas->getHeight())
+        if (drawStrategy == ViewportDrawStrategy::SHRINK_TO_FIT && (targetDims.x != canvas->getWidth() || targetDims.y != canvas->getHeight()))
         {
-            // TODO: resize canvas to fit imgui window
+            canvas->resize(targetDims.x, targetDims.y);
+
+            AccumulationResetEvent event;
+            globalMessenger.dispatch(event);
         }
 
         const auto drawPos = ImVec2((imguiWidth - targetDims.x) / 2, (imguiHeight - targetDims.y) / 2);
@@ -52,7 +57,7 @@ namespace editor
         glm::ivec2 result(0, 0);
 
         const float viewportAR = windowWidth / windowHeight;
-        const float targetAR = 16.0f / 9.0f;// TODO: renderer->getCamera()->targetAspectRatio;
+        const float targetAR = drawStrategy == ViewportDrawStrategy::CUSTOM_RESOLUTION ? getCustomAspectRatio() : this->targetAR;
 
         if (viewportAR > targetAR)
         {

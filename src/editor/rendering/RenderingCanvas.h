@@ -21,7 +21,7 @@ namespace editor
         unsigned int getGLTextureHandle() const { return textureHandle; }
         int getWidth() const { return width; }
         int getHeight() const { return height; }
-        float getAspectRatio() const { return static_cast<float>(width) / height; }
+        float getAspectRatio() const { return static_cast<float>(width) / static_cast<float>(height); }
 
     private:
         int width = 0, height = 0;

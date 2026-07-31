@@ -43,8 +43,8 @@ namespace editor
         registerPanel<ToolbarPanel>(PanelType::EDITOR, globalMessenger, sceneHandler, renderManager, renderSettingsMenu);
         const auto hierarchyPanel = registerPanel<HierarchyPanel>(PanelType::EDITOR, this->window, sceneHandler);
         registerPanel<InspectorPanel>(PanelType::EDITOR, sceneHandler, hierarchyPanel);
-        registerPanel<ViewportPanel>(PanelType::EDITOR, this->window, canvas, hierarchyPanel, globalMessenger, cameraSystem);
-        registerPanel<SettingsPanel>(PanelType::EDITOR, window, clock, raytraceComputeLayer, canvas);
+        const auto viewportPanel = registerPanel<ViewportPanel>(PanelType::EDITOR, this->window, canvas, hierarchyPanel, globalMessenger, cameraSystem);
+        registerPanel<SettingsPanel>(PanelType::EDITOR, window, clock, globalMessenger, raytraceComputeLayer, canvas, viewportPanel);
 
         // Render Only Panels
         registerPanel<RenderPreviewPanel>(PanelType::PREVIEW, canvas);

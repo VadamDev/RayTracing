@@ -28,8 +28,6 @@ namespace editor
 
         void onDestroy() noexcept override {}
 
-        engine::Messenger& getGlobalMessenger() const { return globalMessenger; }
-
         RaytracerSettings settings;
         DebugSettings debugSettings;
     private:
