@@ -1,31 +1,14 @@
-#include <stdexcept>
-
-#include <spdlog/spdlog.h>
-
 #include "engine/window/Window.h"
-#include "app/RaytracingApplication.h"
-#include "engine/clock/FixedStepClock.h"
+#include "editor/RaytracingApp.h"
+#include "engine/clock/SimpleClock.h"
 
-using namespace application;
+using namespace editor;
 
 int main()
 {
-    engine::Window window(1280, 720, "Ray Tracing");
+    engine::Window window(1920, 1080, "Ray Tracing - Editor");
+    RaytracingApp app(window);
 
-    try { window.create(); }
-    catch (std::runtime_error &e)
-    {
-        spdlog::critical(e.what());
-        return -1;
-    }
-
-    RaytracingApplication app(window);
-
-    const auto clock = std::make_unique<engine::FixedStepClock>(window, app);
-    clock->setTargetFPS(engine::Window::getMonitorRefreshRate());
-    clock->bIgnoreFpsCap = true;
-
-    app.start(clock.get());
-
-    return 0;
+    engine::SimpleClock clock(window, app);
+    return app.start(&clock);
 }

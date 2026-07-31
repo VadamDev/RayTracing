@@ -1,116 +1,72 @@
 #include "SteadyProfiler.h"
 
+#include <numeric>
 #include <ranges>
 
-namespace engine {
+namespace engine
+{
     /*
-     * SteadyProfiler
+     * Profiler
      */
 
-    ProfilerEntry* SteadyProfiler::newEntry(const std::string &name)
+    using namespace std::chrono;
+
+    ProfilerEntry* SteadyProfiler::newEntry(const std::string &name, int maxSamples)
     {
         if (entries.contains(name))
-            throw std::runtime_error("A profiler with that name already exists!");
+            throw exceptions::ProfilerException("An entry with that name already exists!");
 
-        auto [it, _] = entries.try_emplace(name, name);
+        auto [it, _] = entries.try_emplace(name, name, maxSamples);
         return &it->second;
     }
 
-    ProfilerEntry& SteadyProfiler::retrieveEntry(const std::string &name)
+    ProfilerEntry& SteadyProfiler::getEntry(const std::string &name)
     {
         return entries.at(name);
     }
 
     std::vector<ProfilerEntry> SteadyProfiler::allEntries()
     {
-        std::vector<ProfilerEntry> result;
-        result.reserve(entries.size());
-
-        for(const auto &entry : entries | std::views::values)
-            result.push_back(entry);
-
-        return result;
-    }
-
-    nanoseconds SteadyProfiler::calculateTotalSpentTime()
-    {
-        nanoseconds total = nanoseconds::zero();
-
-        for (auto &entry: entries | std::views::values)
-            total += entry.getAccumulatedTime();
-
-        return total;
-    }
-
-    uint64_t SteadyProfiler::calculateTotalNumCalls()
-    {
-        uint64_t total = 0;
-
-        for (auto &entry: entries | std::views::values)
-            total += entry.getNumCalls();
-
-        return total;
+        auto values = entries | std::views::values;
+        return std::vector(values.begin(), values.end());
     }
 
     /*
-     * ProfilerEntry
+     *  Entry
      */
 
     void ProfilerEntry::begin()
     {
-        if (bClosed)
-            throw std::runtime_error("Failed to begin profiler, it has been closed!");
-
-        if (bProfiling)
-            throw std::runtime_error("A profiler has already been started");
+        if (profiling)
+            throw exceptions::ProfilerException("A profiler has already been started");
 
         beginTime = steady_clock::now();
-        bProfiling = true;
+        profiling = true;
     }
 
     void ProfilerEntry::end()
     {
-        if (bClosed)
-            throw std::runtime_error("Failed to end profiler, it has been closed!");
-
-        if (!bProfiling)
-            throw std::runtime_error("The profiler hasn't been started");
+        if (!profiling)
+            throw exceptions::ProfilerException("The profiler hasn't been started");
 
         const nanoseconds durationNs = steady_clock::now() - beginTime;
-
-        accumulatedTime += durationNs;
         lastSpentTime = durationNs;
 
-        numCalls++;
+        if (samples.size() >= maxSamples)
+            samples.erase(samples.begin());
+        samples.push_back(durationNs.count() / 1e6f);
 
-        bProfiling = false;
+        spentTimeAvgMs = std::accumulate(samples.begin(), samples.end(), 0.0f) / samples.size();
+
+        profiling = false;
     }
 
     void ProfilerEntry::reset()
     {
-        accumulatedTime = nanoseconds::zero();
-        lastSpentTime = nanoseconds::zero();
-
-        numCalls = 0;
-    }
-
-    void ProfilerEntry::stop()
-    {
-        if (bClosed)
-            throw std::runtime_error("Failed to begin profiler, it has been closed!");
-
-        if(bProfiling)
+        if (profiling)
             end();
 
-        bClosed = true;
-        endTime = steady_clock::now();
-    }
-
-    nanoseconds ProfilerEntry::calculateSpentTimeAvg() const
-    {
-        if (numCalls <= 0)
-            return nanoseconds::zero();
-
-        return accumulatedTime / numCalls;
+        lastSpentTime = nanoseconds::zero();
+        samples.clear();
     }
 }

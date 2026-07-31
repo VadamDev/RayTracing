@@ -7,17 +7,17 @@ namespace engine
     class Entity;
     class Messenger;
 
-    struct AddEntityToSceneEvent
+    struct EntityAddedToSceneEvent
     {
-        explicit AddEntityToSceneEvent(const Entity *entity)
+        explicit EntityAddedToSceneEvent(const Entity *entity)
             : entity(entity) {}
 
         const Entity *entity;
     };
 
-    struct RemoveEntityFromSceneEvent
+    struct EntityRemovedFromSceneEvent
     {
-        explicit RemoveEntityFromSceneEvent(const Entity *entity)
+        explicit EntityRemovedFromSceneEvent(const Entity *entity)
             : entity(entity) {}
 
         const Entity *entity;

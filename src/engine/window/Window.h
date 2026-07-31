@@ -1,17 +1,18 @@
 #pragma once
 
-#include <glad/glad.h> //Prevent the compiler from bitching, GLAD need to be loaded before GLFW
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <string>
 #include <memory>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
-#include "IImGuiLayer.h"
-#include "input/InputsManager.h"
+#include "inputs/InputsManager.h"
 
 namespace engine
 {
     class Messenger;
+    class IRenderLayer;
 
     struct WindowResizeEvent
     {
@@ -27,20 +28,29 @@ namespace engine
         friend class Application;
 
     public:
-        explicit Window(const int width, const int height, std::string title)
-            : width(width), height(height), title(std::move(title)) {}
+        Window(const int width, const int height, std::string title, const bool vsync = false)
+            : width(width), height(height), title(std::move(title)), vsync(vsync) {}
         ~Window();
 
         /*
-         * Window Management
+         * Management
          */
 
         void create();
 
-        void pushFrame() noexcept;
-        void popFrame() const noexcept;
+        template<std::derived_from<IRenderLayer> T, typename... Args>
+        std::shared_ptr<T> registerLayer(Args&&... args)
+        {
+            if (window != nullptr)
+                throw std::runtime_error("Attempted to register a render layer to an already created window");
 
-        void registerImGuiWindow(const std::shared_ptr<IImGuiLayer> &imguiWindow) { imguiWindows.push_back(imguiWindow); }
+            auto layer = std::make_shared<T>(std::forward<Args>(args)...);
+            renderLayers.push_back(layer);
+
+            return layer;
+        }
+
+        void pushAndPop(float deltaTime);
 
         /*
          * Getters
@@ -48,47 +58,43 @@ namespace engine
 
         bool shouldClose() const;
 
-        double getFrameTime() const { return dFrameTime; }
-        float getFrameTimeF() const { return fFrameTime; }
+        float getFrameTime() const { return frameTime; }
 
         bool isGrabbed() const { return grabbed; }
+        bool wasGrabbedBefore() const { return wasGrabbed; }
 
         int getWidth() const { return width; }
         int getHeight() const { return height; }
         float getAspectRatio() const { return (float) width / height; }
         std::string getTitle() const { return title; }
+        bool isVsync() const { return vsync; }
 
-        std::shared_ptr<InputsManager> getInputsManager() const { return inputManager; }
+        InputsManager& getInputsManager() { return inputsManager; }
 
         /*
          * Setters
          */
 
+        void setVsync(bool vsync);
         void setTitle(std::string title);
         void setGrabbed(bool grabbed);
-
-        /*
-         * Static Utils
-         */
-
-        static int getMonitorRefreshRate();
-        static bool wantCapturePeripherals();
+        void hideCursor(bool hidden);
 
     private:
         int width, height;
         std::string title;
+        bool vsync = false;
 
         GLFWwindow *window = nullptr;
-
-        std::shared_ptr<InputsManager> inputManager;
-        std::vector<std::shared_ptr<IImGuiLayer>> imguiWindows;
-
+        InputsManager inputsManager;
         Messenger *messenger = nullptr;
 
-        bool resized = true, grabbed = false;
-        double dFrameTime = 0, fFrameTime = 0;
+        bool resized = true, grabbed = false, wasGrabbed = false, cursorHidden = false;
+        float frameTime = 0;
 
-        void setupCallbacks();
+        std::vector<std::shared_ptr<IRenderLayer>> renderLayers;
+
+        void setupCallbacks() const;
 
         /*
          * Static Utility
@@ -97,12 +103,12 @@ namespace engine
 
         static Mouse& retrieveMouse(GLFWwindow *glfwWindow)
         {
-            return retrieveWindow(glfwWindow)->getInputsManager()->getMouse();
+            return retrieveWindow(glfwWindow)->getInputsManager().getMouse();
         }
 
         static Keyboard& retrieveKeyboard(GLFWwindow *glfwWindow)
         {
-            return retrieveWindow(glfwWindow)->getInputsManager()->getKeyboard();
+            return retrieveWindow(glfwWindow)->getInputsManager().getKeyboard();
         }
 
         static Window* retrieveWindow(GLFWwindow *glfwWindow)

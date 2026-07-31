@@ -1,0 +1,95 @@
+#include "FreecamController.h"
+
+#include "../rendering/CameraSystem.h"
+
+namespace editor
+{
+    static constexpr glm::vec3 ZERO(0, 0, 0);
+    static constexpr glm::vec3 WORLD_UP(0, 1, 0);
+
+    static constexpr float SPRINT_MULTIPLIER = 2.5f;
+
+    bool FreecamController::processInputs(const float deltaTime)
+    {
+        if (!window.isGrabbed())
+            return false;
+
+        TransformComponent *transform = cameraSystem->getPrimaryCamera().transform;
+        processMouse(transform->rotation);
+        processKeyboard(transform->position, transform->rotation, deltaTime);
+
+        if (!moved)
+            return false;
+
+        cameraSystem->updateLocalToWorldMatrix();
+        moved = false;
+
+        return true;
+    }
+
+    void FreecamController::processMouse(glm::vec3 &cameraRot)
+    {
+        const glm::vec2 &mouseDelta = inputsManager.getMouseDelta();
+        if (mouseDelta.x == 0 && mouseDelta.y == 0)
+            return;
+
+        cameraRot.y += mouseDelta.x * sensitivity;
+        cameraRot.x += mouseDelta.y * sensitivity;
+
+        if (cameraRot.x > 90)
+            cameraRot.x = 90;
+        else if (cameraRot.x < -90)
+            cameraRot.x = -90;
+
+        if (cameraRot.y > 360)
+            cameraRot.y -= 360;
+        else if (cameraRot.y < 0)
+            cameraRot.y += 360;
+
+        moved = true;
+    }
+
+    void FreecamController::processKeyboard(glm::vec3 &cameraPos, const glm::vec3 &cameraRot, const float deltaTime)
+    {
+        glm::vec3 offset(0, 0, 0);
+
+        if (inputsManager.isKeyDown(engine::KeyboardKeys::KEY_W))
+            offset.z += 1;
+
+        if (inputsManager.isKeyDown(engine::KeyboardKeys::KEY_A))
+            offset.x -= 1;
+
+        if (inputsManager.isKeyDown(engine::KeyboardKeys::KEY_S))
+            offset.z -= 1;
+
+        if (inputsManager.isKeyDown(engine::KeyboardKeys::KEY_D))
+            offset.x += 1;
+
+        if (inputsManager.isKeyDown(engine::KeyboardKeys::KEY_SPACE))
+            offset.y += 1;
+
+        if (inputsManager.isKeyDown(engine::KeyboardKeys::KEY_LEFT_CONTROL))
+            offset.y -= 1;
+
+        if (offset == ZERO)
+            return;
+
+        const bool sprinting = inputsManager.isKeyDown(engine::KeyboardKeys::KEY_LEFT_SHIFT);
+        offset = glm::normalize(offset) * cameraSpeed * (sprinting ? SPRINT_MULTIPLIER : 1) * deltaTime;
+
+        moveCamera(offset, cameraPos, cameraRot);
+        moved = true;
+    }
+
+    void FreecamController::moveCamera(const glm::vec3 &offset, glm::vec3 &cameraPos, const glm::vec3 &cameraRot)
+    {
+        const float yawRad = glm::radians(cameraRot.y);
+
+        const glm::vec3 forward(glm::sin(yawRad), 0, glm::cos(yawRad));
+        const glm::vec3 right = glm::cross(WORLD_UP, forward);
+
+        cameraPos += offset.x * right;
+        cameraPos += offset.y * WORLD_UP;
+        cameraPos += offset.z * forward;
+    }
+}

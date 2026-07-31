@@ -1,32 +1,29 @@
 #include "Window.h"
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_opengl3.h"
-#include <ImGuizmo.h>
-#include "../messenger/Messenger.hpp"
+#include <ranges>
+#include <spdlog/spdlog.h>
 
-#include "spdlog/spdlog.h"
+#include "IRenderLayer.h"
+#include "../messenger/Messenger.hpp"
 
 namespace engine
 {
     Window::~Window()
     {
-        if(window != nullptr)
+        if (window != nullptr)
         {
-            ImGui_ImplOpenGL3_Shutdown();
-            ImGui_ImplGlfw_Shutdown();
-            ImGui::DestroyContext();
-
             glfwDestroyWindow(window);
+
+            for (const auto &layer : renderLayers)
+                layer->onDestroy();
         }
 
-        glfwTerminate(); // Have no effect when GLFW is not initialized so no need to add a check, I think... Maybe? Eh...
+        glfwTerminate();
     }
 
     void Window::create()
     {
-        // Initializing GLFW
+        // Init GLFW
         glfwSetErrorCallback([](int error, const char* description) {
             spdlog::error("Caught a GLFW error [{}]: \n{}", error, description);
         });
@@ -34,7 +31,7 @@ namespace engine
         if (!glfwInit())
             throw std::runtime_error("Failed to initialize GLFW");
 
-        // Creating the window
+        // Create the window
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
@@ -48,8 +45,6 @@ namespace engine
         window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
         if (!window)
             throw std::runtime_error("Failed to create a GLFW window");
-
-        // Black magic pointer shit that I DO NOT understand
         glfwSetWindowUserPointer(window, this);
 
         // Setup callbacks
@@ -61,52 +56,33 @@ namespace engine
 
         // Set context current
         glfwMakeContextCurrent(window);
-        glfwSwapInterval(0);
+        glfwSwapInterval(vsync ? 1 : 0);
 
         //Create OpenGL capabilities
-        if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
+        if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
             throw std::runtime_error("Failed to initialize OpenGL context");
 
-        // Show OpenGL version
+        // Log OpenGL version
         spdlog::info("OpenGL version {}", std::string_view(reinterpret_cast<const char*>(glGetString(GL_VERSION))));
 
         //Show the window
         glfwShowWindow(window);
 
-        // Setup Imgui
-        IMGUI_CHECKVERSION();
-
-        ImGui::CreateContext();
-        ImGui::StyleColorsDark();
-
-        ImGui_ImplGlfw_InitForOpenGL(window, true);
-        ImGui_ImplOpenGL3_Init("#version 460");
+        for (const auto &layer : renderLayers)
+            layer->onInit(window);
     }
 
-    void Window::setupCallbacks()
+    void Window::setupCallbacks() const
     {
-        /*
-         * Window Resize
-         */
-
-        glfwSetFramebufferSizeCallback(window, [](GLFWwindow *window, const int width, const int height) {
+        // Window Resize
+        glfwSetFramebufferSizeCallback(window, [](GLFWwindow *window, const int newWidth, const int newHeight) {
             auto *self = retrieveWindow(window);
 
-            self->width = width;
-            self->height = height;
+            self->width = newWidth;
+            self->height = newHeight;
 
             self->resized = true;
         });
-
-        /*
-         * Inputs
-         */
-
-        inputManager = std::make_shared<InputsManager>();
-
-        /*
-         * Mouse
-         */
 
         glfwSetMouseButtonCallback(window, [](GLFWwindow *windowHandle, const int button, const int action, const int mods) {
             retrieveMouse(windowHandle).onMouseButton(button, action, mods);
@@ -120,16 +96,12 @@ namespace engine
             retrieveMouse(windowHandle).onCursorPosition(xPos, yPos);
         });
 
-        /*
-         * Keyboard
-         */
-
         glfwSetKeyCallback(window, [](GLFWwindow *windowHandle, const int key, const int scancode, const int action, const int mods) {
             retrieveKeyboard(windowHandle).onKey(key, scancode, action, mods);
         });
     }
 
-    void Window::pushFrame() noexcept
+    void Window::pushAndPop(const float deltaTime)
     {
         if (resized)
         {
@@ -137,31 +109,26 @@ namespace engine
             resized = false;
 
             WindowResizeEvent event(width, height);
-            messenger->dispatch<WindowResizeEvent>(event);
+            messenger->dispatch(event);
         }
 
-        dFrameTime = glfwGetTime();
-        fFrameTime = static_cast<float>(dFrameTime);
+        frameTime = static_cast<float>(glfwGetTime());
 
-        inputManager->getMouse().processDeltas();
+        inputsManager.getMouse().processDeltas();
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        ImGuizmo::BeginFrame();
+        glClear(GL_COLOR_BUFFER_BIT);
+        auto activeLayers = renderLayers | std::views::filter([](const auto &layer) { return layer->canRender(); });
+        // We're doing this separately to be versatile as possible. (For exemple, imgui need to be need to be rendered after geometry)
+        for (const auto &layer : activeLayers)
+            layer->onFramePush(deltaTime);
 
-        // ImGui is currently rendered before world rendering. We're always rendering to a framebuffer so it'll never cause issues
-        for (const auto &imguiWindow : imguiWindows)
-            imguiWindow->draw();
-    }
-
-    void Window::popFrame() const noexcept
-    {
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        for (const auto &layer : activeLayers)
+            layer->onFramePop();
 
         glfwPollEvents();
         glfwSwapBuffers(window);
+        
+        wasGrabbed = grabbed;
     }
 
     /*
@@ -180,27 +147,30 @@ namespace engine
     void Window::setTitle(std::string title)
     {
         this->title = std::move(title);
-        glfwSetWindowTitle(window, this->title.c_str());
+        glfwSetWindowTitle(window, title.c_str());
+    }
+
+    void Window::setVsync(const bool vsync)
+    {
+        this->vsync = vsync;
+        glfwSwapInterval(vsync ? 1 : 0);
     }
 
     void Window::setGrabbed(const bool grabbed)
     {
+        if (this->grabbed == grabbed)
+            return;
+
         glfwSetInputMode(window, GLFW_CURSOR, grabbed ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
         this->grabbed = grabbed;
     }
 
-    /*
-     * Static Utils
-     */
-
-    int Window::getMonitorRefreshRate()
+    void Window::hideCursor(const bool hidden)
     {
-        return glfwGetVideoMode(glfwGetPrimaryMonitor())->refreshRate;
-    }
+        if (grabbed || hidden == cursorHidden)
+            return;
 
-    bool Window::wantCapturePeripherals()
-    {
-        const ImGuiIO &io = ImGui::GetIO();
-        return io.WantCaptureMouse || io.WantCaptureKeyboard;
+        glfwSetInputMode(window, GLFW_CURSOR, hidden ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+        cursorHidden = hidden;
     }
 }

@@ -1,0 +1,32 @@
+#pragma once
+
+#include <vector>
+
+namespace editor
+{
+    class RenderingCanvas
+    {
+
+    public:
+        RenderingCanvas(const int width, const int height)
+            : width(width), height(height) {}
+        ~RenderingCanvas();
+
+        void create();
+        void resize(int newWidth, int newHeight);
+
+        template<typename T>
+        std::vector<T> exportTextureAs(unsigned int type) const;
+
+        unsigned int getGLTextureHandle() const { return textureHandle; }
+        int getWidth() const { return width; }
+        int getHeight() const { return height; }
+        float getAspectRatio() const { return static_cast<float>(width) / static_cast<float>(height); }
+
+    private:
+        int width = 0, height = 0;
+        unsigned int textureHandle = 0;
+
+        unsigned int createTexture(unsigned int binding, unsigned int access) const;
+    };
+}

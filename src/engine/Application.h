@@ -1,5 +1,7 @@
 #pragma once
 
+#include "IAppLifecycle.h"
+#include "window/Window.h"
 #include "clock/AbstractClock.h"
 #include "messenger/Messenger.hpp"
 
@@ -15,17 +17,13 @@ namespace engine
             window.messenger = &globalMessenger;
         }
 
-        /*
-         * Start / Stop
-         */
-        
-        void start(AbstractClock *clock) noexcept
+        int start(AbstractClock *clock) noexcept
         {
             if (this->clock != nullptr && this->clock->isRunning())
-                return;
+                return 0;
 
             this->clock = clock;
-            this->clock->start();
+            return clock->start();
         }
 
         void stop() const noexcept
@@ -42,7 +40,7 @@ namespace engine
 
         Window& getWindow() const { return window; }
         AbstractClock* getClock() const { return clock; }
-        Messenger* getGlobalMessenger() { return &globalMessenger; }
+        Messenger& getGlobalMessenger() { return globalMessenger; }
 
     protected:
         Window &window;

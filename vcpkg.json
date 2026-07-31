@@ -1,0 +1,55 @@
+{
+  "name" : "raytracing",
+  "version-string" : "0.1.0",
+  "builtin-baseline" : "940f58770cee8e2011bfb4847fb2bd70057301a8",
+  "dependencies" : [ {
+    "name" : "egl-registry",
+    "version>=" : "2025-05-27"
+  }, {
+    "name" : "entt",
+    "version>=" : "3.16.0"
+  }, {
+    "name" : "fmt",
+    "version>=" : "12.1.0"
+  }, {
+    "name" : "glad",
+    "version>=" : "0.1.36"
+  }, {
+    "name" : "glfw3",
+    "version>=" : "3.4#1"
+  }, {
+    "name" : "glm",
+    "version>=" : "1.0.3"
+  }, {
+    "name" : "imgui",
+    "version>=" : "1.92.7",
+    "features" : [ "docking-experimental", "glfw-binding", "opengl3-binding" ]
+  }, {
+    "name" : "imguizmo",
+    "version>=" : "1.9"
+  }, {
+    "name" : "nlohmann-json",
+    "version>=" : "3.12.0#2"
+  }, {
+    "name" : "opengl-registry",
+    "version>=" : "2026-01-26"
+  }, {
+    "name" : "portable-file-dialogs",
+    "version>=" : "0.1.0"
+  }, {
+    "name" : "spdlog",
+    "version>=" : "1.17.0"
+  }, {
+    "name" : "tinyobjloader",
+    "version>=" : "2.0.0rc13"
+  }, {
+    "name" : "vcpkg-cmake-config",
+    "version>=" : "2024-05-23"
+  }, {
+    "name" : "vcpkg-cmake",
+    "version>=" : "2024-04-23"
+  }, {
+    "name" : "stb",
+    "version>=" : "2024-07-29#1"
+  } ]
+}

@@ -8,12 +8,9 @@ namespace engine
     public:
         virtual ~IAppLifecycle() = default;
 
-        virtual void init() = 0;
-
-        virtual void update() = 0;
-        virtual void processInputs(float deltaTime) = 0;
-        virtual void render(float deltaTime) = 0;
-
-        virtual void destroy() noexcept = 0;
+        virtual void onInit() = 0; // Called before render layer & window init
+        virtual void onPostInit() = 0; // Called AFTER render layer & window init
+        virtual void onPreRender(float deltaTime) = 0; // Called BEFORE render layer pushFrame
+        virtual void onDestroy() noexcept = 0;
     };
 }

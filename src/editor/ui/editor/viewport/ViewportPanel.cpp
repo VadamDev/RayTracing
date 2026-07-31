@@ -1,0 +1,75 @@
+#include "ViewportPanel.h"
+
+#include "../../ImGuiUtils.hpp"
+#include "../../../../engine/messenger/Messenger.hpp"
+#include "../../../../engine/window/Window.h"
+#include "../../../rendering/RenderingCanvas.h"
+#include "../../../rendering/RenderingEvents.h"
+#include "../inspector/HierarchyPanel.h"
+
+namespace editor
+{
+    void ViewportPanel::draw(float deltaTime)
+    {
+        ImGui::Begin(getName());
+
+        const float imguiWidth = ImGui::GetWindowWidth();
+        const float imguiHeight = ImGui::GetWindowHeight() - (ImGui::GetFrameHeight() + ImGui::GetStyle().WindowPadding.y); // This weirdness is here to get actual height without the header bar
+
+        // Calculate the size of the rendered image inside the viewport window
+        const glm::ivec2 targetDims = calculateViewportSize(imguiWidth, imguiHeight);
+
+        if (drawStrategy == ViewportDrawStrategy::SHRINK_TO_FIT && (targetDims.x != canvas->getWidth() || targetDims.y != canvas->getHeight()))
+        {
+            canvas->resize(targetDims.x, targetDims.y);
+
+            AccumulationResetEvent event;
+            globalMessenger.dispatch(event);
+        }
+
+        const auto drawPos = ImVec2((imguiWidth - targetDims.x) / 2, (imguiHeight - targetDims.y) / 2);
+
+        ImGui::SetCursorPos(drawPos);
+        ImGui::Image(canvas->getGLTextureHandle(), ImVec2(targetDims.x, targetDims.y), { 0, 1 }, { 1, 0 });
+
+        const ImVec2 viewportMin = ImGui::GetItemRectMin();
+        const ImVec2 viewportSize = ImGui::GetItemRectSize();
+
+        if (!window.isGrabbed())
+            rightButtonsRenderer.render(drawPos);
+
+        ImGui::SetCursorPos(drawPos);
+        if (hierarchyPanel->selectedEntity)
+        {
+            guizmoRenderer.processInputs();
+            guizmoRenderer.render(hierarchyPanel->selectedEntity, viewportMin, viewportSize);
+        }
+        else if (ImGui::InvisibleButton("viewport", ImVec2(targetDims.x ,targetDims.y)))
+            window.setGrabbed(true);
+
+        guizmoRenderer.drawButtons(drawPos);
+
+        ImGui::End();
+    }
+
+    glm::ivec2 ViewportPanel::calculateViewportSize(const float windowWidth, const float windowHeight) const
+    {
+        glm::ivec2 result(0, 0);
+
+        const float viewportAR = windowWidth / windowHeight;
+        const float targetAR = drawStrategy == ViewportDrawStrategy::CUSTOM_RESOLUTION ? getCustomAspectRatio() : this->targetAR;
+
+        if (viewportAR > targetAR)
+        {
+            result.x = static_cast<int>(windowHeight * targetAR);
+            result.y = windowHeight;
+        }
+        else
+        {
+            result.x = windowWidth;
+            result.y = static_cast<int>(windowWidth / targetAR);
+        }
+
+        return result;
+    }
+}

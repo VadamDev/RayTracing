@@ -10,7 +10,7 @@ namespace engine
         const Entity entity(registry.create(), this);
         entity.addComponent<TagComponent>(name);
 
-        AddEntityToSceneEvent event(&entity);
+        EntityAddedToSceneEvent event(&entity);
         globalMessenger->dispatch(event);
 
         return entity;
@@ -24,7 +24,7 @@ namespace engine
 
         for (auto&& [id, storage] : registry.storage())
         {
-            // Ignore TagComponent, since it's added above
+            // Ignore TagComponent, since it's added by the newEntity function
             if(id == TAG_COMPONENT_ID)
                 continue;
 
@@ -39,7 +39,7 @@ namespace engine
     {
         registry.destroy(entity);
 
-        RemoveEntityFromSceneEvent event(&entity);
+        EntityRemovedFromSceneEvent event(&entity);
         globalMessenger->dispatch(event);
     }
 }
