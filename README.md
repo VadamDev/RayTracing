@@ -9,12 +9,12 @@
 - Bounding volume hierarchy generation with Surface Area Heuristic split
 - Depth of Field
 - Simple ray diverge Anti-Aliasing
+- Simple skybox
 
-#### Ideas for future updates (Soon™)
-- Skybox
-- Enhanced UI and better camera controls
-- Fix BVH Traversal overhead (*performance is not as high as it should be*)
-- Multiple Importance Sampling (see: https://lisyarus.github.io/blog/posts/multiple-importance-sampling.html / https://www.youtube.com/watch?v=p772XkEnEIU)
+### Gallery
+|                         Editor View                          |          Render (*with changes to the scene*)           |
+|:------------------------------------------------------------:|:-------------------------------------------------------:|
+| <img src="gallery/editor.jpg" width="512" alt="Editor View"> | <img src="gallery/render.jpg" width="512" alt="Render"> |
 
 ## Dependencies
 - [spdlog](https://github.com/gabime/spdlog) - 1.17.0
@@ -45,3 +45,8 @@
 - Slab ray AABB intersection: https://tavianator.com/2022/ray_box_boundary.html
 - Jacob Gordiak's raytracing serie: https://www.youtube.com/@JacobGordiak
 - The Cherno's game engine Youtube serie: https://www.youtube.com/playlist?list=PLlrATfBNZ98dC-V-N3m0Go4deliWHPFwT
+
+## Ideas for future updates (Soon™)
+- Enhanced UI and better camera controls
+- Fix BVH Traversal overhead (*performance is not as high as it should be*)
+- Multiple Importance Sampling (see: https://lisyarus.github.io/blog/posts/multiple-importance-sampling.html / https://www.youtube.com/watch?v=p772XkEnEIU)
